@@ -13,7 +13,8 @@ import {
   LogOut,
   Menu,
   X,
-  Download
+  Download,
+  ChevronDown
 } from 'lucide-react';
 import { HSK1_VOCABULARY } from './data/hsk1';
 import { LESSON_UNITS } from './data/lessonUnits';
@@ -606,8 +607,29 @@ export function App() {
                 </div>
               </div>
 
-              {/* Units horizontal scroll bar */}
-              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs">
+              {/* Mobile View: Clean Dropdown Selector */}
+              <div className="sm:hidden">
+                <div className="relative">
+                  <select
+                    value={selectedUnitId}
+                    onChange={(e) => setSelectedUnitId(e.target.value)}
+                    className="w-full appearance-none bg-stone-50 hover:bg-stone-100 border border-stone-200 text-stone-800 text-xs font-semibold py-2.5 pl-3.5 pr-10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:bg-white shadow-xs transition cursor-pointer"
+                  >
+                    <option value="all">Semua Bab &middot; 130 Kata HSK 1</option>
+                    {LESSON_UNITS.map((unit) => (
+                      <option key={unit.id} value={unit.id}>
+                        {unit.icon} Bab {unit.unitNumber}: {unit.title} ({unit.wordIds.length} kata)
+                      </option>
+                    ))}
+                  </select>
+                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3.5 text-stone-500">
+                    <ChevronDown className="w-4 h-4" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Desktop / Tablet View: Horizontal Pill Bar */}
+              <div className="hidden sm:flex items-center gap-1.5 overflow-x-auto pb-1 text-xs">
                 <button
                   onClick={() => setSelectedUnitId('all')}
                   className={`px-3 py-2 rounded-xl whitespace-nowrap transition font-medium ${

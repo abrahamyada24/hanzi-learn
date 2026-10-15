@@ -4,12 +4,15 @@ import {
   HelpCircle, 
   Layers, 
   Search, 
-  Star, 
-  Filter, 
-  PenTool
+  PenTool,
+  Compass,
+  LayoutGrid,
+  List,
+  Maximize2
 } from 'lucide-react';
 import { HSK1_VOCABULARY } from './data/hsk1';
-import type { VocabItem, WordCategory, MasteryStatus, UserStats } from './types';
+import { LESSON_UNITS } from './data/lessonUnits';
+import type { VocabItem, MasteryStatus, UserStats } from './types';
 import { 
   getAllProgress, 
   saveWordProgress, 
@@ -20,36 +23,29 @@ import {
 } from './utils/storage';
 import { StatsHeader } from './components/StatsHeader';
 import { VocabCard } from './components/VocabCard';
+import { FocusFlashcardView } from './components/FocusFlashcardView';
+import { CompactListView } from './components/CompactListView';
+import { CharacterStoriesView } from './components/CharacterStoriesView';
 import { WritingModal } from './components/WritingModal';
 import { QuizMode } from './components/QuizMode';
 import { RadicalsView } from './components/RadicalsView';
 import { CustomCharacterSandbox } from './components/CustomCharacterSandbox';
 
-type NavTab = 'flashcards' | 'quiz' | 'radicals' | 'sandbox';
+type NavTab = 'flashcards' | 'stories' | 'quiz' | 'radicals' | 'sandbox';
+type ViewMode = 'focus' | 'compact' | 'grid';
 type FilterStatusType = 'all' | 'new' | 'learning' | 'mastered' | 'bookmarked';
-
-const CATEGORIES: WordCategory[] = [
-  'Semua',
-  'Salam & Dasar',
-  'Kata Ganti & Tata Bahasa',
-  'Angka & Waktu',
-  'Orang & Keluarga',
-  'Makanan & Minuman',
-  'Kata Kerja & Aktivitas',
-  'Benda & Sehari-hari',
-  'Tempat & Arah',
-  'Kata Sifat & Deskripsi'
-];
 
 export function App() {
   const [activeTab, setActiveTab] = useState<NavTab>('flashcards');
+  const [viewMode, setViewMode] = useState<ViewMode>('focus');
+  const [selectedUnitId, setSelectedUnitId] = useState<string>('unit-1'); // Default Bab 1: 10 kata
+  
   const [progress, setProgress] = useState<Record<string, any>>({});
   const [stats, setStats] = useState<UserStats>(getUserStats());
   const [bookmarks, setBookmarks] = useState<string[]>([]);
   
   // Filters
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<WordCategory>('Semua');
   const [statusFilter, setStatusFilter] = useState<FilterStatusType>('all');
 
   // Modal for writing practice
@@ -100,9 +96,12 @@ export function App() {
   // Filtered vocabulary list
   const filteredVocab = useMemo(() => {
     return HSK1_VOCABULARY.filter(item => {
-      // Category match
-      if (selectedCategory !== 'Semua' && item.category !== selectedCategory) {
-        return false;
+      // Unit filter (if not "all")
+      if (selectedUnitId !== 'all') {
+        const unit = LESSON_UNITS.find(u => u.id === selectedUnitId);
+        if (unit && !unit.wordIds.includes(item.id)) {
+          return false;
+        }
       }
 
       // Status match
@@ -125,7 +124,7 @@ export function App() {
 
       return true;
     });
-  }, [selectedCategory, statusFilter, searchQuery, progress, bookmarks]);
+  }, [selectedUnitId, statusFilter, searchQuery, progress, bookmarks]);
 
   // Compute counts for stats
   const masteredCount = useMemo(() => {
@@ -149,71 +148,86 @@ export function App() {
     ? () => setWritingModalVocab(filteredVocab[currentModalIndex + 1]) 
     : undefined;
 
+  const currentUnit = LESSON_UNITS.find(u => u.id === selectedUnitId);
+
   return (
-    <div className="min-h-screen bg-stone-100/60 text-stone-900 pb-16 font-sans">
-      {/* Top Navbar */}
-      <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-stone-200">
-        <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-red-700 text-white font-serif font-bold text-2xl flex items-center justify-center shadow-md">
-              汉
+    <div className="min-h-screen bg-stone-100/60 text-stone-900 pb-20 font-sans">
+      {/* Top Navbar: Mobile-optimized sticky navigation */}
+      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-stone-200">
+        <div className="max-w-6xl mx-auto px-3 sm:px-4">
+          <div className="h-16 flex items-center justify-between gap-2">
+            {/* Logo */}
+            <div className="flex items-center gap-2.5 flex-shrink-0">
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-red-700 text-white font-serif font-bold text-xl sm:text-2xl flex items-center justify-center shadow-md">
+                汉
+              </div>
+              <div>
+                <span className="font-bold text-base sm:text-lg text-stone-900 tracking-tight">HanziLearn</span>
+                <span className="hidden md:inline-block ml-2 text-[11px] bg-red-50 text-red-700 font-semibold px-2 py-0.5 rounded-full border border-red-200">
+                  HSK 1 & Piktogram
+                </span>
+              </div>
             </div>
-            <div>
-              <span className="font-bold text-lg text-stone-900 tracking-tight">HanziLearn</span>
-              <span className="hidden sm:inline-block ml-2 text-xs bg-red-50 text-red-700 font-semibold px-2 py-0.5 rounded-full border border-red-200">
-                HSK 1 & Menulis
-              </span>
-            </div>
+
+            {/* Navigation Tabs (Scrollable on small mobile screens) */}
+            <nav className="flex items-center gap-1 bg-stone-100 p-1 rounded-2xl text-xs sm:text-sm font-medium text-stone-600 overflow-x-auto max-w-[calc(100vw-110px)] sm:max-w-none">
+              <button
+                onClick={() => setActiveTab('flashcards')}
+                className={`px-2.5 sm:px-3 py-1.5 rounded-xl whitespace-nowrap transition-all flex items-center gap-1.5 ${
+                  activeTab === 'flashcards' ? 'bg-white text-stone-900 shadow-xs font-semibold' : 'hover:text-stone-900'
+                }`}
+              >
+                <BookOpen className="w-4 h-4 text-red-600 flex-shrink-0" />
+                <span>Kosakata</span>
+              </button>
+
+              <button
+                onClick={() => setActiveTab('stories')}
+                className={`px-2.5 sm:px-3 py-1.5 rounded-xl whitespace-nowrap transition-all flex items-center gap-1.5 ${
+                  activeTab === 'stories' ? 'bg-white text-stone-900 shadow-xs font-semibold' : 'hover:text-stone-900'
+                }`}
+              >
+                <Compass className="w-4 h-4 text-amber-600 flex-shrink-0" />
+                <span>Asal Huruf</span>
+              </button>
+
+              <button
+                onClick={() => setActiveTab('quiz')}
+                className={`px-2.5 sm:px-3 py-1.5 rounded-xl whitespace-nowrap transition-all flex items-center gap-1.5 ${
+                  activeTab === 'quiz' ? 'bg-white text-stone-900 shadow-xs font-semibold' : 'hover:text-stone-900'
+                }`}
+              >
+                <HelpCircle className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                <span>Kuis</span>
+              </button>
+
+              <button
+                onClick={() => setActiveTab('radicals')}
+                className={`px-2.5 sm:px-3 py-1.5 rounded-xl whitespace-nowrap transition-all flex items-center gap-1.5 ${
+                  activeTab === 'radicals' ? 'bg-white text-stone-900 shadow-xs font-semibold' : 'hover:text-stone-900'
+                }`}
+              >
+                <Layers className="w-4 h-4 text-blue-600 flex-shrink-0" />
+                <span>Radikal</span>
+              </button>
+
+              <button
+                onClick={() => setActiveTab('sandbox')}
+                className={`px-2.5 sm:px-3 py-1.5 rounded-xl whitespace-nowrap transition-all flex items-center gap-1.5 ${
+                  activeTab === 'sandbox' ? 'bg-white text-stone-900 shadow-xs font-semibold' : 'hover:text-stone-900'
+                }`}
+              >
+                <PenTool className="w-4 h-4 text-purple-600 flex-shrink-0" />
+                <span className="hidden sm:inline">Tulis Bebas</span>
+              </button>
+            </nav>
           </div>
-
-          {/* Navigation Tabs */}
-          <nav className="flex items-center gap-1 bg-stone-100 p-1 rounded-2xl text-xs sm:text-sm font-medium text-stone-600">
-            <button
-              onClick={() => setActiveTab('flashcards')}
-              className={`px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 ${
-                activeTab === 'flashcards' ? 'bg-white text-stone-900 shadow-xs font-semibold' : 'hover:text-stone-900'
-              }`}
-            >
-              <BookOpen className="w-4 h-4 text-red-600" />
-              <span>Kosakata</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('quiz')}
-              className={`px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 ${
-                activeTab === 'quiz' ? 'bg-white text-stone-900 shadow-xs font-semibold' : 'hover:text-stone-900'
-              }`}
-            >
-              <HelpCircle className="w-4 h-4 text-amber-600" />
-              <span>Kuis</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('radicals')}
-              className={`px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 ${
-                activeTab === 'radicals' ? 'bg-white text-stone-900 shadow-xs font-semibold' : 'hover:text-stone-900'
-              }`}
-            >
-              <Layers className="w-4 h-4 text-blue-600" />
-              <span>Radikal</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('sandbox')}
-              className={`px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 ${
-                activeTab === 'sandbox' ? 'bg-white text-stone-900 shadow-xs font-semibold' : 'hover:text-stone-900'
-              }`}
-            >
-              <PenTool className="w-4 h-4 text-purple-600" />
-              <span>Tulis Bebas</span>
-            </button>
-          </nav>
         </div>
       </header>
 
-      {/* Main Content Container */}
-      <main className="max-w-6xl mx-auto px-4 pt-6 space-y-6">
-        {/* Hero & Progress Stats Banner */}
+      {/* Main Container */}
+      <main className="max-w-6xl mx-auto px-3 sm:px-4 pt-5 space-y-6">
+        {/* Progress & Streak Stats Banner */}
         <StatsHeader
           stats={stats}
           totalWords={HSK1_VOCABULARY.length}
@@ -223,103 +237,163 @@ export function App() {
 
         {/* TAB 1: KOSAKATA & FLASHCARD */}
         {activeTab === 'flashcards' && (
-          <div className="space-y-6 animate-in fade-in">
-            {/* Search and Filters Bar */}
-            <div className="bg-white p-4 rounded-3xl border border-stone-200 shadow-sm space-y-4">
-              <div className="flex flex-col md:flex-row gap-3">
-                {/* Search Input */}
-                <div className="relative flex-1">
-                  <Search className="w-4 h-4 text-stone-400 absolute left-3.5 top-3.5" />
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Cari karakter (你), pinyin (ni hao), atau arti (halo)..."
-                    className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-stone-50 border border-stone-200 text-sm focus:outline-none focus:ring-2 focus:ring-red-600/20 focus:border-red-600"
-                  />
-                  {searchQuery && (
+          <div className="space-y-4 animate-in fade-in">
+            {/* Bab / Unit Selector Pill Bar (Anti-Overload!) */}
+            <div className="bg-white p-3.5 sm:p-4 rounded-3xl border border-stone-200 shadow-xs space-y-3">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-stone-100">
+                <div>
+                  <div className="text-xs text-stone-400 font-semibold uppercase tracking-wider">
+                    Pilih Bab Belajar:
+                  </div>
+                  <h3 className="font-bold text-stone-900 text-sm sm:text-base flex items-center gap-1.5 mt-0.5">
+                    <span>{currentUnit ? `${currentUnit.icon} ${currentUnit.title}` : 'Semua Bab (130 Kata)'}</span>
+                    {currentUnit && (
+                      <span className="text-xs font-normal text-stone-500">
+                        &bull; {currentUnit.wordIds.length} kata
+                      </span>
+                    )}
+                  </h3>
+                </div>
+
+                {/* View Mode Switcher: Fokus (1 Kartu) vs List Ringkas vs Grid */}
+                <div className="flex items-center gap-1 bg-stone-100 p-1 rounded-2xl text-xs font-semibold self-start sm:self-auto">
+                  <button
+                    onClick={() => setViewMode('focus')}
+                    className={`px-3 py-1.5 rounded-xl transition flex items-center gap-1 ${
+                      viewMode === 'focus' ? 'bg-white text-stone-900 shadow-xs' : 'text-stone-500 hover:text-stone-800'
+                    }`}
+                    title="Mode fokus belajar 1 kartu per waktu"
+                  >
+                    <Maximize2 className="w-3.5 h-3.5 text-red-600" />
+                    <span>Fokus 1 Kartu</span>
+                  </button>
+
+                  <button
+                    onClick={() => setViewMode('compact')}
+                    className={`px-3 py-1.5 rounded-xl transition flex items-center gap-1 ${
+                      viewMode === 'compact' ? 'bg-white text-stone-900 shadow-xs' : 'text-stone-500 hover:text-stone-800'
+                    }`}
+                    title="Tampilan daftar ringkas hemat ruang"
+                  >
+                    <List className="w-3.5 h-3.5 text-blue-600" />
+                    <span>Daftar</span>
+                  </button>
+
+                  <button
+                    onClick={() => setViewMode('grid')}
+                    className={`px-3 py-1.5 rounded-xl transition flex items-center gap-1 ${
+                      viewMode === 'grid' ? 'bg-white text-stone-900 shadow-xs' : 'text-stone-500 hover:text-stone-800'
+                    }`}
+                    title="Tampilan grid kartu lengkap"
+                  >
+                    <LayoutGrid className="w-3.5 h-3.5 text-stone-600" />
+                    <span>Grid</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Units horizontal scroll bar */}
+              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs">
+                <button
+                  onClick={() => setSelectedUnitId('all')}
+                  className={`px-3 py-2 rounded-xl whitespace-nowrap transition font-medium ${
+                    selectedUnitId === 'all'
+                      ? 'bg-stone-900 text-white shadow-xs font-bold'
+                      : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
+                  }`}
+                >
+                  Semua Kata (130)
+                </button>
+
+                {LESSON_UNITS.map((unit) => {
+                  const isSelected = selectedUnitId === unit.id;
+                  return (
                     <button
-                      onClick={() => setSearchQuery('')}
-                      className="absolute right-3 top-2.5 text-xs text-stone-400 hover:text-stone-600 p-1"
+                      key={unit.id}
+                      onClick={() => setSelectedUnitId(unit.id)}
+                      className={`px-3 py-2 rounded-xl whitespace-nowrap transition flex items-center gap-1.5 font-medium ${
+                        isSelected
+                          ? 'bg-red-700 text-white shadow-xs font-bold'
+                          : 'bg-stone-100 text-stone-700 hover:bg-stone-200'
+                      }`}
                     >
-                      Batal
+                      <span>{unit.icon}</span>
+                      <span>Bab {unit.unitNumber}</span>
                     </button>
-                  )}
-                </div>
-
-                {/* Status Filter Buttons */}
-                <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 text-xs font-medium">
-                  <button
-                    onClick={() => setStatusFilter('all')}
-                    className={`px-3 py-2 rounded-xl border whitespace-nowrap transition-all ${
-                      statusFilter === 'all'
-                        ? 'bg-stone-900 text-white border-stone-900 shadow-xs'
-                        : 'bg-white text-stone-600 border-stone-200 hover:bg-stone-50'
-                    }`}
-                  >
-                    Semua ({HSK1_VOCABULARY.length})
-                  </button>
-
-                  <button
-                    onClick={() => setStatusFilter('mastered')}
-                    className={`px-3 py-2 rounded-xl border whitespace-nowrap transition-all ${
-                      statusFilter === 'mastered'
-                        ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
-                        : 'bg-white text-emerald-800 border-stone-200 hover:bg-emerald-50'
-                    }`}
-                  >
-                    Hafal ({masteredCount})
-                  </button>
-
-                  <button
-                    onClick={() => setStatusFilter('learning')}
-                    className={`px-3 py-2 rounded-xl border whitespace-nowrap transition-all ${
-                      statusFilter === 'learning'
-                        ? 'bg-amber-600 text-white border-amber-600 shadow-xs'
-                        : 'bg-white text-amber-800 border-stone-200 hover:bg-amber-50'
-                    }`}
-                  >
-                    Belajar ({learningCount})
-                  </button>
-
-                  <button
-                    onClick={() => setStatusFilter('bookmarked')}
-                    className={`px-3 py-2 rounded-xl border whitespace-nowrap transition-all flex items-center gap-1 ${
-                      statusFilter === 'bookmarked'
-                        ? 'bg-amber-500 text-white border-amber-500 shadow-xs'
-                        : 'bg-white text-stone-600 border-stone-200 hover:bg-amber-50'
-                    }`}
-                  >
-                    <Star className={`w-3.5 h-3.5 ${statusFilter === 'bookmarked' ? 'fill-white' : 'fill-amber-400 text-amber-400'}`} />
-                    Favorit ({bookmarks.length})
-                  </button>
-                </div>
+                  );
+                })}
               </div>
 
-              {/* Categories Pills */}
-              <div className="flex items-center gap-1.5 overflow-x-auto pt-2 border-t border-stone-100 text-xs">
-                <span className="text-stone-400 font-medium flex items-center gap-1 pr-1 flex-shrink-0">
-                  <Filter className="w-3.5 h-3.5" /> Kategori:
-                </span>
-                {CATEGORIES.map((cat) => (
-                  <button
-                    key={cat}
-                    onClick={() => setSelectedCategory(cat)}
-                    className={`px-3 py-1.5 rounded-xl whitespace-nowrap transition-all font-medium ${
-                      selectedCategory === cat
-                        ? 'bg-red-700 text-white shadow-xs'
-                        : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
-                    }`}
-                  >
-                    {cat}
-                  </button>
-                ))}
-              </div>
+              {/* Optional Search & Status filters if on Compact or Grid view */}
+              {viewMode !== 'focus' && (
+                <div className="flex flex-col sm:flex-row gap-2 pt-2 border-t border-stone-100">
+                  <div className="relative flex-1">
+                    <Search className="w-4 h-4 text-stone-400 absolute left-3 top-3" />
+                    <input
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      placeholder="Cari kata di bab ini..."
+                      className="w-full pl-9 pr-4 py-2 rounded-xl bg-stone-50 border border-stone-200 text-xs focus:outline-none focus:ring-2 focus:ring-red-600/20"
+                    />
+                  </div>
+
+                  <div className="flex items-center gap-1 overflow-x-auto text-xs">
+                    {(['all', 'mastered', 'learning', 'bookmarked'] as FilterStatusType[]).map((st) => (
+                      <button
+                        key={st}
+                        onClick={() => setStatusFilter(st)}
+                        className={`px-2.5 py-1.5 rounded-xl border whitespace-nowrap text-xs transition ${
+                          statusFilter === st
+                            ? 'bg-stone-800 text-white border-stone-800 font-semibold'
+                            : 'bg-white text-stone-600 border-stone-200 hover:bg-stone-50'
+                        }`}
+                      >
+                        {st === 'all' ? 'Semua' : st === 'mastered' ? 'Hafal' : st === 'learning' ? 'Belajar' : 'Favorit'}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
-            {/* Vocab Cards Grid */}
-            {filteredVocab.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {/* VIEW MODE 1: FOCUS FLASHCARD 1-BY-1 (Default: Bersih, Santai, Tidak Overload) */}
+            {viewMode === 'focus' && (
+              <div className="py-2">
+                <FocusFlashcardView
+                  vocabList={filteredVocab}
+                  progress={progress}
+                  bookmarks={bookmarks}
+                  onStatusChange={handleStatusChange}
+                  onToggleBookmark={handleToggleBookmark}
+                  onCharacterCompleted={handleCharacterCompleted}
+                />
+              </div>
+            )}
+
+            {/* VIEW MODE 2: COMPACT LIST (Daftar Rapi, Hemat Ruang di Mobile) */}
+            {viewMode === 'compact' && (
+              <div className="animate-in fade-in">
+                {filteredVocab.length > 0 ? (
+                  <CompactListView
+                    vocabList={filteredVocab}
+                    progress={progress}
+                    bookmarks={bookmarks}
+                    onStatusChange={handleStatusChange}
+                    onToggleBookmark={handleToggleBookmark}
+                    onOpenWritingPractice={(vocab) => setWritingModalVocab(vocab)}
+                  />
+                ) : (
+                  <div className="bg-white rounded-3xl p-8 text-center text-stone-400">
+                    Tidak ada kata yang sesuai.
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* VIEW MODE 3: GRID (Kartu Lengkap) */}
+            {viewMode === 'grid' && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 animate-in fade-in">
                 {filteredVocab.map((item) => (
                   <VocabCard
                     key={item.id}
@@ -332,23 +406,18 @@ export function App() {
                   />
                 ))}
               </div>
-            ) : (
-              <div className="bg-white rounded-3xl p-12 text-center border border-stone-200 text-stone-400">
-                <BookOpen className="w-12 h-12 mx-auto mb-3 opacity-30 text-stone-500" />
-                <h4 className="text-base font-semibold text-stone-700">Tidak ada kata yang cocok</h4>
-                <p className="text-xs text-stone-400 mt-1">Coba sesuaikan kata kunci pencarian atau kategori filter.</p>
-                <button
-                  onClick={() => { setSearchQuery(''); setSelectedCategory('Semua'); setStatusFilter('all'); }}
-                  className="mt-4 px-4 py-2 bg-stone-100 text-stone-700 font-semibold text-xs rounded-xl hover:bg-stone-200 transition"
-                >
-                  Reset Semua Filter
-                </button>
-              </div>
             )}
           </div>
         )}
 
-        {/* TAB 2: KUIS INTERAKTIF */}
+        {/* TAB 2: ASAL-USUL HURUF (PIKTOGRAM & CERITA ETİMOLOGI) */}
+        {activeTab === 'stories' && (
+          <div className="animate-in fade-in">
+            <CharacterStoriesView />
+          </div>
+        )}
+
+        {/* TAB 3: KUIS INTERAKTIF */}
         {activeTab === 'quiz' && (
           <div className="animate-in fade-in">
             <QuizMode
@@ -359,14 +428,14 @@ export function App() {
           </div>
         )}
 
-        {/* TAB 3: RADIKAL KANGXI */}
+        {/* TAB 4: RADIKAL KANGXI */}
         {activeTab === 'radicals' && (
           <div className="animate-in fade-in">
             <RadicalsView />
           </div>
         )}
 
-        {/* TAB 4: LATIHAN NULIS BEBAS (SANDBOX) */}
+        {/* TAB 5: LATIHAN NULIS BEBAS (SANDBOX) */}
         {activeTab === 'sandbox' && (
           <div className="animate-in fade-in">
             <CustomCharacterSandbox />

@@ -42,6 +42,29 @@ export interface RadicalItem {
   examples: string[];
 }
 
+export interface CharacterStory {
+  id: string;
+  character: string;
+  pinyin: string;
+  meaning: string;
+  type: 'Piktogram (Gambar Benda)' | 'Ideogram (Konsep Abstrak)' | 'Gabungan Logika (Asosiasi Ide)' | 'Fono-Semantik (Makna + Bunyi)';
+  pictogramOrigin: string; // The original shape story
+  story: string; // Engaging mnemonic story in Indonesian
+  components?: { char: string; meaning: string }[];
+  evolution?: string[]; // e.g. ["☉ (Kuno)", "日 (Modern)"]
+  sampleWords: { word: string; pinyin: string; meaning: string }[];
+  tags: string[];
+}
+
+export interface LessonUnit {
+  id: string;
+  unitNumber: number;
+  title: string;
+  subtitle: string;
+  icon: string;
+  wordIds: string[];
+}
+
 export type MasteryStatus = 'new' | 'learning' | 'mastered';
 
 export interface WordProgress {

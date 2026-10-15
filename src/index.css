@@ -1,0 +1,36 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    @apply bg-stone-50 text-stone-900 antialiased min-h-screen;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans SC', 'PingFang SC', sans-serif;
+  }
+}
+
+/* Mi Zi Ge (Rice character grid) calligraphy background for character canvas */
+.mizige-bg {
+  background-color: #faf9f5;
+  background-image: 
+    linear-gradient(to right, rgba(220, 38, 38, 0.15) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(220, 38, 38, 0.15) 1px, transparent 1px),
+    linear-gradient(45deg, transparent 49.5%, rgba(220, 38, 38, 0.1) 49.5%, rgba(220, 38, 38, 0.1) 50.5%, transparent 50.5%),
+    linear-gradient(-45deg, transparent 49.5%, rgba(220, 38, 38, 0.1) 49.5%, rgba(220, 38, 38, 0.1) 50.5%, transparent 50.5%);
+  background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%;
+  background-position: center;
+}
+
+/* Custom scrollbar for vocab lists */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #d6d3d1;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a29e;
+}

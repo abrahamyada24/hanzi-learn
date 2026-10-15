@@ -13,6 +13,7 @@ import {
   HelpCircle
 } from 'lucide-react';
 import { speechManager } from '../utils/speech';
+import { useTheme } from '../context/ThemeContext';
 
 interface HanziWriterCanvasProps {
   text: string; // Hanzi string (can be 1 or more characters, e.g. "你好")
@@ -31,6 +32,7 @@ export const HanziWriterCanvas: React.FC<HanziWriterCanvasProps> = ({
   onCharacterComplete,
   className = ''
 }) => {
+  const { isDark } = useTheme();
   // Extract all Chinese characters from the string
   const characters = text.split('').filter(c => /[\u4e00-\u9fa5]/.test(c));
   const [currentCharIndex, setCurrentCharIndex] = useState(0);
@@ -82,13 +84,13 @@ export const HanziWriterCanvas: React.FC<HanziWriterCanvasProps> = ({
         showOutline: showOutline,
         strokeAnimationSpeed: speed,
         delayBetweenStrokes: 150,
-        strokeColor: '#b91c1c', // deep cinnabar red for stroke
-        outlineColor: '#e5e7eb', // subtle light gray
-        drawingColor: '#1e3a8a', // deep ink blue when user writes
+        strokeColor: isDark ? '#f87171' : '#b91c1c', // vibrant red in dark, cinnabar red in light
+        outlineColor: isDark ? '#44403c' : '#e5e7eb', // stone-700 in dark, subtle gray in light
+        drawingColor: isDark ? '#38bdf8' : '#1e3a8a', // vibrant sky cyan in dark, ink blue in light
         drawingWidth: 16,
         showHintAfterMisses: 2,
         highlightOnComplete: true,
-        highlightColor: '#16a34a', // green flash on success
+        highlightColor: isDark ? '#22c55e' : '#16a34a', // green flash on success
         charDataLoader: (char, onComplete, onError) => {
           fetch(`https://cdn.jsdelivr.net/npm/hanzi-writer-data@2.0/${char}.json`)
             .then(res => {
@@ -113,7 +115,7 @@ export const HanziWriterCanvas: React.FC<HanziWriterCanvasProps> = ({
         writerRef.current.cancelQuiz();
       }
     };
-  }, [currentChar, size]);
+  }, [currentChar, size, isDark]);
 
   // Handle outline toggle
   useEffect(() => {
@@ -237,7 +239,7 @@ export const HanziWriterCanvas: React.FC<HanziWriterCanvasProps> = ({
                   className={`px-3 py-1.5 rounded-lg text-lg font-bold transition-all ${
                     currentCharIndex === idx
                       ? 'bg-red-700 text-white shadow-sm'
-                      : 'text-stone-600 hover:text-stone-900 hover:bg-stone-200'
+                      : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 hover:bg-stone-200 dark:hover:bg-stone-800'
                   }`}
                 >
                   {char}
@@ -245,13 +247,13 @@ export const HanziWriterCanvas: React.FC<HanziWriterCanvasProps> = ({
               ))}
             </div>
           ) : (
-            <span className="text-2xl font-bold text-stone-800">{currentChar}</span>
+            <span className="text-2xl font-bold text-stone-800 dark:text-stone-100">{currentChar}</span>
           )}
 
           <button
             onClick={handleAudio}
             title="Dengarkan pelafalan karakter ini"
-            className="p-2 text-stone-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
+            className="p-2 text-stone-500 dark:text-stone-400 hover:text-red-700 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 rounded-lg transition-colors"
           >
             <Volume2 className="w-5 h-5" />
           </button>
@@ -260,7 +262,7 @@ export const HanziWriterCanvas: React.FC<HanziWriterCanvasProps> = ({
             <button
               onClick={handleFullWordAudio}
               title="Dengarkan pelafalan seluruh kata"
-              className="px-2 py-1 text-xs text-red-700 bg-red-50 hover:bg-red-100 rounded-lg transition-colors font-medium"
+              className="px-2 py-1 text-xs text-red-700 dark:text-red-400 bg-red-50 dark:bg-red-950/60 hover:bg-red-100 dark:hover:bg-red-900/60 rounded-lg transition-colors font-medium border border-red-200/50 dark:border-red-900/50"
             >
               Kata
             </button>
@@ -269,8 +271,8 @@ export const HanziWriterCanvas: React.FC<HanziWriterCanvasProps> = ({
 
         {/* Pinyin & Meaning info */}
         <div className="text-right">
-          {pinyin && <div className="text-sm font-semibold text-red-700">{pinyin}</div>}
-          {meaning && <div className="text-xs text-stone-500 max-w-[180px] truncate">{meaning}</div>}
+          {pinyin && <div className="text-sm font-semibold text-red-700 dark:text-red-400">{pinyin}</div>}
+          {meaning && <div className="text-xs text-stone-500 dark:text-stone-400 max-w-[180px] truncate">{meaning}</div>}
         </div>
       </div>
 
@@ -279,7 +281,7 @@ export const HanziWriterCanvas: React.FC<HanziWriterCanvasProps> = ({
         <div
           ref={containerRef}
           style={{ width: size, height: size }}
-          className="mizige-bg rounded-xl border-2 border-stone-300 shadow-inner overflow-hidden cursor-crosshair touch-none select-none"
+          className="mizige-bg rounded-xl border-2 border-stone-300 dark:border-stone-700 shadow-inner overflow-hidden cursor-crosshair touch-none select-none"
         />
 
         {/* Status Overlay Badge */}
@@ -298,12 +300,12 @@ export const HanziWriterCanvas: React.FC<HanziWriterCanvasProps> = ({
 
         {/* Quiz Success Celebration Overlay */}
         {quizStatus.completed && (
-          <div className="absolute inset-0 bg-emerald-500/15 backdrop-blur-[2px] rounded-xl flex flex-col items-center justify-center p-4 text-center animate-in fade-in">
+          <div className="absolute inset-0 bg-emerald-500/15 dark:bg-stone-900/90 backdrop-blur-[2px] rounded-xl flex flex-col items-center justify-center p-4 text-center animate-in fade-in border border-emerald-500/30">
             <div className="w-12 h-12 bg-emerald-600 text-white rounded-full flex items-center justify-center shadow-lg mb-2">
               <Sparkles className="w-6 h-6" />
             </div>
-            <h4 className="text-emerald-900 font-bold text-lg">Hebat! Selesai!</h4>
-            <p className="text-emerald-700 text-xs mt-0.5">
+            <h4 className="text-emerald-900 dark:text-emerald-300 font-bold text-lg">Hebat! Selesai!</h4>
+            <p className="text-emerald-700 dark:text-emerald-400 text-xs mt-0.5">
               {quizStatus.mistakes === 0 
                 ? 'Goresan sempurna tanpa salah!' 
                 : `Berhasil dengan ${quizStatus.mistakes} kesalahan.`}
@@ -312,7 +314,7 @@ export const HanziWriterCanvas: React.FC<HanziWriterCanvasProps> = ({
             <div className="flex gap-2 mt-3 pointer-events-auto">
               <button
                 onClick={handleStartQuiz}
-                className="px-3 py-1.5 bg-white text-emerald-700 font-medium text-xs rounded-lg shadow hover:bg-stone-50 border border-emerald-200 flex items-center gap-1"
+                className="px-3 py-1.5 bg-white dark:bg-stone-800 text-emerald-700 dark:text-emerald-300 font-medium text-xs rounded-lg shadow hover:bg-stone-50 dark:hover:bg-stone-750 border border-emerald-200 dark:border-stone-700 flex items-center gap-1"
               >
                 <RotateCcw className="w-3.5 h-3.5" /> Tulis Lagi
               </button>
@@ -338,11 +340,11 @@ export const HanziWriterCanvas: React.FC<HanziWriterCanvasProps> = ({
             disabled={animating}
             className={`py-2 px-3 rounded-xl font-medium text-sm flex items-center justify-center gap-1.5 transition-all ${
               mode === 'animate'
-                ? 'bg-amber-100 text-amber-900 border border-amber-300'
-                : 'bg-stone-100 hover:bg-stone-200 text-stone-700'
+                ? 'bg-amber-100 dark:bg-amber-950/60 text-amber-900 dark:text-amber-300 border border-amber-300 dark:border-amber-800'
+                : 'bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-200'
             }`}
           >
-            <Play className={`w-4 h-4 ${animating ? 'animate-pulse text-amber-700' : ''}`} />
+            <Play className={`w-4 h-4 ${animating ? 'animate-pulse text-amber-700 dark:text-amber-400' : ''}`} />
             {animating ? 'Memutar...' : 'Animasi Goresan'}
           </button>
 
@@ -361,14 +363,14 @@ export const HanziWriterCanvas: React.FC<HanziWriterCanvasProps> = ({
         </div>
 
         {/* Secondary controls row */}
-        <div className="flex items-center justify-between text-xs text-stone-600 pt-1 border-t border-stone-100">
+        <div className="flex items-center justify-between text-xs text-stone-600 dark:text-stone-400 pt-1 border-t border-stone-100 dark:border-stone-800">
           {/* Outline toggle */}
           <button
             onClick={() => setShowOutline(!showOutline)}
-            className="flex items-center gap-1.5 py-1 px-2 rounded-lg hover:bg-stone-100 text-stone-600 transition-colors"
+            className="flex items-center gap-1.5 py-1 px-2 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-600 dark:text-stone-400 transition-colors"
             title="Sembunyikan atau tampilkan bayangan garis bantu tulisan"
           >
-            {showOutline ? <Eye className="w-3.5 h-3.5 text-stone-700" /> : <EyeOff className="w-3.5 h-3.5 text-stone-400" />}
+            {showOutline ? <Eye className="w-3.5 h-3.5 text-stone-700 dark:text-stone-300" /> : <EyeOff className="w-3.5 h-3.5 text-stone-400 dark:text-stone-500" />}
             <span>Panduan: {showOutline ? 'Aktif' : 'Nonaktif'}</span>
           </button>
 
@@ -379,8 +381,10 @@ export const HanziWriterCanvas: React.FC<HanziWriterCanvasProps> = ({
               <button
                 key={s}
                 onClick={() => setSpeed(s)}
-                className={`px-1.5 py-0.5 rounded text-[11px] font-medium ${
-                  speed === s ? 'bg-stone-200 text-stone-900' : 'text-stone-400 hover:text-stone-700'
+                className={`px-1.5 py-0.5 rounded text-[11px] font-medium transition ${
+                  speed === s 
+                    ? 'bg-stone-200 dark:bg-stone-700 text-stone-900 dark:text-stone-100 font-bold' 
+                    : 'text-stone-400 hover:text-stone-700 dark:hover:text-stone-200'
                 }`}
               >
                 {s}x
@@ -391,7 +395,7 @@ export const HanziWriterCanvas: React.FC<HanziWriterCanvasProps> = ({
           {/* Reset button */}
           <button
             onClick={handleReset}
-            className="flex items-center gap-1 py-1 px-2 rounded-lg hover:bg-stone-100 text-stone-600 transition-colors"
+            className="flex items-center gap-1 py-1 px-2 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-600 dark:text-stone-400 transition-colors"
             title="Kembalikan tampilan awal"
           >
             <RotateCcw className="w-3.5 h-3.5" />
@@ -401,7 +405,7 @@ export const HanziWriterCanvas: React.FC<HanziWriterCanvasProps> = ({
       </div>
 
       {/* Guide Note for user */}
-      <div className="mt-3 text-[11px] text-stone-400 flex items-center gap-1 text-center justify-center">
+      <div className="mt-3 text-[11px] text-stone-400 dark:text-stone-500 flex items-center gap-1 text-center justify-center">
         <HelpCircle className="w-3 h-3 flex-shrink-0" />
         <span>Goreskan mouse atau jarimu di atas kotak sesuai urutan goresan Hanzi.</span>
       </div>

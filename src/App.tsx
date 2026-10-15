@@ -9,8 +9,11 @@ import {
   List,
   Maximize2,
   Download,
-  User
+  User,
+  Sun,
+  Moon
 } from 'lucide-react';
+import { useTheme } from './context/ThemeContext';
 import { HSK1_VOCABULARY } from './data/hsk1';
 import { LESSON_UNITS } from './data/lessonUnits';
 import type { VocabItem, MasteryStatus, UserStats } from './types';
@@ -42,6 +45,7 @@ type FilterStatusType = 'all' | 'new' | 'learning' | 'mastered' | 'bookmarked';
 
 export function App() {
   const { user, loginWithGoogle } = useAuth();
+  const { isDark, toggleTheme } = useTheme();
   const [toast, setToast] = useState<ToastMessage | null>(null);
   const [isSyncing, setIsSyncing] = useState(false);
 
@@ -281,84 +285,98 @@ export function App() {
   const currentUnit = LESSON_UNITS.find(u => u.id === selectedUnitId);
 
   return (
-    <div className="min-h-screen bg-stone-100/60 text-stone-900 pb-20 font-sans">
+    <div className="min-h-screen bg-stone-100/60 dark:bg-stone-950 text-stone-900 dark:text-stone-100 pb-20 font-sans transition-colors duration-150">
       {/* Top Navbar: Mobile-optimized sticky navigation */}
-      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-stone-200">
+      <header className="sticky top-0 z-40 bg-white/95 dark:bg-stone-900/95 backdrop-blur-md border-b border-stone-200 dark:border-stone-800 transition-colors">
         <div className="max-w-6xl mx-auto px-3 sm:px-4">
           <div className="h-16 flex items-center justify-between gap-3">
             {/* Logo */}
-            <div className="flex items-center gap-2.5 flex-shrink-0">
+            <div className="flex items-center gap-2.5 flex-shrink-0 cursor-pointer" onClick={() => setActiveTab('home')}>
               <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-red-700 text-white font-serif font-bold text-xl sm:text-2xl flex items-center justify-center shadow-md">
                 汉
               </div>
               <div>
-                <span className="font-bold text-base sm:text-lg text-stone-900 tracking-tight">HanziLearn</span>
-                <span className="hidden lg:inline-block ml-2 text-[11px] bg-red-50 text-red-700 font-semibold px-2 py-0.5 rounded-full border border-red-200">
+                <span className="font-bold text-base sm:text-lg text-stone-900 dark:text-stone-100 tracking-tight">HanziLearn</span>
+                <span className="hidden lg:inline-block ml-2 text-[11px] bg-red-50 dark:bg-red-950/60 text-red-700 dark:text-red-300 font-semibold px-2 py-0.5 rounded-full border border-red-200 dark:border-red-900/50">
                   HSK 1 & Piktogram
                 </span>
               </div>
             </div>
 
             {/* Desktop Navigation Tabs (Hidden on mobile) */}
-            <nav className="hidden md:flex items-center gap-1 bg-stone-100 p-1 rounded-2xl text-xs lg:text-sm font-medium text-stone-600">
+            <nav className="hidden md:flex items-center gap-1 bg-stone-100 dark:bg-stone-800/80 p-1 rounded-2xl text-xs lg:text-sm font-medium text-stone-600 dark:text-stone-400">
               <button
                 onClick={() => setActiveTab('home')}
                 className={`px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 ${
-                  activeTab === 'home' ? 'bg-white text-stone-900 shadow-xs font-semibold' : 'hover:text-stone-900'
+                  activeTab === 'home' ? 'bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 shadow-xs font-semibold' : 'hover:text-stone-900 dark:hover:text-stone-100'
                 }`}
               >
-                <Home className="w-4 h-4 text-red-600 flex-shrink-0" />
+                <Home className="w-4 h-4 text-red-600 dark:text-red-500 flex-shrink-0" />
                 <span>Beranda</span>
               </button>
 
               <button
                 onClick={() => setActiveTab('flashcards')}
                 className={`px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 ${
-                  activeTab === 'flashcards' ? 'bg-white text-stone-900 shadow-xs font-semibold' : 'hover:text-stone-900'
+                  activeTab === 'flashcards' ? 'bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 shadow-xs font-semibold' : 'hover:text-stone-900 dark:hover:text-stone-100'
                 }`}
               >
-                <BookOpen className="w-4 h-4 text-red-600 flex-shrink-0" />
+                <BookOpen className="w-4 h-4 text-red-600 dark:text-red-500 flex-shrink-0" />
                 <span>Belajar</span>
               </button>
 
               <button
                 onClick={() => setActiveTab('stories')}
                 className={`px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 ${
-                  activeTab === 'stories' ? 'bg-white text-stone-900 shadow-xs font-semibold' : 'hover:text-stone-900'
+                  activeTab === 'stories' ? 'bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 shadow-xs font-semibold' : 'hover:text-stone-900 dark:hover:text-stone-100'
                 }`}
               >
-                <Compass className="w-4 h-4 text-amber-600 flex-shrink-0" />
+                <Compass className="w-4 h-4 text-amber-600 dark:text-amber-400 flex-shrink-0" />
                 <span>Aksara & Radikal</span>
               </button>
 
               <button
                 onClick={() => setActiveTab('quiz')}
                 className={`px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 ${
-                  activeTab === 'quiz' ? 'bg-white text-stone-900 shadow-xs font-semibold' : 'hover:text-stone-900'
+                  activeTab === 'quiz' ? 'bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 shadow-xs font-semibold' : 'hover:text-stone-900 dark:hover:text-stone-100'
                 }`}
               >
-                <HelpCircle className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                <HelpCircle className="w-4 h-4 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
                 <span>Kuis</span>
               </button>
 
               <button
                 onClick={() => setActiveTab('profile')}
                 className={`px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 ${
-                  activeTab === 'profile' ? 'bg-white text-stone-900 shadow-xs font-semibold' : 'hover:text-stone-900'
+                  activeTab === 'profile' ? 'bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 shadow-xs font-semibold' : 'hover:text-stone-900 dark:hover:text-stone-100'
                 }`}
               >
-                <User className="w-4 h-4 text-stone-700 flex-shrink-0" />
+                <User className="w-4 h-4 text-stone-700 dark:text-stone-300 flex-shrink-0" />
                 <span>Profil</span>
               </button>
             </nav>
 
-            {/* Right Side Actions: PWA Install (Desktop) + User Avatar / Login */}
+            {/* Right Side Actions: Theme Toggle + PWA Install + User Avatar / Login */}
             <div className="flex items-center gap-2 flex-shrink-0">
+              {/* Quick Theme Toggle Button (Available everywhere) */}
+              <button
+                onClick={toggleTheme}
+                className="p-2 rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 text-stone-700 dark:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-700 transition active:scale-95 shadow-2xs"
+                title={isDark ? 'Ganti ke Mode Terang' : 'Ganti ke Mode Gelap'}
+                aria-label="Toggle dark mode"
+              >
+                {isDark ? (
+                  <Sun className="w-4 h-4 text-amber-400" />
+                ) : (
+                  <Moon className="w-4 h-4 text-stone-600" />
+                )}
+              </button>
+
               {/* Desktop 1-Click PWA Install Button */}
               {!isStandalone && (
                 <button
                   onClick={handleTriggerInstall}
-                  className="hidden sm:flex items-center gap-1.5 py-1.5 px-3 bg-red-50 hover:bg-red-100 text-red-700 border border-red-200/80 rounded-xl text-xs font-semibold transition active:scale-95 shadow-xs"
+                  className="hidden sm:flex items-center gap-1.5 py-1.5 px-3 bg-red-50 dark:bg-red-950/50 hover:bg-red-100 dark:hover:bg-red-900/50 text-red-700 dark:text-red-300 border border-red-200/80 dark:border-red-900/60 rounded-xl text-xs font-semibold transition active:scale-95 shadow-xs"
                   title="Pasang aplikasi HanziLearn di laptop / HP kamu"
                 >
                   <Download className="w-3.5 h-3.5" />
@@ -372,19 +390,19 @@ export function App() {
                   onClick={() => setActiveTab('profile')}
                   className={`flex items-center gap-2 p-1 pl-2 rounded-full transition border active:scale-95 ${
                     activeTab === 'profile'
-                      ? 'bg-red-50 border-red-200 ring-2 ring-red-100'
-                      : 'bg-stone-100 hover:bg-stone-200 border-stone-200'
+                      ? 'bg-red-50 dark:bg-red-950/60 border-red-200 dark:border-red-900 ring-2 ring-red-100 dark:ring-red-950/60'
+                      : 'bg-stone-100 dark:bg-stone-800 hover:bg-stone-200 dark:hover:bg-stone-700 border-stone-200 dark:border-stone-700'
                   }`}
                   title="Buka profil akun & statistik"
                 >
-                  <span className="text-xs font-semibold text-stone-700 hidden sm:inline max-w-[90px] truncate">
+                  <span className="text-xs font-semibold text-stone-700 dark:text-stone-300 hidden sm:inline max-w-[90px] truncate">
                     {user.displayName?.split(' ')[0] || 'User'}
                   </span>
                   {user.photoURL ? (
                     <img
                       src={user.photoURL}
                       alt="Profile"
-                      className="w-7 h-7 rounded-full object-cover border border-white"
+                      className="w-7 h-7 rounded-full object-cover border border-white dark:border-stone-700"
                     />
                   ) : (
                     <div className="w-7 h-7 rounded-full bg-red-700 text-white font-bold text-xs flex items-center justify-center">
@@ -395,7 +413,7 @@ export function App() {
               ) : (
                 <button
                   onClick={() => loginWithGoogle()}
-                  className="flex items-center gap-1.5 py-1.5 px-3 bg-white hover:bg-stone-50 border border-stone-200 text-stone-800 rounded-xl text-xs font-semibold transition shadow-xs active:scale-95"
+                  className="flex items-center gap-1.5 py-1.5 px-3 bg-white dark:bg-stone-800 hover:bg-stone-50 dark:hover:bg-stone-700 border border-stone-200 dark:border-stone-700 text-stone-800 dark:text-stone-200 rounded-xl text-xs font-semibold transition shadow-xs active:scale-95"
                   title="Masuk dengan Google"
                 >
                   <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24">
@@ -441,16 +459,16 @@ export function App() {
         {activeTab === 'flashcards' && (
           <div className="space-y-4 animate-in fade-in">
             {/* Bab / Unit Selector Pill Bar (Anti-Overload!) */}
-            <div className="bg-white p-3.5 sm:p-4 rounded-3xl border border-stone-200 shadow-xs space-y-3">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-stone-100">
+            <div className="bg-white dark:bg-stone-900 p-3.5 sm:p-4 rounded-3xl border border-stone-200 dark:border-stone-800 shadow-xs space-y-3 transition-colors">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-stone-100 dark:border-stone-800">
                 <div>
                   <div className="text-xs text-stone-400 font-semibold uppercase tracking-wider">
                     Pilih Bab Belajar:
                   </div>
-                  <h3 className="font-bold text-stone-900 text-sm sm:text-base flex items-center gap-1.5 mt-0.5">
+                  <h3 className="font-bold text-stone-900 dark:text-stone-100 text-sm sm:text-base flex items-center gap-1.5 mt-0.5">
                     <span>{currentUnit ? `${currentUnit.icon} ${currentUnit.title}` : 'Semua Bab (130 Kata)'}</span>
                     {currentUnit && (
-                      <span className="text-xs font-normal text-stone-500">
+                      <span className="text-xs font-normal text-stone-500 dark:text-stone-400">
                         &bull; {currentUnit.wordIds.length} kata
                       </span>
                     )}
@@ -458,37 +476,37 @@ export function App() {
                 </div>
 
                 {/* View Mode Switcher: Fokus (1 Kartu) vs List Ringkas vs Grid */}
-                <div className="flex items-center gap-1 bg-stone-100 p-1 rounded-2xl text-xs font-semibold self-start sm:self-auto">
+                <div className="flex items-center gap-1 bg-stone-100 dark:bg-stone-800 p-1 rounded-2xl text-xs font-semibold self-start sm:self-auto">
                   <button
                     onClick={() => setViewMode('focus')}
                     className={`px-3 py-1.5 rounded-xl transition flex items-center gap-1 ${
-                      viewMode === 'focus' ? 'bg-white text-stone-900 shadow-xs' : 'text-stone-500 hover:text-stone-800'
+                      viewMode === 'focus' ? 'bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 shadow-xs font-bold' : 'text-stone-500 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-200'
                     }`}
                     title="Mode fokus belajar 1 kartu per waktu"
                   >
-                    <Maximize2 className="w-3.5 h-3.5 text-red-600" />
+                    <Maximize2 className="w-3.5 h-3.5 text-red-600 dark:text-red-500" />
                     <span>Fokus 1 Kartu</span>
                   </button>
 
                   <button
                     onClick={() => setViewMode('compact')}
                     className={`px-3 py-1.5 rounded-xl transition flex items-center gap-1 ${
-                      viewMode === 'compact' ? 'bg-white text-stone-900 shadow-xs' : 'text-stone-500 hover:text-stone-800'
+                      viewMode === 'compact' ? 'bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 shadow-xs font-bold' : 'text-stone-500 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-200'
                     }`}
                     title="Tampilan daftar ringkas hemat ruang"
                   >
-                    <List className="w-3.5 h-3.5 text-blue-600" />
+                    <List className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
                     <span>Daftar</span>
                   </button>
 
                   <button
                     onClick={() => setViewMode('grid')}
                     className={`px-3 py-1.5 rounded-xl transition flex items-center gap-1 ${
-                      viewMode === 'grid' ? 'bg-white text-stone-900 shadow-xs' : 'text-stone-500 hover:text-stone-800'
+                      viewMode === 'grid' ? 'bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 shadow-xs font-bold' : 'text-stone-500 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-200'
                     }`}
                     title="Tampilan grid kartu lengkap"
                   >
-                    <LayoutGrid className="w-3.5 h-3.5 text-stone-600" />
+                    <LayoutGrid className="w-3.5 h-3.5 text-stone-600 dark:text-stone-400" />
                     <span>Grid</span>
                   </button>
                 </div>
@@ -514,8 +532,8 @@ export function App() {
                   onClick={() => setSelectedUnitId('all')}
                   className={`px-3 py-2 rounded-xl whitespace-nowrap transition font-medium ${
                     selectedUnitId === 'all'
-                      ? 'bg-stone-900 text-white shadow-xs font-bold'
-                      : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
+                      ? 'bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 shadow-xs font-bold'
+                      : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-stone-700'
                   }`}
                 >
                   Semua Kata (130)
@@ -530,7 +548,7 @@ export function App() {
                       className={`px-3 py-2 rounded-xl whitespace-nowrap transition flex items-center gap-1.5 font-medium ${
                         isSelected
                           ? 'bg-red-700 text-white shadow-xs font-bold'
-                          : 'bg-stone-100 text-stone-700 hover:bg-stone-200'
+                          : 'bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-stone-700'
                       }`}
                     >
                       <span>{unit.icon}</span>
@@ -542,7 +560,7 @@ export function App() {
 
               {/* Optional Search & Status filters if on Compact or Grid view */}
               {viewMode !== 'focus' && (
-                <div className="flex flex-col sm:flex-row gap-2 pt-2 border-t border-stone-100">
+                <div className="flex flex-col sm:flex-row gap-2 pt-2 border-t border-stone-100 dark:border-stone-800">
                   <div className="relative flex-1">
                     <Search className="w-4 h-4 text-stone-400 absolute left-3 top-3" />
                     <input
@@ -550,7 +568,7 @@ export function App() {
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       placeholder="Cari kata di bab ini..."
-                      className="w-full pl-9 pr-4 py-2 rounded-xl bg-stone-50 border border-stone-200 text-xs focus:outline-none focus:ring-2 focus:ring-red-600/20"
+                      className="w-full pl-9 pr-4 py-2 rounded-xl bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-xs text-stone-900 dark:text-stone-100 placeholder-stone-400 dark:placeholder-stone-500 focus:outline-none focus:ring-2 focus:ring-red-600/20"
                     />
                   </div>
 
@@ -561,8 +579,8 @@ export function App() {
                         onClick={() => setStatusFilter(st)}
                         className={`px-2.5 py-1.5 rounded-xl border whitespace-nowrap text-xs transition ${
                           statusFilter === st
-                            ? 'bg-stone-800 text-white border-stone-800 font-semibold'
-                            : 'bg-white text-stone-600 border-stone-200 hover:bg-stone-50'
+                            ? 'bg-stone-800 dark:bg-stone-100 text-white dark:text-stone-900 border-stone-800 dark:border-stone-100 font-semibold'
+                            : 'bg-white dark:bg-stone-800 text-stone-600 dark:text-stone-300 border-stone-200 dark:border-stone-700 hover:bg-stone-50 dark:hover:bg-stone-750'
                         }`}
                       >
                         {st === 'all' ? 'Semua' : st === 'mastered' ? 'Hafal' : st === 'learning' ? 'Belajar' : 'Favorit'}
@@ -601,7 +619,7 @@ export function App() {
                     onOpenWritingPractice={(vocab) => setWritingModalVocab(vocab)}
                   />
                 ) : (
-                  <div className="bg-white rounded-3xl p-8 text-center text-stone-400">
+                  <div className="bg-white dark:bg-stone-900 rounded-3xl p-8 text-center text-stone-400 dark:text-stone-500 border border-stone-200 dark:border-stone-800">
                     Tidak ada kata yang sesuai.
                   </div>
                 )}

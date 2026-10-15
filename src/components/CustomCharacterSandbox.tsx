@@ -35,15 +35,15 @@ export const CustomCharacterSandbox: React.FC = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
+    <div className="max-w-2xl mx-auto space-y-6 animate-in fade-in">
       {/* Search Input Box */}
-      <div className="bg-white p-6 rounded-3xl border border-stone-200 shadow-sm">
+      <div className="bg-white dark:bg-stone-900 p-6 rounded-3xl border border-stone-200 dark:border-stone-800 shadow-sm transition-colors">
         <div className="mb-4">
-          <h3 className="font-bold text-lg text-stone-900 flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-red-600" />
+          <h3 className="font-bold text-lg text-stone-900 dark:text-stone-100 flex items-center gap-2">
+            <Sparkles className="w-5 h-5 text-red-600 dark:text-red-400" />
             <span>Ketik / Tempel Karakter Mandarin Apa Saja</span>
           </h3>
-          <p className="text-stone-500 text-xs mt-1">
+          <p className="text-stone-500 dark:text-stone-400 text-xs mt-1">
             Mau coba karakter di luar HSK 1? Masukkan karakter Hanzi apa pun dari lagu, film, atau nama kamu untuk melihat animasi urutan goresan dan berlatih menulisnya.
           </p>
         </div>
@@ -55,13 +55,13 @@ export const CustomCharacterSandbox: React.FC = () => {
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
               placeholder="Ketik karakter Hanzi (contoh: 龙, 梦, 谢谢)..."
-              className="w-full pl-4 pr-10 py-3 rounded-2xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-red-600/20 focus:border-red-600 text-base font-serif"
+              className="w-full pl-4 pr-10 py-3 rounded-2xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-stone-900 dark:text-stone-100 placeholder-stone-400 dark:placeholder-stone-500 focus:outline-none focus:ring-2 focus:ring-red-600/20 focus:border-red-600 text-base font-serif"
             />
             {inputText && (
               <button
                 type="button"
                 onClick={() => speechManager.speak(inputText)}
-                className="absolute right-3 top-3 text-stone-400 hover:text-red-700 transition"
+                className="absolute right-3 top-3 text-stone-400 dark:text-stone-500 hover:text-red-700 dark:hover:text-red-400 transition"
                 title="Dengar pelafalan"
               >
                 <Volume2 className="w-5 h-5" />
@@ -71,7 +71,7 @@ export const CustomCharacterSandbox: React.FC = () => {
 
           <button
             type="submit"
-            className="px-6 py-3 bg-red-700 text-white font-semibold text-sm rounded-2xl hover:bg-red-800 transition shadow-sm flex items-center gap-1.5"
+            className="px-6 py-3 bg-red-700 text-white font-semibold text-sm rounded-2xl hover:bg-red-800 transition shadow-sm flex items-center gap-1.5 active:scale-95 flex-shrink-0"
           >
             <Search className="w-4 h-4" />
             <span>Lihat Goresan</span>
@@ -79,8 +79,8 @@ export const CustomCharacterSandbox: React.FC = () => {
         </form>
 
         {/* Popular Suggestions */}
-        <div className="mt-4 pt-3 border-t border-stone-100">
-          <span className="text-xs text-stone-400 font-medium mr-2">Coba Karakter Populer:</span>
+        <div className="mt-4 pt-3 border-t border-stone-100 dark:border-stone-800">
+          <span className="text-xs text-stone-400 dark:text-stone-500 font-medium mr-2">Coba Karakter Populer:</span>
           <div className="flex flex-wrap gap-1.5 mt-2">
             {POPULAR_SUGGESTIONS.map((item) => (
               <button
@@ -88,13 +88,13 @@ export const CustomCharacterSandbox: React.FC = () => {
                 onClick={() => handleSelectSuggestion(item.char)}
                 className={`px-2.5 py-1 rounded-xl text-xs font-medium border transition-all ${
                   activeText === item.char
-                    ? 'bg-red-50 text-red-800 border-red-300 font-bold'
-                    : 'bg-stone-50 text-stone-700 border-stone-200 hover:bg-stone-100'
+                    ? 'bg-red-50 dark:bg-red-950/60 text-red-800 dark:text-red-300 border-red-300 dark:border-red-900/60 font-bold'
+                    : 'bg-stone-50 dark:bg-stone-800 text-stone-700 dark:text-stone-300 border-stone-200 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-750'
                 }`}
                 title={item.note}
               >
                 <span className="font-serif text-sm mr-1">{item.char}</span>
-                <span className="text-[10px] text-stone-500 font-sans">{item.note.split(' ')[0]}</span>
+                <span className="text-[10px] text-stone-500 dark:text-stone-400 font-sans">{item.note.split(' ')[0]}</span>
               </button>
             ))}
           </div>
@@ -106,18 +106,18 @@ export const CustomCharacterSandbox: React.FC = () => {
         <div className="flex justify-center animate-in fade-in">
           <HanziWriterCanvas
             text={activeText}
-            size={300}
+            size={280}
             className="shadow-md"
           />
         </div>
       )}
 
       {/* Info Notice */}
-      <div className="bg-amber-50/60 border border-amber-200/80 rounded-2xl p-4 text-xs text-amber-900 flex items-start gap-2.5">
-        <AlertCircle className="w-4 h-4 text-amber-700 flex-shrink-0 mt-0.5" />
+      <div className="bg-amber-50/60 dark:bg-stone-900 border border-amber-200/80 dark:border-amber-900/40 rounded-2xl p-4 text-xs text-amber-900 dark:text-amber-300 flex items-start gap-2.5 transition-colors">
+        <AlertCircle className="w-4 h-4 text-amber-700 dark:text-amber-400 flex-shrink-0 mt-0.5" />
         <div>
           <span className="font-semibold">Tips Menulis Aksara Mandarin:</span>
-          <ul className="list-disc pl-4 mt-1 space-y-0.5 text-stone-700">
+          <ul className="list-disc pl-4 mt-1 space-y-0.5 text-stone-700 dark:text-stone-300">
             <li>Goresan selalu dimulai dari <strong>atas ke bawah</strong> (上到下).</li>
             <li>Dari <strong>kiri ke kanan</strong> (左到右).</li>
             <li>Garis horizontal sebelum vertikal (先横后竖).</li>

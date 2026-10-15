@@ -70,25 +70,25 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({
       />
 
       {/* 2. KARTU "LANJUTKAN BELAJAR" (QUICK RESUME) */}
-      <div className="bg-white rounded-3xl p-5 sm:p-6 border border-stone-200 shadow-xs relative overflow-hidden">
+      <div className="bg-white dark:bg-stone-900 rounded-3xl p-5 sm:p-6 border border-stone-200 dark:border-stone-800 shadow-xs relative overflow-hidden transition-colors">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-start gap-3.5 min-w-0">
-            <div className="w-12 h-12 rounded-2xl bg-red-50 text-2xl flex items-center justify-center flex-shrink-0 shadow-xs border border-red-100">
+            <div className="w-12 h-12 rounded-2xl bg-red-50 dark:bg-stone-800 text-2xl flex items-center justify-center flex-shrink-0 shadow-xs border border-red-100 dark:border-stone-700">
               {activeUnit.icon}
             </div>
             <div className="min-w-0">
               <div className="flex items-center gap-2">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-red-700 bg-red-50 px-2 py-0.5 rounded-full">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-950/60 px-2 py-0.5 rounded-full border border-red-200/50 dark:border-red-900/40">
                   Lanjutkan Belajar
                 </span>
-                <span className="text-xs text-stone-400">
+                <span className="text-xs text-stone-400 dark:text-stone-500">
                   {activeUnitProgress.mastered} dari {activeUnitProgress.total} kata hafal
                 </span>
               </div>
-              <h2 className="text-base sm:text-lg font-bold text-stone-900 mt-1 truncate">
+              <h2 className="text-base sm:text-lg font-bold text-stone-900 dark:text-stone-100 mt-1 truncate">
                 {activeUnit.title}
               </h2>
-              <p className="text-xs text-stone-500 truncate mt-0.5">
+              <p className="text-xs text-stone-500 dark:text-stone-400 truncate mt-0.5">
                 {activeUnit.subtitle}
               </p>
             </div>
@@ -107,7 +107,7 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({
         </div>
 
         {/* Progress bar inside resume card */}
-        <div className="w-full bg-stone-100 h-2 rounded-full mt-4 overflow-hidden flex">
+        <div className="w-full bg-stone-100 dark:bg-stone-800 h-2 rounded-full mt-4 overflow-hidden flex">
           <div 
             className="bg-emerald-500 h-full transition-all duration-500" 
             style={{ width: `${activeUnitProgress.percent}%` }}
@@ -124,16 +124,16 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({
         {/* Radikal Dasar */}
         <button
           onClick={() => onNavigateTab('stories', 'radicals')}
-          className="bg-white hover:bg-stone-50 p-4 rounded-2xl border border-stone-200 shadow-xs text-left transition flex items-center gap-3.5 group active:scale-98"
+          className="bg-white hover:bg-stone-50 dark:bg-stone-900 dark:hover:bg-stone-850 p-4 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs text-left transition flex items-center gap-3.5 group active:scale-98"
         >
-          <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition">
+          <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition border border-blue-100 dark:border-blue-900/40">
             <Layers className="w-5 h-5" />
           </div>
           <div className="min-w-0">
-            <div className="font-bold text-xs text-stone-900 group-hover:text-blue-600 transition">
+            <div className="font-bold text-xs text-stone-900 dark:text-stone-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition">
               16 Radikal Kunci
             </div>
-            <div className="text-[11px] text-stone-500 truncate mt-0.5">
+            <div className="text-[11px] text-stone-500 dark:text-stone-400 truncate mt-0.5">
               Fondasi pembentuk aksara
             </div>
           </div>
@@ -142,16 +142,16 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({
         {/* Kuis Interaktif */}
         <button
           onClick={() => onNavigateTab('quiz')}
-          className="bg-white hover:bg-stone-50 p-4 rounded-2xl border border-stone-200 shadow-xs text-left transition flex items-center gap-3.5 group active:scale-98"
+          className="bg-white hover:bg-stone-50 dark:bg-stone-900 dark:hover:bg-stone-850 p-4 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs text-left transition flex items-center gap-3.5 group active:scale-98"
         >
-          <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition">
+          <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition border border-emerald-100 dark:border-emerald-900/40">
             <HelpCircle className="w-5 h-5" />
           </div>
           <div className="min-w-0">
-            <div className="font-bold text-xs text-stone-900 group-hover:text-emerald-600 transition">
+            <div className="font-bold text-xs text-stone-900 dark:text-stone-100 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition">
               Kuis Interaktif
             </div>
-            <div className="text-[11px] text-stone-500 truncate mt-0.5">
+            <div className="text-[11px] text-stone-500 dark:text-stone-400 truncate mt-0.5">
               Tebak arti & kuis tulis
             </div>
           </div>
@@ -160,16 +160,16 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({
         {/* Tulis Bebas (Sandbox) */}
         <button
           onClick={() => onNavigateTab('stories', 'sandbox')}
-          className="bg-white hover:bg-stone-50 p-4 rounded-2xl border border-stone-200 shadow-xs text-left transition flex items-center gap-3.5 group active:scale-98"
+          className="bg-white hover:bg-stone-50 dark:bg-stone-900 dark:hover:bg-stone-850 p-4 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs text-left transition flex items-center gap-3.5 group active:scale-98"
         >
-          <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition">
+          <div className="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition border border-purple-100 dark:border-purple-900/40">
             <PenTool className="w-5 h-5" />
           </div>
           <div className="min-w-0">
-            <div className="font-bold text-xs text-stone-900 group-hover:text-purple-600 transition">
+            <div className="font-bold text-xs text-stone-900 dark:text-stone-100 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition">
               Kanvas Tulis Bebas
             </div>
-            <div className="text-[11px] text-stone-500 truncate mt-0.5">
+            <div className="text-[11px] text-stone-500 dark:text-stone-400 truncate mt-0.5">
               Coba karakter apa saja
             </div>
           </div>
@@ -178,24 +178,24 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({
 
       {/* 4. AKSARA HARI INI (HANZI OF THE DAY) */}
       {dailyStory && (
-        <div className="bg-gradient-to-br from-amber-50/80 via-white to-stone-50 rounded-3xl p-5 sm:p-6 border border-amber-200/70 shadow-xs relative overflow-hidden">
+        <div className="bg-gradient-to-br from-amber-50/80 via-white to-stone-50 dark:from-stone-900 dark:via-stone-900/95 dark:to-stone-850 rounded-3xl p-5 sm:p-6 border border-amber-200/70 dark:border-stone-800 shadow-xs relative overflow-hidden transition-colors">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-start gap-4">
               {/* Big Hanzi Character */}
-              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-white text-stone-900 font-serif font-bold text-4xl sm:text-5xl flex items-center justify-center shadow-sm border border-amber-200/80 flex-shrink-0">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-white dark:bg-stone-800 text-stone-900 dark:text-stone-100 font-serif font-bold text-4xl sm:text-5xl flex items-center justify-center shadow-sm border border-amber-200/80 dark:border-stone-700 flex-shrink-0">
                 {dailyStory.character}
               </div>
 
               <div>
-                <div className="flex items-center gap-1.5 text-amber-700 text-[11px] font-bold">
+                <div className="flex items-center gap-1.5 text-amber-700 dark:text-amber-400 text-[11px] font-bold">
                   <Sparkles className="w-3.5 h-3.5" />
                   <span>Aksara & Piktogram Hari Ini</span>
                 </div>
                 <div className="flex items-baseline gap-2 mt-0.5">
-                  <span className="text-sm sm:text-base font-bold text-red-700">{dailyStory.pinyin}</span>
-                  <span className="text-xs text-stone-600 font-medium">&bull; {dailyStory.meaning}</span>
+                  <span className="text-sm sm:text-base font-bold text-red-700 dark:text-red-400">{dailyStory.pinyin}</span>
+                  <span className="text-xs text-stone-600 dark:text-stone-300 font-medium">&bull; {dailyStory.meaning}</span>
                 </div>
-                <p className="text-xs text-stone-500 mt-1.5 leading-relaxed line-clamp-2 max-w-xl">
+                <p className="text-xs text-stone-500 dark:text-stone-400 mt-1.5 leading-relaxed line-clamp-2 max-w-xl">
                   {dailyStory.story}
                 </p>
               </div>
@@ -203,9 +203,9 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({
 
             <button
               onClick={() => onNavigateTab('stories', 'stories')}
-              className="py-2 px-4 bg-white hover:bg-amber-50 text-stone-800 border border-amber-200 rounded-xl text-xs font-semibold transition flex items-center justify-center gap-1.5 self-start sm:self-center active:scale-95 whitespace-nowrap shadow-2xs"
+              className="py-2 px-4 bg-white dark:bg-stone-800 hover:bg-amber-50 dark:hover:bg-stone-750 text-stone-800 dark:text-stone-200 border border-amber-200 dark:border-stone-700 rounded-xl text-xs font-semibold transition flex items-center justify-center gap-1.5 self-start sm:self-center active:scale-95 whitespace-nowrap shadow-2xs"
             >
-              <Compass className="w-3.5 h-3.5 text-amber-600" />
+              <Compass className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
               <span>Buka Cerita Lengkap</span>
             </button>
           </div>
@@ -213,15 +213,15 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({
       )}
 
       {/* 5. PETA 10 BAB HSK 1 (LEARNING ROADMAP) */}
-      <div className="bg-white rounded-3xl p-5 sm:p-6 border border-stone-200 shadow-xs space-y-4">
+      <div className="bg-white dark:bg-stone-900 rounded-3xl p-5 sm:p-6 border border-stone-200 dark:border-stone-800 shadow-xs space-y-4 transition-colors">
         <div>
           <div className="text-[10px] font-bold uppercase tracking-wider text-stone-400">
             Kurikulum Pembelajaran
           </div>
-          <h2 className="text-base sm:text-lg font-bold text-stone-900 mt-0.5">
+          <h2 className="text-base sm:text-lg font-bold text-stone-900 dark:text-stone-100 mt-0.5">
             Peta 10 Bab HSK 1 (130 Kata Dasar)
           </h2>
-          <p className="text-xs text-stone-500 mt-0.5">
+          <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">
             Pilih salah satu bab untuk mulai latihan kosakata dan urutan goresan menulisnya:
           </p>
         </div>
@@ -244,16 +244,16 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({
                 }}
                 className={`p-3.5 sm:p-4 rounded-2xl border text-left transition flex items-center justify-between gap-3 group active:scale-[0.99] ${
                   isCurrent 
-                    ? 'border-red-300 bg-red-50/40 shadow-xs ring-1 ring-red-200' 
-                    : 'border-stone-200 bg-stone-50/50 hover:bg-stone-50'
+                    ? 'border-red-300 dark:border-red-900/80 bg-red-50/40 dark:bg-red-950/30 shadow-xs ring-1 ring-red-200 dark:ring-red-900/50' 
+                    : 'border-stone-200 dark:border-stone-800 bg-stone-50/50 dark:bg-stone-800/40 hover:bg-stone-50 dark:hover:bg-stone-800/80'
                 }`}
               >
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-10 h-10 rounded-xl bg-white text-xl flex items-center justify-center flex-shrink-0 shadow-2xs border border-stone-200 group-hover:scale-105 transition">
+                  <div className="w-10 h-10 rounded-xl bg-white dark:bg-stone-800 text-xl flex items-center justify-center flex-shrink-0 shadow-2xs border border-stone-200 dark:border-stone-700 group-hover:scale-105 transition">
                     {unit.icon}
                   </div>
                   <div className="min-w-0">
-                    <div className="font-bold text-xs sm:text-sm text-stone-900 truncate group-hover:text-red-700 transition">
+                    <div className="font-bold text-xs sm:text-sm text-stone-900 dark:text-stone-100 truncate group-hover:text-red-700 dark:group-hover:text-red-400 transition">
                       {unit.title}
                     </div>
                     <div className="text-[10px] text-stone-400 truncate mt-0.5">
@@ -264,16 +264,16 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({
 
                 <div className="text-right flex-shrink-0">
                   {isCompleted ? (
-                    <div className="flex items-center gap-1 text-[11px] text-emerald-700 font-bold bg-emerald-50 px-2 py-1 rounded-lg border border-emerald-200/80">
+                    <div className="flex items-center gap-1 text-[11px] text-emerald-700 dark:text-emerald-300 font-bold bg-emerald-50 dark:bg-emerald-950/60 px-2 py-1 rounded-lg border border-emerald-200/80 dark:border-emerald-800/60">
                       <CheckCircle2 className="w-3.5 h-3.5" />
                       <span>Khatam</span>
                     </div>
                   ) : (
                     <div>
-                      <div className="text-[11px] font-bold text-stone-700">
+                      <div className="text-[11px] font-bold text-stone-700 dark:text-stone-300">
                         {masteredInUnit}/{totalInUnit} <span className="text-[9px] font-normal text-stone-400">kata</span>
                       </div>
-                      <div className="w-14 bg-stone-200 h-1.5 rounded-full mt-1 overflow-hidden flex">
+                      <div className="w-14 bg-stone-200 dark:bg-stone-700 h-1.5 rounded-full mt-1 overflow-hidden flex">
                         <div 
                           className="bg-emerald-500 h-full" 
                           style={{ width: `${(masteredInUnit / totalInUnit) * 100}%` }}

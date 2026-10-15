@@ -13,7 +13,6 @@ import {
   LogOut,
   Menu,
   X,
-  Smartphone,
   Download
 } from 'lucide-react';
 import { HSK1_VOCABULARY } from './data/hsk1';
@@ -407,7 +406,7 @@ export function App() {
           />
 
           {/* Sliding Side Drawer from Right */}
-          <div className="fixed inset-y-0 right-0 max-w-[290px] w-full bg-white shadow-2xl flex flex-col justify-between p-5 z-50 animate-in slide-in-from-right duration-200">
+          <div className="fixed inset-y-0 right-0 max-w-[310px] w-[84vw] bg-white shadow-2xl flex flex-col justify-between p-5 z-50 animate-in slide-in-from-right duration-200">
             <div>
               {/* Drawer Top Header */}
               <div className="flex items-center justify-between pb-4 border-b border-stone-100">
@@ -436,10 +435,10 @@ export function App() {
                       setIsMobileMenuOpen(false);
                       handleTriggerInstall();
                     }}
-                    className="w-full py-2.5 px-3 bg-gradient-to-r from-red-700 to-red-800 text-white font-semibold text-xs rounded-xl shadow-xs flex items-center justify-center gap-2 active:scale-98 transition"
+                    className="w-full py-2.5 px-3 bg-red-700 hover:bg-red-800 text-white font-semibold text-xs rounded-xl shadow-xs flex items-center justify-center gap-2 active:scale-98 transition"
                   >
                     <Download className="w-4 h-4" />
-                    <span>Pasang Aplikasi ke Layar HP</span>
+                    <span>Install di HP</span>
                   </button>
                 </div>
               )}
@@ -495,9 +494,9 @@ export function App() {
                 
                 {[
                   { id: 'flashcards', label: 'Kosakata HSK 1', icon: BookOpen, color: 'text-red-600', badge: '10 Bab' },
-                  { id: 'stories', label: 'Asal Huruf & Piktogram', icon: Compass, color: 'text-amber-600', badge: 'Populer' },
+                  { id: 'stories', label: 'Asal-Usul Huruf', icon: Compass, color: 'text-amber-600', badge: 'Piktogram' },
                   { id: 'quiz', label: 'Kuis Interaktif', icon: HelpCircle, color: 'text-emerald-600' },
-                  { id: 'radicals', label: 'Radikal Dasar (Kangxi)', icon: Layers, color: 'text-blue-600' },
+                  { id: 'radicals', label: 'Radikal Dasar', icon: Layers, color: 'text-blue-600' },
                   { id: 'sandbox', label: 'Latihan Tulis Bebas', icon: PenTool, color: 'text-purple-600' }
                 ].map((tab) => {
                   const IconComp = tab.icon;
@@ -509,18 +508,18 @@ export function App() {
                         setActiveTab(tab.id as NavTab);
                         setIsMobileMenuOpen(false);
                       }}
-                      className={`w-full flex items-center justify-between p-3 rounded-2xl text-sm font-semibold transition ${
+                      className={`w-full flex items-center justify-between px-3.5 py-3 rounded-2xl text-xs sm:text-sm font-semibold transition ${
                         isActive
                           ? 'bg-red-50 text-red-900 border border-red-200/80 shadow-xs'
                           : 'text-stone-700 hover:bg-stone-50'
                       }`}
                     >
-                      <div className="flex items-center gap-3">
-                        <IconComp className={`w-5 h-5 ${tab.color}`} />
-                        <span>{tab.label}</span>
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <IconComp className={`w-4 h-4 ${tab.color} flex-shrink-0`} />
+                        <span className="whitespace-nowrap">{tab.label}</span>
                       </div>
                       {tab.badge && (
-                        <span className="text-[10px] bg-stone-100 text-stone-600 px-2 py-0.5 rounded-full font-medium">
+                        <span className="text-[10px] bg-stone-100 text-stone-500 px-2 py-0.5 rounded-full font-medium whitespace-nowrap ml-2">
                           {tab.badge}
                         </span>
                       )}
@@ -541,7 +540,7 @@ export function App() {
       )}
 
       {/* Main Container */}
-      <main className="max-w-6xl mx-auto px-3 sm:px-4 pt-5 space-y-6">
+      <main className="max-w-6xl mx-auto px-3 sm:px-4 pt-5 pb-28 sm:pb-16 space-y-6">
         {/* Progress & Streak Stats Banner */}
         <StatsHeader
           stats={stats}
@@ -760,13 +759,13 @@ export function App() {
 
       {/* Floating 1-Click Install Button for Mobile & Desktop when not installed */}
       {!isStandalone && (
-        <div className="fixed bottom-4 right-4 z-30 animate-in slide-in-from-bottom duration-300">
+        <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-30 animate-in slide-in-from-bottom duration-300">
           <button
             onClick={handleTriggerInstall}
             className="bg-stone-900/95 hover:bg-stone-900 text-white backdrop-blur-md px-4 py-2.5 rounded-full shadow-2xl border border-white/20 flex items-center gap-2 text-xs font-semibold active:scale-95 transition"
           >
-            <Smartphone className="w-4 h-4 text-red-400" />
-            <span>Pasang di HP</span>
+            <Download className="w-4 h-4 text-red-400" />
+            <span>Install di HP</span>
           </button>
         </div>
       )}

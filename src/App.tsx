@@ -13,7 +13,8 @@ import {
   LogOut,
   Menu,
   X,
-  Smartphone
+  Smartphone,
+  Download
 } from 'lucide-react';
 import { HSK1_VOCABULARY } from './data/hsk1';
 import { LESSON_UNITS } from './data/lessonUnits';
@@ -37,6 +38,7 @@ import { WritingModal } from './components/WritingModal';
 import { QuizMode } from './components/QuizMode';
 import { RadicalsView } from './components/RadicalsView';
 import { CustomCharacterSandbox } from './components/CustomCharacterSandbox';
+import { InstallPwaModal } from './components/InstallPwaModal';
 
 type NavTab = 'flashcards' | 'stories' | 'quiz' | 'radicals' | 'sandbox';
 type ViewMode = 'focus' | 'compact' | 'grid';
@@ -46,6 +48,12 @@ export function App() {
   const { user, loginWithGoogle, logout } = useAuth();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // PWA installation state
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [showInstallModal, setShowInstallModal] = useState(false);
+  const [isStandalone, setIsStandalone] = useState(false);
+  const [isIos, setIsIos] = useState(false);
 
   const [activeTab, setActiveTab] = useState<NavTab>('flashcards');
   const [viewMode, setViewMode] = useState<ViewMode>('focus');
@@ -61,6 +69,36 @@ export function App() {
 
   // Modal for writing practice
   const [writingModalVocab, setWritingModalVocab] = useState<VocabItem | null>(null);
+
+  // PWA detection & event listener
+  useEffect(() => {
+    const checkStandalone = window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone === true;
+    setIsStandalone(Boolean(checkStandalone));
+
+    const userAgent = window.navigator.userAgent.toLowerCase();
+    setIsIos(/iphone|ipad|ipod/.test(userAgent));
+
+    const handlePrompt = (e: Event) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+    };
+
+    window.addEventListener('beforeinstallprompt', handlePrompt);
+    return () => window.removeEventListener('beforeinstallprompt', handlePrompt);
+  }, []);
+
+  const handleTriggerInstall = async () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === 'accepted') {
+        setDeferredPrompt(null);
+        setShowInstallModal(false);
+      }
+    } else {
+      setShowInstallModal(true);
+    }
+  };
 
   // Load local progress on mount
   useEffect(() => {
@@ -250,7 +288,7 @@ export function App() {
 
               <button
                 onClick={() => setActiveTab('radicals')}
-                className={`px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 ${
+                className={`px-2.5 sm:px-3 py-1.5 rounded-xl whitespace-nowrap transition-all flex items-center gap-1.5 ${
                   activeTab === 'radicals' ? 'bg-white text-stone-900 shadow-xs font-semibold' : 'hover:text-stone-900'
                 }`}
               >
@@ -269,8 +307,20 @@ export function App() {
               </button>
             </nav>
 
-            {/* Right Side Actions: Google Login & Mobile Hamburger Button */}
+            {/* Right Side Actions: PWA Install + Google Login + Mobile Hamburger Button */}
             <div className="flex items-center gap-2 flex-shrink-0">
+              {/* Desktop 1-Click PWA Install Button */}
+              {!isStandalone && (
+                <button
+                  onClick={handleTriggerInstall}
+                  className="hidden sm:flex items-center gap-1.5 py-1.5 px-3 bg-red-50 hover:bg-red-100 text-red-700 border border-red-200/80 rounded-xl text-xs font-semibold transition active:scale-95 shadow-xs"
+                  title="Pasang aplikasi HanziLearn di laptop / HP kamu"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>Pasang App</span>
+                </button>
+              )}
+
               {/* Google Login / Avatar */}
               {user ? (
                 <div className="relative">
@@ -357,7 +407,7 @@ export function App() {
           />
 
           {/* Sliding Side Drawer from Right */}
-          <div className="fixed inset-y-0 right-0 max-w-[280px] w-full bg-white shadow-2xl flex flex-col justify-between p-5 z-50 animate-in slide-in-from-right duration-200">
+          <div className="fixed inset-y-0 right-0 max-w-[290px] w-full bg-white shadow-2xl flex flex-col justify-between p-5 z-50 animate-in slide-in-from-right duration-200">
             <div>
               {/* Drawer Top Header */}
               <div className="flex items-center justify-between pb-4 border-b border-stone-100">
@@ -378,8 +428,24 @@ export function App() {
                 </button>
               </div>
 
+              {/* 1-Click PWA Install button inside mobile menu */}
+              {!isStandalone && (
+                <div className="mt-3">
+                  <button
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      handleTriggerInstall();
+                    }}
+                    className="w-full py-2.5 px-3 bg-gradient-to-r from-red-700 to-red-800 text-white font-semibold text-xs rounded-xl shadow-xs flex items-center justify-center gap-2 active:scale-98 transition"
+                  >
+                    <Download className="w-4 h-4" />
+                    <span>Pasang Aplikasi ke Layar HP</span>
+                  </button>
+                </div>
+              )}
+
               {/* User Status in Drawer */}
-              <div className="mt-4 p-3 bg-stone-50 rounded-2xl border border-stone-100">
+              <div className="mt-3 p-3 bg-stone-50 rounded-2xl border border-stone-100">
                 {user ? (
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2.5 min-w-0">
@@ -422,7 +488,7 @@ export function App() {
               </div>
 
               {/* Navigation Links inside Drawer */}
-              <div className="mt-5 space-y-1.5">
+              <div className="mt-4 space-y-1.5">
                 <div className="text-[11px] font-bold text-stone-400 uppercase tracking-wider px-2 mb-1">
                   Menu Utama
                 </div>
@@ -465,13 +531,9 @@ export function App() {
             </div>
 
             {/* Bottom Drawer Footer: PWA Hint */}
-            <div className="pt-4 border-t border-stone-100">
-              <div className="bg-stone-50 p-3 rounded-2xl border border-stone-100 text-xs text-stone-500 flex items-center gap-2">
-                <Smartphone className="w-5 h-5 text-red-600 flex-shrink-0" />
-                <div className="text-left text-[11px] leading-tight">
-                  <span className="font-semibold text-stone-800">Bisa Dipasang (PWA):</span>
-                  <div className="text-stone-500 mt-0.5">Buka menu browser &rarr; "Add to Home screen" untuk install di HP!</div>
-                </div>
+            <div className="pt-3 border-t border-stone-100">
+              <div className="text-center text-[10px] text-stone-400">
+                HanziLearn &middot; Aksara Mandarin HSK 1
               </div>
             </div>
           </div>
@@ -696,6 +758,19 @@ export function App() {
         )}
       </main>
 
+      {/* Floating 1-Click Install Button for Mobile & Desktop when not installed */}
+      {!isStandalone && (
+        <div className="fixed bottom-4 right-4 z-30 animate-in slide-in-from-bottom duration-300">
+          <button
+            onClick={handleTriggerInstall}
+            className="bg-stone-900/95 hover:bg-stone-900 text-white backdrop-blur-md px-4 py-2.5 rounded-full shadow-2xl border border-white/20 flex items-center gap-2 text-xs font-semibold active:scale-95 transition"
+          >
+            <Smartphone className="w-4 h-4 text-red-400" />
+            <span>Pasang di HP</span>
+          </button>
+        </div>
+      )}
+
       {/* Writing Practice Focused Modal */}
       <WritingModal
         vocab={writingModalVocab}
@@ -704,6 +779,14 @@ export function App() {
         onPrev={handlePrevVocab}
         onNext={handleNextVocab}
         onCharacterCompleted={handleCharacterCompleted}
+      />
+
+      {/* PWA 1-Click Installation Dialog Modal */}
+      <InstallPwaModal
+        isOpen={showInstallModal}
+        onClose={() => setShowInstallModal(false)}
+        onInstall={handleTriggerInstall}
+        isIos={isIos}
       />
     </div>
   );

@@ -10,7 +10,7 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['icon.svg', 'favicon.svg'],
+      includeAssets: ['icon.svg', 'pwa-192.png', 'pwa-512.png', 'favicon.svg'],
       manifest: {
         name: 'HanziLearn - Belajar Mandarin & Menulis',
         short_name: 'HanziLearn',
@@ -23,14 +23,20 @@ export default defineConfig({
         start_url: '/',
         icons: [
           {
-            src: '/icon.svg',
-            sizes: '192x192 512x512',
-            type: 'image/svg+xml',
+            src: '/pwa-192.png',
+            sizes: '192x192',
+            type: 'image/png',
+            purpose: 'any'
+          },
+          {
+            src: '/pwa-512.png',
+            sizes: '512x512',
+            type: 'image/png',
             purpose: 'any'
           },
           {
             src: '/icon.svg',
-            sizes: '192x192 512x512',
+            sizes: '512x512',
             type: 'image/svg+xml',
             purpose: 'maskable'
           }

@@ -10,7 +10,10 @@ import {
   List,
   Maximize2,
   Cloud,
-  LogOut
+  LogOut,
+  Menu,
+  X,
+  Smartphone
 } from 'lucide-react';
 import { HSK1_VOCABULARY } from './data/hsk1';
 import { LESSON_UNITS } from './data/lessonUnits';
@@ -42,6 +45,7 @@ type FilterStatusType = 'all' | 'new' | 'learning' | 'mastered' | 'bookmarked';
 export function App() {
   const { user, loginWithGoogle, logout } = useAuth();
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const [activeTab, setActiveTab] = useState<NavTab>('flashcards');
   const [viewMode, setViewMode] = useState<ViewMode>('focus');
@@ -198,7 +202,7 @@ export function App() {
       {/* Top Navbar: Mobile-optimized sticky navigation */}
       <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-stone-200">
         <div className="max-w-6xl mx-auto px-3 sm:px-4">
-          <div className="h-16 flex items-center justify-between gap-2">
+          <div className="h-16 flex items-center justify-between gap-3">
             {/* Logo */}
             <div className="flex items-center gap-2.5 flex-shrink-0">
               <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-red-700 text-white font-serif font-bold text-xl sm:text-2xl flex items-center justify-center shadow-md">
@@ -206,17 +210,17 @@ export function App() {
               </div>
               <div>
                 <span className="font-bold text-base sm:text-lg text-stone-900 tracking-tight">HanziLearn</span>
-                <span className="hidden md:inline-block ml-2 text-[11px] bg-red-50 text-red-700 font-semibold px-2 py-0.5 rounded-full border border-red-200">
+                <span className="hidden lg:inline-block ml-2 text-[11px] bg-red-50 text-red-700 font-semibold px-2 py-0.5 rounded-full border border-red-200">
                   HSK 1 & Piktogram
                 </span>
               </div>
             </div>
 
-            {/* Navigation Tabs (Scrollable on small mobile screens) */}
-            <nav className="flex items-center gap-1 bg-stone-100 p-1 rounded-2xl text-xs sm:text-sm font-medium text-stone-600 overflow-x-auto max-w-[calc(100vw-210px)] sm:max-w-none">
+            {/* Desktop Navigation Tabs (Hidden on mobile) */}
+            <nav className="hidden md:flex items-center gap-1 bg-stone-100 p-1 rounded-2xl text-xs lg:text-sm font-medium text-stone-600">
               <button
                 onClick={() => setActiveTab('flashcards')}
-                className={`px-2.5 sm:px-3 py-1.5 rounded-xl whitespace-nowrap transition-all flex items-center gap-1.5 ${
+                className={`px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 ${
                   activeTab === 'flashcards' ? 'bg-white text-stone-900 shadow-xs font-semibold' : 'hover:text-stone-900'
                 }`}
               >
@@ -226,7 +230,7 @@ export function App() {
 
               <button
                 onClick={() => setActiveTab('stories')}
-                className={`px-2.5 sm:px-3 py-1.5 rounded-xl whitespace-nowrap transition-all flex items-center gap-1.5 ${
+                className={`px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 ${
                   activeTab === 'stories' ? 'bg-white text-stone-900 shadow-xs font-semibold' : 'hover:text-stone-900'
                 }`}
               >
@@ -236,7 +240,7 @@ export function App() {
 
               <button
                 onClick={() => setActiveTab('quiz')}
-                className={`px-2.5 sm:px-3 py-1.5 rounded-xl whitespace-nowrap transition-all flex items-center gap-1.5 ${
+                className={`px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 ${
                   activeTab === 'quiz' ? 'bg-white text-stone-900 shadow-xs font-semibold' : 'hover:text-stone-900'
                 }`}
               >
@@ -246,7 +250,7 @@ export function App() {
 
               <button
                 onClick={() => setActiveTab('radicals')}
-                className={`px-2.5 sm:px-3 py-1.5 rounded-xl whitespace-nowrap transition-all flex items-center gap-1.5 ${
+                className={`px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 ${
                   activeTab === 'radicals' ? 'bg-white text-stone-900 shadow-xs font-semibold' : 'hover:text-stone-900'
                 }`}
               >
@@ -256,17 +260,18 @@ export function App() {
 
               <button
                 onClick={() => setActiveTab('sandbox')}
-                className={`px-2.5 sm:px-3 py-1.5 rounded-xl whitespace-nowrap transition-all flex items-center gap-1.5 ${
+                className={`px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 ${
                   activeTab === 'sandbox' ? 'bg-white text-stone-900 shadow-xs font-semibold' : 'hover:text-stone-900'
                 }`}
               >
                 <PenTool className="w-4 h-4 text-purple-600 flex-shrink-0" />
-                <span className="hidden sm:inline">Tulis Bebas</span>
+                <span>Tulis Bebas</span>
               </button>
             </nav>
 
-            {/* Right Side: Google Login / User Profile */}
+            {/* Right Side Actions: Google Login & Mobile Hamburger Button */}
             <div className="flex items-center gap-2 flex-shrink-0">
+              {/* Google Login / Avatar */}
               {user ? (
                 <div className="relative">
                   <button
@@ -295,7 +300,7 @@ export function App() {
                       <div className="pb-2.5 mb-2 border-b border-stone-100">
                         <div className="font-bold text-sm text-stone-900 truncate">{user.displayName || 'Pengguna'}</div>
                         <div className="text-xs text-stone-500 truncate">{user.email}</div>
-                        <div className="flex items-center gap-1.5 mt-2 text-[11px] text-emerald-700 bg-emerald-50 px-2 py-1 rounded-lg">
+                        <div className="flex items-center gap-1.5 mt-2 text-[11px] text-emerald-700 bg-emerald-50 px-2 py-1 rounded-lg font-medium">
                           <Cloud className="w-3.5 h-3.5" />
                           <span>Tersinkron ke Google Cloud</span>
                         </div>
@@ -316,34 +321,162 @@ export function App() {
               ) : (
                 <button
                   onClick={() => loginWithGoogle()}
-                  className="flex items-center gap-2 py-1.5 px-3 bg-white hover:bg-stone-50 border border-stone-200 text-stone-800 rounded-xl text-xs font-semibold transition shadow-xs active:scale-95"
-                  title="Masuk dengan Google untuk sinkronkan hafalanmu di semua perangkat"
+                  className="flex items-center gap-1.5 py-1.5 px-3 bg-white hover:bg-stone-50 border border-stone-200 text-stone-800 rounded-xl text-xs font-semibold transition shadow-xs active:scale-95"
+                  title="Masuk dengan Google"
                 >
                   <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24">
-                    <path
-                      fill="#4285F4"
-                      d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"
-                    />
-                    <path
-                      fill="#34A853"
-                      d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"
-                    />
-                    <path
-                      fill="#FBBC05"
-                      d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.97 0 12s.45 3.82 1.25 5.42l4.03-3.15z"
-                    />
-                    <path
-                      fill="#EA4335"
-                      d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"
-                    />
+                    <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
+                    <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/>
+                    <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.97 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/>
+                    <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
                   </svg>
-                  <span className="hidden sm:inline">Masuk</span>
+                  <span>Masuk</span>
                 </button>
               )}
+
+              {/* Mobile Hamburger Burger Button (Only visible on mobile) */}
+              <button
+                onClick={() => setIsMobileMenuOpen(true)}
+                className="md:hidden p-2 rounded-xl text-stone-700 hover:bg-stone-100 transition active:scale-95 border border-stone-200"
+                aria-label="Buka menu navigasi samping"
+              >
+                <Menu className="w-5 h-5 text-stone-800" />
+              </button>
             </div>
           </div>
         </div>
       </header>
+
+      {/* Mobile Drawer / Sidebar Overlay */}
+      {isMobileMenuOpen && (
+        <div className="fixed inset-0 z-50 md:hidden">
+          {/* Backdrop Blur */}
+          <div 
+            className="fixed inset-0 bg-stone-950/60 backdrop-blur-xs transition-opacity animate-in fade-in"
+            onClick={() => setIsMobileMenuOpen(false)}
+          />
+
+          {/* Sliding Side Drawer from Right */}
+          <div className="fixed inset-y-0 right-0 max-w-[280px] w-full bg-white shadow-2xl flex flex-col justify-between p-5 z-50 animate-in slide-in-from-right duration-200">
+            <div>
+              {/* Drawer Top Header */}
+              <div className="flex items-center justify-between pb-4 border-b border-stone-100">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-xl bg-red-700 text-white font-serif font-bold text-lg flex items-center justify-center shadow-xs">
+                    汉
+                  </div>
+                  <div>
+                    <span className="font-bold text-base text-stone-900">HanziLearn</span>
+                    <div className="text-[10px] text-red-700 font-semibold">Mandarin Mandiri</div>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="p-1.5 text-stone-400 hover:text-stone-700 hover:bg-stone-100 rounded-xl transition"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* User Status in Drawer */}
+              <div className="mt-4 p-3 bg-stone-50 rounded-2xl border border-stone-100">
+                {user ? (
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      {user.photoURL ? (
+                        <img src={user.photoURL} alt="User" className="w-9 h-9 rounded-full object-cover border border-white flex-shrink-0" />
+                      ) : (
+                        <div className="w-9 h-9 rounded-full bg-red-700 text-white font-bold text-sm flex items-center justify-center flex-shrink-0">
+                          {user.email?.[0].toUpperCase()}
+                        </div>
+                      )}
+                      <div className="min-w-0">
+                        <div className="text-xs font-bold text-stone-900 truncate">{user.displayName || 'Pengguna'}</div>
+                        <div className="text-[10px] text-emerald-700 flex items-center gap-1 font-medium">
+                          <Cloud className="w-3 h-3" /> Cloud Aktif
+                        </div>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => { logout(); setIsMobileMenuOpen(false); }}
+                      className="p-1.5 text-stone-400 hover:text-red-600 transition"
+                      title="Keluar"
+                    >
+                      <LogOut className="w-4 h-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => { loginWithGoogle(); setIsMobileMenuOpen(false); }}
+                    className="w-full py-2.5 px-3 bg-white border border-stone-200 rounded-xl text-xs font-semibold text-stone-800 flex items-center justify-center gap-2 shadow-xs active:scale-95"
+                  >
+                    <svg className="w-4 h-4" viewBox="0 0 24 24">
+                      <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
+                      <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/>
+                      <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.97 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/>
+                      <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
+                    </svg>
+                    <span>Masuk dengan Google</span>
+                  </button>
+                )}
+              </div>
+
+              {/* Navigation Links inside Drawer */}
+              <div className="mt-5 space-y-1.5">
+                <div className="text-[11px] font-bold text-stone-400 uppercase tracking-wider px-2 mb-1">
+                  Menu Utama
+                </div>
+                
+                {[
+                  { id: 'flashcards', label: 'Kosakata HSK 1', icon: BookOpen, color: 'text-red-600', badge: '10 Bab' },
+                  { id: 'stories', label: 'Asal Huruf & Piktogram', icon: Compass, color: 'text-amber-600', badge: 'Populer' },
+                  { id: 'quiz', label: 'Kuis Interaktif', icon: HelpCircle, color: 'text-emerald-600' },
+                  { id: 'radicals', label: 'Radikal Dasar (Kangxi)', icon: Layers, color: 'text-blue-600' },
+                  { id: 'sandbox', label: 'Latihan Tulis Bebas', icon: PenTool, color: 'text-purple-600' }
+                ].map((tab) => {
+                  const IconComp = tab.icon;
+                  const isActive = activeTab === tab.id;
+                  return (
+                    <button
+                      key={tab.id}
+                      onClick={() => {
+                        setActiveTab(tab.id as NavTab);
+                        setIsMobileMenuOpen(false);
+                      }}
+                      className={`w-full flex items-center justify-between p-3 rounded-2xl text-sm font-semibold transition ${
+                        isActive
+                          ? 'bg-red-50 text-red-900 border border-red-200/80 shadow-xs'
+                          : 'text-stone-700 hover:bg-stone-50'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <IconComp className={`w-5 h-5 ${tab.color}`} />
+                        <span>{tab.label}</span>
+                      </div>
+                      {tab.badge && (
+                        <span className="text-[10px] bg-stone-100 text-stone-600 px-2 py-0.5 rounded-full font-medium">
+                          {tab.badge}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Bottom Drawer Footer: PWA Hint */}
+            <div className="pt-4 border-t border-stone-100">
+              <div className="bg-stone-50 p-3 rounded-2xl border border-stone-100 text-xs text-stone-500 flex items-center gap-2">
+                <Smartphone className="w-5 h-5 text-red-600 flex-shrink-0" />
+                <div className="text-left text-[11px] leading-tight">
+                  <span className="font-semibold text-stone-800">Bisa Dipasang (PWA):</span>
+                  <div className="text-stone-500 mt-0.5">Buka menu browser &rarr; "Add to Home screen" untuk install di HP!</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Main Container */}
       <main className="max-w-6xl mx-auto px-3 sm:px-4 pt-5 space-y-6">

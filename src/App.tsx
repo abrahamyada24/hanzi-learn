@@ -13,8 +13,7 @@ import {
   LogOut,
   Menu,
   X,
-  Download,
-  ChevronDown
+  Download
 } from 'lucide-react';
 import { HSK1_VOCABULARY } from './data/hsk1';
 import { LESSON_UNITS } from './data/lessonUnits';
@@ -39,6 +38,7 @@ import { QuizMode } from './components/QuizMode';
 import { RadicalsView } from './components/RadicalsView';
 import { CustomCharacterSandbox } from './components/CustomCharacterSandbox';
 import { InstallPwaModal } from './components/InstallPwaModal';
+import { UnitSelectorDropdown } from './components/UnitSelectorDropdown';
 
 type NavTab = 'flashcards' | 'stories' | 'quiz' | 'radicals' | 'sandbox';
 type ViewMode = 'focus' | 'compact' | 'grid';
@@ -58,6 +58,7 @@ export function App() {
   const [activeTab, setActiveTab] = useState<NavTab>('flashcards');
   const [viewMode, setViewMode] = useState<ViewMode>('focus');
   const [selectedUnitId, setSelectedUnitId] = useState<string>('unit-1'); // Default Bab 1: 10 kata
+  const [activeWordId, setActiveWordId] = useState<string | undefined>(undefined);
   
   const [progress, setProgress] = useState<Record<string, any>>({});
   const [stats, setStats] = useState<UserStats>(getUserStats());
@@ -607,25 +608,18 @@ export function App() {
                 </div>
               </div>
 
-              {/* Mobile View: Clean Dropdown Selector */}
+              {/* Mobile View: Custom Dropdown with Bab & Vocab Search */}
               <div className="sm:hidden">
-                <div className="relative">
-                  <select
-                    value={selectedUnitId}
-                    onChange={(e) => setSelectedUnitId(e.target.value)}
-                    className="w-full appearance-none bg-stone-50 hover:bg-stone-100 border border-stone-200 text-stone-800 text-xs font-semibold py-2.5 pl-3.5 pr-10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:bg-white shadow-xs transition cursor-pointer"
-                  >
-                    <option value="all">Semua Bab &middot; 130 Kata HSK 1</option>
-                    {LESSON_UNITS.map((unit) => (
-                      <option key={unit.id} value={unit.id}>
-                        {unit.icon} Bab {unit.unitNumber}: {unit.title} ({unit.wordIds.length} kata)
-                      </option>
-                    ))}
-                  </select>
-                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3.5 text-stone-500">
-                    <ChevronDown className="w-4 h-4" />
-                  </div>
-                </div>
+                <UnitSelectorDropdown
+                  selectedUnitId={selectedUnitId}
+                  onSelectUnit={(unitId) => {
+                    setSelectedUnitId(unitId);
+                    setActiveWordId(undefined);
+                  }}
+                  onSelectWord={(word) => {
+                    setActiveWordId(word.id);
+                  }}
+                />
               </div>
 
               {/* Desktop / Tablet View: Horizontal Pill Bar */}
@@ -703,6 +697,7 @@ export function App() {
                   onStatusChange={handleStatusChange}
                   onToggleBookmark={handleToggleBookmark}
                   onCharacterCompleted={handleCharacterCompleted}
+                  activeWordId={activeWordId}
                 />
               </div>
             )}

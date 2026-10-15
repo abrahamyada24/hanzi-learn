@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   Volume2, 
   ChevronLeft, 
@@ -20,6 +20,7 @@ interface FocusFlashcardViewProps {
   onStatusChange: (wordId: string, status: MasteryStatus) => void;
   onToggleBookmark: (wordId: string) => void;
   onCharacterCompleted?: (char: string, mistakes: number) => void;
+  activeWordId?: string;
 }
 
 export const FocusFlashcardView: React.FC<FocusFlashcardViewProps> = ({
@@ -28,11 +29,24 @@ export const FocusFlashcardView: React.FC<FocusFlashcardViewProps> = ({
   bookmarks,
   onStatusChange,
   onToggleBookmark,
-  onCharacterCompleted
+  onCharacterCompleted,
+  activeWordId
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isRevealed, setIsRevealed] = useState(false);
   const [showWritingCanvas, setShowWritingCanvas] = useState(false);
+
+  // Jump to specific word if provided by search / selection
+  useEffect(() => {
+    if (activeWordId) {
+      const idx = vocabList.findIndex(v => v.id === activeWordId);
+      if (idx !== -1) {
+        setCurrentIndex(idx);
+        setIsRevealed(false);
+        setShowWritingCanvas(false);
+      }
+    }
+  }, [activeWordId, vocabList]);
 
   if (!vocabList || vocabList.length === 0) {
     return (

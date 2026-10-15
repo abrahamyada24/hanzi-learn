@@ -1,7 +1,7 @@
 import React from 'react';
-import { BookOpen, Compass, HelpCircle, Layers, User } from 'lucide-react';
+import { Home, BookOpen, Compass, HelpCircle, User } from 'lucide-react';
 
-export type NavTab = 'flashcards' | 'stories' | 'quiz' | 'radicals' | 'sandbox' | 'profile';
+export type NavTab = 'home' | 'flashcards' | 'stories' | 'quiz' | 'profile';
 
 interface BottomNavBarProps {
   activeTab: NavTab;
@@ -15,21 +15,19 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({
   userPhotoUrl
 }) => {
   const tabs = [
+    { id: 'home' as NavTab, label: 'Beranda', icon: Home },
     { id: 'flashcards' as NavTab, label: 'Belajar', icon: BookOpen },
-    { id: 'stories' as NavTab, label: 'Cerita', icon: Compass },
+    { id: 'stories' as NavTab, label: 'Aksara', icon: Compass },
     { id: 'quiz' as NavTab, label: 'Kuis', icon: HelpCircle },
-    { id: 'radicals' as NavTab, label: 'Radikal', icon: Layers },
     { id: 'profile' as NavTab, label: 'Profil', icon: User }
   ];
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-lg border-t border-stone-200/90 shadow-[0_-4px_20px_rgba(0,0,0,0.06)]">
+    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-lg border-t border-stone-200/90 shadow-[0_-4px_20px_rgba(0,0,0,0.06)] pb-[env(safe-area-inset-bottom)]">
       <div className="grid grid-cols-5 h-16 max-w-lg mx-auto px-1">
         {tabs.map((tab) => {
           const Icon = tab.icon;
-          const isActive = 
-            activeTab === tab.id || 
-            (tab.id === 'radicals' && activeTab === 'sandbox');
+          const isActive = activeTab === tab.id;
 
           return (
             <button

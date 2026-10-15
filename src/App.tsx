@@ -1,10 +1,9 @@
 import { useState, useEffect, useMemo } from 'react';
 import { 
+  Home,
   BookOpen, 
   HelpCircle, 
-  Layers, 
   Search, 
-  PenTool,
   Compass,
   LayoutGrid,
   List,
@@ -25,22 +24,19 @@ import {
 } from './utils/storage';
 import { useAuth } from './context/AuthContext';
 import { syncUserData, saveToCloud } from './utils/cloudSync';
-import { StatsHeader } from './components/StatsHeader';
+import { HomeDashboardView } from './components/HomeDashboardView';
 import { VocabCard } from './components/VocabCard';
 import { FocusFlashcardView } from './components/FocusFlashcardView';
 import { CompactListView } from './components/CompactListView';
-import { CharacterStoriesView } from './components/CharacterStoriesView';
+import { StoriesAndRadicalsView, type StorySubTab } from './components/StoriesAndRadicalsView';
 import { WritingModal } from './components/WritingModal';
 import { QuizMode } from './components/QuizMode';
-import { RadicalsView } from './components/RadicalsView';
-import { CustomCharacterSandbox } from './components/CustomCharacterSandbox';
 import { InstallPwaModal } from './components/InstallPwaModal';
 import { UnitSelectorDropdown } from './components/UnitSelectorDropdown';
-import { BottomNavBar } from './components/BottomNavBar';
+import { BottomNavBar, type NavTab } from './components/BottomNavBar';
 import { ProfileView } from './components/ProfileView';
 import { Toast, type ToastMessage } from './components/Toast';
 
-type NavTab = 'flashcards' | 'stories' | 'quiz' | 'radicals' | 'sandbox' | 'profile';
 type ViewMode = 'focus' | 'compact' | 'grid';
 type FilterStatusType = 'all' | 'new' | 'learning' | 'mastered' | 'bookmarked';
 
@@ -55,7 +51,8 @@ export function App() {
   const [isStandalone, setIsStandalone] = useState(false);
   const [isIos, setIsIos] = useState(false);
 
-  const [activeTab, setActiveTab] = useState<NavTab>('flashcards');
+  const [activeTab, setActiveTab] = useState<NavTab>('home');
+  const [storySubTab, setStorySubTab] = useState<StorySubTab>('stories');
   const [viewMode, setViewMode] = useState<ViewMode>('focus');
   const [selectedUnitId, setSelectedUnitId] = useState<string>('unit-1'); // Default Bab 1: 10 kata
   const [activeWordId, setActiveWordId] = useState<string | undefined>(undefined);
@@ -305,13 +302,23 @@ export function App() {
             {/* Desktop Navigation Tabs (Hidden on mobile) */}
             <nav className="hidden md:flex items-center gap-1 bg-stone-100 p-1 rounded-2xl text-xs lg:text-sm font-medium text-stone-600">
               <button
+                onClick={() => setActiveTab('home')}
+                className={`px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 ${
+                  activeTab === 'home' ? 'bg-white text-stone-900 shadow-xs font-semibold' : 'hover:text-stone-900'
+                }`}
+              >
+                <Home className="w-4 h-4 text-red-600 flex-shrink-0" />
+                <span>Beranda</span>
+              </button>
+
+              <button
                 onClick={() => setActiveTab('flashcards')}
                 className={`px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 ${
                   activeTab === 'flashcards' ? 'bg-white text-stone-900 shadow-xs font-semibold' : 'hover:text-stone-900'
                 }`}
               >
                 <BookOpen className="w-4 h-4 text-red-600 flex-shrink-0" />
-                <span>Kosakata</span>
+                <span>Belajar</span>
               </button>
 
               <button
@@ -321,7 +328,7 @@ export function App() {
                 }`}
               >
                 <Compass className="w-4 h-4 text-amber-600 flex-shrink-0" />
-                <span>Asal Huruf</span>
+                <span>Aksara & Radikal</span>
               </button>
 
               <button
@@ -332,26 +339,6 @@ export function App() {
               >
                 <HelpCircle className="w-4 h-4 text-emerald-600 flex-shrink-0" />
                 <span>Kuis</span>
-              </button>
-
-              <button
-                onClick={() => setActiveTab('radicals')}
-                className={`px-2.5 sm:px-3 py-1.5 rounded-xl whitespace-nowrap transition-all flex items-center gap-1.5 ${
-                  activeTab === 'radicals' ? 'bg-white text-stone-900 shadow-xs font-semibold' : 'hover:text-stone-900'
-                }`}
-              >
-                <Layers className="w-4 h-4 text-blue-600 flex-shrink-0" />
-                <span>Radikal</span>
-              </button>
-
-              <button
-                onClick={() => setActiveTab('sandbox')}
-                className={`px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 ${
-                  activeTab === 'sandbox' ? 'bg-white text-stone-900 shadow-xs font-semibold' : 'hover:text-stone-900'
-                }`}
-              >
-                <PenTool className="w-4 h-4 text-purple-600 flex-shrink-0" />
-                <span>Tulis Bebas</span>
               </button>
 
               <button
@@ -427,13 +414,26 @@ export function App() {
 
       {/* Main Container */}
       <main className="max-w-6xl mx-auto px-3 sm:px-4 pt-5 pb-24 md:pb-12 space-y-6">
-        {/* Progress & Streak Stats Banner (Hidden on Profile tab to avoid duplicate) */}
-        {activeTab !== 'profile' && (
-          <StatsHeader
+        {/* TAB 0: BERANDA / DASHBOARD */}
+        {activeTab === 'home' && (
+          <HomeDashboardView
             stats={stats}
             totalWords={HSK1_VOCABULARY.length}
             masteredCount={masteredCount}
             learningCount={learningCount}
+            selectedUnitId={selectedUnitId}
+            progress={progress}
+            onStartUnit={(unitId) => {
+              setSelectedUnitId(unitId);
+              setActiveWordId(undefined);
+            }}
+            onNavigateTab={(tab, subTab) => {
+              if (subTab) {
+                setStorySubTab(subTab);
+              }
+              setActiveTab(tab);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
           />
         )}
 
@@ -627,11 +627,12 @@ export function App() {
           </div>
         )}
 
-        {/* TAB 2: ASAL-USUL HURUF (PIKTOGRAM & CERITA ETİMOLOGI) */}
+        {/* TAB 2: ASAL-USUL HURUF, RADIKAL & TULIS BEBAS */}
         {activeTab === 'stories' && (
-          <div className="animate-in fade-in">
-            <CharacterStoriesView />
-          </div>
+          <StoriesAndRadicalsView
+            activeSubTab={storySubTab}
+            onSubTabChange={setStorySubTab}
+          />
         )}
 
         {/* TAB 3: KUIS INTERAKTIF */}
@@ -642,20 +643,6 @@ export function App() {
               onFinishQuiz={handleFinishQuiz}
               onExit={() => setActiveTab('flashcards')}
             />
-          </div>
-        )}
-
-        {/* TAB 4: RADIKAL KANGXI */}
-        {activeTab === 'radicals' && (
-          <div className="animate-in fade-in">
-            <RadicalsView />
-          </div>
-        )}
-
-        {/* TAB 5: LATIHAN NULIS BEBAS (SANDBOX) */}
-        {activeTab === 'sandbox' && (
-          <div className="animate-in fade-in">
-            <CustomCharacterSandbox />
           </div>
         )}
 

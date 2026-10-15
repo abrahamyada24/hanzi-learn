@@ -89,7 +89,7 @@ export const CustomCharacterSandbox: React.FC = () => {
                 className={`px-2.5 py-1 rounded-xl text-xs font-medium border transition-all ${
                   activeText === item.char
                     ? 'bg-red-50 dark:bg-red-950/60 text-red-800 dark:text-red-300 border-red-300 dark:border-red-900/60 font-bold'
-                    : 'bg-stone-50 dark:bg-stone-800 text-stone-700 dark:text-stone-300 border-stone-200 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-750'
+                    : 'bg-stone-50 dark:bg-stone-800 text-stone-700 dark:text-stone-300 border-stone-200 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-700'
                 }`}
                 title={item.note}
               >

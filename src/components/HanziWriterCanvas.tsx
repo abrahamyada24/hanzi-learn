@@ -226,12 +226,12 @@ export const HanziWriterCanvas: React.FC<HanziWriterCanvasProps> = ({
   };
 
   return (
-    <div className={`flex flex-col items-center bg-white rounded-2xl border border-stone-200 shadow-sm p-4 ${className}`}>
+    <div className={`flex flex-col items-center bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-sm p-4 transition-colors ${className}`}>
       {/* Top Header: Multi-character Tabs (if > 1 char) */}
-      <div className="w-full flex items-center justify-between pb-3 border-b border-stone-100 mb-3">
+      <div className="w-full flex items-center justify-between pb-3 border-b border-stone-100 dark:border-stone-800 mb-3">
         <div className="flex items-center gap-2">
           {characters.length > 1 ? (
-            <div className="flex items-center bg-stone-100 p-1 rounded-xl gap-1">
+            <div className="flex items-center bg-stone-100 dark:bg-stone-800 p-1 rounded-xl gap-1">
               {characters.map((char, idx) => (
                 <button
                   key={idx}
@@ -314,7 +314,7 @@ export const HanziWriterCanvas: React.FC<HanziWriterCanvasProps> = ({
             <div className="flex gap-2 mt-3 pointer-events-auto">
               <button
                 onClick={handleStartQuiz}
-                className="px-3 py-1.5 bg-white dark:bg-stone-800 text-emerald-700 dark:text-emerald-300 font-medium text-xs rounded-lg shadow hover:bg-stone-50 dark:hover:bg-stone-750 border border-emerald-200 dark:border-stone-700 flex items-center gap-1"
+                className="px-3 py-1.5 bg-white dark:bg-stone-800 text-emerald-700 dark:text-emerald-300 font-medium text-xs rounded-lg shadow hover:bg-stone-50 dark:hover:bg-stone-700 border border-emerald-200 dark:border-stone-700 flex items-center gap-1"
               >
                 <RotateCcw className="w-3.5 h-3.5" /> Tulis Lagi
               </button>

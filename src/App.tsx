@@ -532,8 +532,8 @@ export function App() {
                   onClick={() => setSelectedUnitId('all')}
                   className={`px-3 py-2 rounded-xl whitespace-nowrap transition font-medium ${
                     selectedUnitId === 'all'
-                      ? 'bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 shadow-xs font-bold'
-                      : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-stone-700'
+                      ? 'bg-stone-900 dark:bg-stone-800 text-white shadow-xs font-bold border border-stone-900 dark:border-stone-700'
+                      : 'bg-stone-100 dark:bg-stone-800/80 text-stone-600 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-stone-700'
                   }`}
                 >
                   Semua Kata (130)
@@ -579,8 +579,8 @@ export function App() {
                         onClick={() => setStatusFilter(st)}
                         className={`px-2.5 py-1.5 rounded-xl border whitespace-nowrap text-xs transition ${
                           statusFilter === st
-                            ? 'bg-stone-800 dark:bg-stone-100 text-white dark:text-stone-900 border-stone-800 dark:border-stone-100 font-semibold'
-                            : 'bg-white dark:bg-stone-800 text-stone-600 dark:text-stone-300 border-stone-200 dark:border-stone-700 hover:bg-stone-50 dark:hover:bg-stone-750'
+                            ? 'bg-stone-900 dark:bg-stone-800 text-white border-stone-900 dark:border-stone-600 font-semibold shadow-xs'
+                            : 'bg-white dark:bg-stone-800 text-stone-600 dark:text-stone-300 border-stone-200 dark:border-stone-700 hover:bg-stone-50 dark:hover:bg-stone-700'
                         }`}
                       >
                         {st === 'all' ? 'Semua' : st === 'mastered' ? 'Hafal' : st === 'learning' ? 'Belajar' : 'Favorit'}

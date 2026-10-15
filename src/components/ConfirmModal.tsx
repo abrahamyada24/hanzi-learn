@@ -54,7 +54,7 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
           <button
             type="button"
             onClick={onCancel}
-            className="w-full py-2.5 px-4 bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-750 text-stone-700 dark:text-stone-300 text-xs font-semibold rounded-xl transition active:scale-95"
+            className="w-full py-2.5 px-4 bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-300 text-xs font-semibold rounded-xl transition active:scale-95"
           >
             {cancelLabel}
           </button>
@@ -64,7 +64,7 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
             className={`w-full py-2.5 px-4 text-xs font-semibold rounded-xl shadow-xs transition active:scale-95 ${
               isDestructive 
                 ? 'bg-red-600 hover:bg-red-700 text-white' 
-                : 'bg-stone-900 hover:bg-stone-800 dark:bg-stone-100 dark:hover:bg-white text-white dark:text-stone-900'
+                : 'bg-stone-900 hover:bg-stone-800 dark:bg-stone-800 dark:hover:bg-stone-700 text-white border border-stone-800 dark:border-stone-700'
             }`}
           >
             {confirmLabel}

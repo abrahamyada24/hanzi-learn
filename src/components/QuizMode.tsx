@@ -226,7 +226,7 @@ export const QuizMode: React.FC<QuizModeProps> = ({
               } else if (isSelected) {
                 btnStyle = 'bg-red-50 dark:bg-red-950/50 border-red-500 dark:border-red-600 text-red-900 dark:text-red-200 ring-2 ring-red-500/20';
               } else {
-                btnStyle = 'opacity-40 bg-stone-50 dark:bg-stone-850 border-stone-200 dark:border-stone-800 text-stone-400 dark:text-stone-500';
+                btnStyle = 'opacity-40 bg-stone-50 dark:bg-stone-900/60 border-stone-200 dark:border-stone-800 text-stone-400 dark:text-stone-500';
               }
             }
 

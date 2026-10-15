@@ -95,7 +95,7 @@ export const RadicalsView: React.FC = () => {
           {/* Dropdown Trigger Button */}
           <button
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            className="flex-1 bg-white dark:bg-stone-900 hover:bg-stone-50 dark:hover:bg-stone-850 border border-stone-200 dark:border-stone-800 p-2 sm:p-2.5 px-3 sm:px-4 rounded-2xl shadow-xs transition flex items-center justify-between min-w-0 active:scale-[0.99]"
+            className="flex-1 bg-white dark:bg-stone-900 hover:bg-stone-50 dark:hover:bg-stone-800 border border-stone-200 dark:border-stone-800 p-2 sm:p-2.5 px-3 sm:px-4 rounded-2xl shadow-xs transition flex items-center justify-between min-w-0 active:scale-[0.99]"
           >
             <div className="flex items-center gap-2.5 min-w-0">
               <span className="font-serif font-bold text-2xl sm:text-3xl text-stone-900 dark:text-stone-100 flex-shrink-0">
@@ -141,7 +141,7 @@ export const RadicalsView: React.FC = () => {
         {isDropdownOpen && (
           <div className="absolute left-0 right-0 top-full mt-2 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-3xl shadow-2xl z-50 overflow-hidden flex flex-col max-h-[400px] animate-in fade-in zoom-in-95 duration-150">
             {/* Search Header */}
-            <div className="p-3 border-b border-stone-100 dark:border-stone-800 bg-stone-50/80 dark:bg-stone-850/80 sticky top-0 z-10 backdrop-blur-xs">
+            <div className="p-3 border-b border-stone-100 dark:border-stone-800 bg-stone-50/90 dark:bg-stone-900/95 sticky top-0 z-10 backdrop-blur-xs">
               <div className="relative">
                 <Search className="w-4 h-4 text-stone-400 absolute left-3 top-3 pointer-events-none" />
                 <input
@@ -294,7 +294,7 @@ export const RadicalsView: React.FC = () => {
               <button
                 key={idx}
                 onClick={() => speechManager.speak(char)}
-                className="py-2 px-3 bg-stone-50 dark:bg-stone-800/70 hover:bg-blue-50 dark:hover:bg-blue-950/40 hover:border-blue-200 dark:hover:border-blue-900/50 border border-stone-100 dark:border-stone-750 rounded-xl transition flex items-center gap-1.5 active:scale-95 group"
+                className="py-2 px-3 bg-stone-50 dark:bg-stone-800/70 hover:bg-blue-50 dark:hover:bg-blue-950/40 hover:border-blue-200 dark:hover:border-blue-900/50 border border-stone-100 dark:border-stone-700 rounded-xl transition flex items-center gap-1.5 active:scale-95 group"
               >
                 <span className="font-serif font-bold text-lg text-stone-900 dark:text-stone-100 group-hover:text-blue-700 dark:group-hover:text-blue-400 transition">
                   {char}

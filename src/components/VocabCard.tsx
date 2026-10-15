@@ -105,7 +105,7 @@ export const VocabCard: React.FC<VocabCardProps> = ({
             </button>
 
             {showExamples && (
-              <div className="mt-2 space-y-2 text-xs bg-stone-50 dark:bg-stone-800/60 p-2.5 rounded-xl border border-stone-100 dark:border-stone-750 animate-in fade-in">
+              <div className="mt-2 space-y-2 text-xs bg-stone-50 dark:bg-stone-800/60 p-2.5 rounded-xl border border-stone-100 dark:border-stone-700 animate-in fade-in">
                 {vocab.examples.map((ex, idx) => (
                   <div key={idx} className="group/ex">
                     <div className="flex items-start justify-between gap-1">
@@ -129,7 +129,7 @@ export const VocabCard: React.FC<VocabCardProps> = ({
       </div>
 
       {/* Bottom Status Buttons (SRS Quick Tagging) */}
-      <div className="p-3 bg-stone-50/70 dark:bg-stone-850 border-t border-stone-100 dark:border-stone-800 mt-2 flex items-center justify-between text-xs transition-colors">
+      <div className="p-3 bg-stone-50/70 dark:bg-stone-950/80 border-t border-stone-100 dark:border-stone-800 mt-2 flex items-center justify-between text-xs transition-colors">
         <span className="text-stone-400 dark:text-stone-500 text-[11px]">Hafalan:</span>
         <div className="flex items-center gap-1">
           <button

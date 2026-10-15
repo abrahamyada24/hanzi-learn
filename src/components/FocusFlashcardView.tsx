@@ -130,7 +130,7 @@ export const FocusFlashcardView: React.FC<FocusFlashcardViewProps> = ({
             </h2>
             <button
               onClick={() => handleAudio()}
-              className="absolute -right-10 top-1/2 -translate-y-1/2 p-2.5 bg-red-50 dark:bg-stone-800 text-red-700 dark:text-red-400 hover:bg-red-100 dark:hover:bg-stone-750 rounded-full transition shadow-xs active:scale-95 border border-red-100 dark:border-stone-700"
+              className="absolute -right-10 top-1/2 -translate-y-1/2 p-2.5 bg-red-50 dark:bg-stone-800 text-red-700 dark:text-red-400 hover:bg-red-100 dark:hover:bg-stone-700 rounded-full transition shadow-xs active:scale-95 border border-red-100 dark:border-stone-700"
               title="Dengarkan pelafalan"
             >
               <Volume2 className="w-5 h-5" />
@@ -145,7 +145,7 @@ export const FocusFlashcardView: React.FC<FocusFlashcardViewProps> = ({
                   setIsRevealed(true);
                   handleAudio();
                 }}
-                className="w-full py-3.5 px-4 bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-750 text-stone-700 dark:text-stone-200 font-semibold text-sm rounded-2xl transition flex items-center justify-center gap-2 border border-stone-200/80 dark:border-stone-700 active:scale-98"
+                className="w-full py-3.5 px-4 bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-200 font-semibold text-sm rounded-2xl transition flex items-center justify-center gap-2 border border-stone-200/80 dark:border-stone-700 active:scale-98"
               >
                 <Eye className="w-4 h-4 text-stone-500 dark:text-stone-400" />
                 <span>Buka Arti & Pinyin</span>
@@ -212,11 +212,11 @@ export const FocusFlashcardView: React.FC<FocusFlashcardViewProps> = ({
         </div>
 
         {/* Bottom SRS Quick Tagging */}
-        <div className="bg-stone-50 dark:bg-stone-850 p-3 border-t border-stone-100 dark:border-stone-800 flex items-center justify-between text-xs transition-colors">
+        <div className="bg-stone-50 dark:bg-stone-950/80 p-3 border-t border-stone-100 dark:border-stone-800 flex items-center justify-between text-xs transition-colors">
           <button
             onClick={() => onStatusChange(currentWord.id, 'new')}
             className={`flex-1 py-1.5 rounded-xl font-medium transition ${
-              currentStatus === 'new' ? 'bg-stone-300 dark:bg-stone-700 text-stone-900 dark:text-stone-100 font-bold' : 'text-stone-500 dark:text-stone-400 hover:bg-stone-200 dark:hover:bg-stone-800'
+              currentStatus === 'new' ? 'bg-stone-300 dark:bg-stone-800 text-stone-900 dark:text-stone-100 font-bold' : 'text-stone-500 dark:text-stone-400 hover:bg-stone-200 dark:hover:bg-stone-800/60'
             }`}
           >
             Ulangi
@@ -224,7 +224,7 @@ export const FocusFlashcardView: React.FC<FocusFlashcardViewProps> = ({
           <button
             onClick={() => onStatusChange(currentWord.id, 'learning')}
             className={`flex-1 py-1.5 rounded-xl font-medium transition flex items-center justify-center gap-1 ${
-              currentStatus === 'learning' ? 'bg-amber-200 dark:bg-amber-950 text-amber-950 dark:text-amber-300 font-bold' : 'text-stone-500 dark:text-stone-400 hover:bg-amber-100 dark:hover:bg-amber-950/40'
+              currentStatus === 'learning' ? 'bg-amber-200 dark:bg-amber-950/80 text-amber-950 dark:text-amber-300 font-bold border border-amber-300 dark:border-amber-900/50' : 'text-stone-500 dark:text-stone-400 hover:bg-amber-100 dark:hover:bg-amber-950/40'
             }`}
           >
             <Clock className="w-3 h-3" /> Belajar

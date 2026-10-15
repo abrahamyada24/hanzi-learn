@@ -114,7 +114,7 @@ export const UnitSelectorDropdown: React.FC<UnitSelectorDropdownProps> = ({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full bg-white dark:bg-stone-850 hover:bg-stone-50 dark:hover:bg-stone-800 border border-stone-200 dark:border-stone-700 text-stone-800 dark:text-stone-200 text-xs font-semibold py-2.5 px-3.5 rounded-2xl flex items-center justify-between shadow-xs transition active:scale-[0.99]"
+        className="w-full bg-white dark:bg-stone-900 hover:bg-stone-50 dark:hover:bg-stone-800 border border-stone-200 dark:border-stone-700 text-stone-800 dark:text-stone-200 text-xs font-semibold py-2.5 px-3.5 rounded-2xl flex items-center justify-between shadow-xs transition active:scale-[0.99]"
         aria-expanded={isOpen}
       >
         <div className="flex items-center gap-2 min-w-0 pr-2">
@@ -125,7 +125,7 @@ export const UnitSelectorDropdown: React.FC<UnitSelectorDropdownProps> = ({
             {currentUnit ? currentUnit.title : 'Semua Bab (130 Kata)'}
           </span>
           {currentUnit && (
-            <span className="text-[10px] bg-stone-100 dark:bg-stone-750 text-stone-500 dark:text-stone-400 px-2 py-0.5 rounded-full font-medium whitespace-nowrap hidden min-[360px]:inline">
+            <span className="text-[10px] bg-stone-100 dark:bg-stone-800 text-stone-500 dark:text-stone-400 px-2 py-0.5 rounded-full font-medium whitespace-nowrap hidden min-[360px]:inline">
               {currentUnit.wordIds.length} kata
             </span>
           )}
@@ -141,7 +141,7 @@ export const UnitSelectorDropdown: React.FC<UnitSelectorDropdownProps> = ({
       {isOpen && (
         <div className="absolute left-0 right-0 top-full mt-1.5 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl shadow-2xl z-50 overflow-hidden flex flex-col max-h-[380px] animate-in fade-in zoom-in-95 duration-150">
           {/* Search Box Header */}
-          <div className="p-2.5 border-b border-stone-100 dark:border-stone-800 bg-stone-50/80 dark:bg-stone-850/80 sticky top-0 z-10 backdrop-blur-xs">
+          <div className="p-2.5 border-b border-stone-100 dark:border-stone-800 bg-stone-50/90 dark:bg-stone-900/95 sticky top-0 z-10 backdrop-blur-xs">
             <div className="relative">
               <Search className="w-3.5 h-3.5 text-stone-400 absolute left-3 top-3 pointer-events-none" />
               <input
@@ -193,7 +193,7 @@ export const UnitSelectorDropdown: React.FC<UnitSelectorDropdownProps> = ({
                 </button>
 
                 {/* Section title */}
-                <div className="px-3.5 py-1.5 bg-stone-50 dark:bg-stone-850 text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider">
+                <div className="px-3.5 py-1.5 bg-stone-50 dark:bg-stone-800 text-[10px] font-bold text-stone-400 dark:text-stone-400 uppercase tracking-wider">
                   Daftar 10 Bab Terstruktur
                 </div>
 
@@ -219,7 +219,7 @@ export const UnitSelectorDropdown: React.FC<UnitSelectorDropdownProps> = ({
                         </div>
                       </div>
                       <div className="flex items-center gap-1.5 flex-shrink-0">
-                        <span className="text-[10px] bg-stone-100 dark:bg-stone-750 text-stone-500 dark:text-stone-400 px-2 py-0.5 rounded-full font-medium">
+                        <span className="text-[10px] bg-stone-100 dark:bg-stone-800 text-stone-500 dark:text-stone-400 px-2 py-0.5 rounded-full font-medium">
                           {unit.wordIds.length} kata
                         </span>
                         {isSelected && (
@@ -238,7 +238,7 @@ export const UnitSelectorDropdown: React.FC<UnitSelectorDropdownProps> = ({
                 {/* 1. MATCHING BAB / UNITS */}
                 {matchingUnits.length > 0 && (
                   <div>
-                    <div className="px-3.5 py-1.5 bg-stone-50 dark:bg-stone-850 text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider flex items-center justify-between">
+                    <div className="px-3.5 py-1.5 bg-stone-50 dark:bg-stone-800 text-[10px] font-bold text-stone-400 dark:text-stone-400 uppercase tracking-wider flex items-center justify-between">
                       <span>Bab yang Cocok</span>
                       <span className="bg-stone-200 dark:bg-stone-700 text-stone-600 dark:text-stone-300 text-[9px] px-1.5 py-0.2 rounded-full font-semibold">
                         {matchingUnits.length}
@@ -271,7 +271,7 @@ export const UnitSelectorDropdown: React.FC<UnitSelectorDropdownProps> = ({
                 {/* 2. MATCHING VOCABULARY WORDS */}
                 {matchingWords.length > 0 && (
                   <div>
-                    <div className="px-3.5 py-1.5 bg-stone-50 dark:bg-stone-850 text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider flex items-center justify-between">
+                    <div className="px-3.5 py-1.5 bg-stone-50 dark:bg-stone-800 text-[10px] font-bold text-stone-400 dark:text-stone-400 uppercase tracking-wider flex items-center justify-between">
                       <span>Kosakata yang Cocok</span>
                       <span className="bg-red-100 dark:bg-red-950/60 text-red-700 dark:text-red-300 text-[9px] px-1.5 py-0.2 rounded-full font-semibold">
                         {matchingWords.length} kata

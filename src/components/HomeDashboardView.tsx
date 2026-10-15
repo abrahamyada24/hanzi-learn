@@ -124,7 +124,7 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({
         {/* Radikal Dasar */}
         <button
           onClick={() => onNavigateTab('stories', 'radicals')}
-          className="bg-white hover:bg-stone-50 dark:bg-stone-900 dark:hover:bg-stone-850 p-4 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs text-left transition flex items-center gap-3.5 group active:scale-98"
+          className="bg-white hover:bg-stone-50 dark:bg-stone-900 dark:hover:bg-stone-800 p-4 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs text-left transition flex items-center gap-3.5 group active:scale-98"
         >
           <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition border border-blue-100 dark:border-blue-900/40">
             <Layers className="w-5 h-5" />
@@ -142,7 +142,7 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({
         {/* Kuis Interaktif */}
         <button
           onClick={() => onNavigateTab('quiz')}
-          className="bg-white hover:bg-stone-50 dark:bg-stone-900 dark:hover:bg-stone-850 p-4 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs text-left transition flex items-center gap-3.5 group active:scale-98"
+          className="bg-white hover:bg-stone-50 dark:bg-stone-900 dark:hover:bg-stone-800 p-4 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs text-left transition flex items-center gap-3.5 group active:scale-98"
         >
           <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition border border-emerald-100 dark:border-emerald-900/40">
             <HelpCircle className="w-5 h-5" />
@@ -160,7 +160,7 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({
         {/* Tulis Bebas (Sandbox) */}
         <button
           onClick={() => onNavigateTab('stories', 'sandbox')}
-          className="bg-white hover:bg-stone-50 dark:bg-stone-900 dark:hover:bg-stone-850 p-4 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs text-left transition flex items-center gap-3.5 group active:scale-98"
+          className="bg-white hover:bg-stone-50 dark:bg-stone-900 dark:hover:bg-stone-800 p-4 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs text-left transition flex items-center gap-3.5 group active:scale-98"
         >
           <div className="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition border border-purple-100 dark:border-purple-900/40">
             <PenTool className="w-5 h-5" />
@@ -178,7 +178,7 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({
 
       {/* 4. AKSARA HARI INI (HANZI OF THE DAY) */}
       {dailyStory && (
-        <div className="bg-gradient-to-br from-amber-50/80 via-white to-stone-50 dark:from-stone-900 dark:via-stone-900/95 dark:to-stone-850 rounded-3xl p-5 sm:p-6 border border-amber-200/70 dark:border-stone-800 shadow-xs relative overflow-hidden transition-colors">
+        <div className="bg-gradient-to-br from-amber-50/80 via-white to-stone-50 dark:from-stone-900 dark:via-stone-900/95 dark:to-stone-900 rounded-3xl p-5 sm:p-6 border border-amber-200/70 dark:border-stone-800 shadow-xs relative overflow-hidden transition-colors">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-start gap-4">
               {/* Big Hanzi Character */}
@@ -203,7 +203,7 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({
 
             <button
               onClick={() => onNavigateTab('stories', 'stories')}
-              className="py-2 px-4 bg-white dark:bg-stone-800 hover:bg-amber-50 dark:hover:bg-stone-750 text-stone-800 dark:text-stone-200 border border-amber-200 dark:border-stone-700 rounded-xl text-xs font-semibold transition flex items-center justify-center gap-1.5 self-start sm:self-center active:scale-95 whitespace-nowrap shadow-2xs"
+              className="py-2 px-4 bg-white dark:bg-stone-800 hover:bg-amber-50 dark:hover:bg-stone-700 text-stone-800 dark:text-stone-200 border border-amber-200 dark:border-stone-700 rounded-xl text-xs font-semibold transition flex items-center justify-center gap-1.5 self-start sm:self-center active:scale-95 whitespace-nowrap shadow-2xs"
             >
               <Compass className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
               <span>Buka Cerita Lengkap</span>

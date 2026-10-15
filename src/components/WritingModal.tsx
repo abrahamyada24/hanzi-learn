@@ -45,7 +45,7 @@ export const WritingModal: React.FC<WritingModalProps> = ({
         {/* Modal Body */}
         <div className="p-6 overflow-y-auto space-y-5">
           {/* Word Information Card */}
-          <div className="bg-white dark:bg-stone-850 p-4 rounded-2xl border border-stone-200/80 dark:border-stone-800 shadow-sm flex items-center justify-between">
+          <div className="bg-white dark:bg-stone-800 p-4 rounded-2xl border border-stone-200/80 dark:border-stone-700 shadow-sm flex items-center justify-between">
             <div>
               <div className="flex items-baseline gap-2">
                 <span className="text-3xl font-bold font-serif text-stone-900 dark:text-stone-100">{vocab.hanzi}</span>
@@ -62,7 +62,7 @@ export const WritingModal: React.FC<WritingModalProps> = ({
                 {vocab.indonesian} <span className="text-stone-400 dark:text-stone-500 text-xs">({vocab.english})</span>
               </div>
             </div>
-            <span className="text-xs bg-stone-100 dark:bg-stone-750 text-stone-600 dark:text-stone-300 px-3 py-1 rounded-xl font-medium">
+            <span className="text-xs bg-stone-100 dark:bg-stone-700 text-stone-600 dark:text-stone-300 px-3 py-1 rounded-xl font-medium">
               {vocab.category}
             </span>
           </div>
@@ -80,7 +80,7 @@ export const WritingModal: React.FC<WritingModalProps> = ({
 
           {/* Example sentence hint */}
           {vocab.examples && vocab.examples[0] && (
-            <div className="bg-white dark:bg-stone-850 p-4 rounded-2xl border border-stone-200 dark:border-stone-800 text-xs space-y-1">
+            <div className="bg-white dark:bg-stone-800 p-4 rounded-2xl border border-stone-200 dark:border-stone-700 text-xs space-y-1">
               <div className="font-semibold text-stone-700 dark:text-stone-300 flex items-center gap-1.5">
                 <BookOpen className="w-3.5 h-3.5 text-red-600 dark:text-red-400" />
                 <span>Contoh Penggunaan:</span>

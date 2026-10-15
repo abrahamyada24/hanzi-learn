@@ -111,7 +111,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
             </div>
             <button
               onClick={() => loginWithGoogle()}
-              className="inline-flex items-center gap-2 py-2.5 px-5 bg-white dark:bg-stone-800 hover:bg-stone-50 dark:hover:bg-stone-750 border border-stone-300 dark:border-stone-700 text-stone-800 dark:text-stone-100 rounded-2xl text-xs font-bold transition shadow-xs active:scale-95"
+              className="inline-flex items-center gap-2 py-2.5 px-5 bg-white dark:bg-stone-800 hover:bg-stone-50 dark:hover:bg-stone-700 border border-stone-300 dark:border-stone-700 text-stone-800 dark:text-stone-100 rounded-2xl text-xs font-bold transition shadow-xs active:scale-95"
             >
               <svg className="w-4 h-4" viewBox="0 0 24 24">
                 <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
@@ -178,7 +178,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
 
         {/* 4 Stats Cards */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <div className="bg-stone-50 dark:bg-stone-850 rounded-2xl p-3.5 border border-stone-100 dark:border-stone-800 flex items-center gap-3">
+          <div className="bg-stone-50 dark:bg-stone-800/80 rounded-2xl p-3.5 border border-stone-100 dark:border-stone-700/80 flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-amber-500/15 text-amber-600 dark:text-amber-400 flex items-center justify-center flex-shrink-0">
               <Flame className="w-5 h-5 fill-amber-500" />
             </div>
@@ -188,7 +188,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
             </div>
           </div>
 
-          <div className="bg-stone-50 dark:bg-stone-850 rounded-2xl p-3.5 border border-stone-100 dark:border-stone-800 flex items-center gap-3">
+          <div className="bg-stone-50 dark:bg-stone-800/80 rounded-2xl p-3.5 border border-stone-100 dark:border-stone-700/80 flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-blue-500/15 text-blue-600 dark:text-blue-400 flex items-center justify-center flex-shrink-0">
               <PenTool className="w-5 h-5" />
             </div>
@@ -198,7 +198,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
             </div>
           </div>
 
-          <div className="bg-stone-50 dark:bg-stone-850 rounded-2xl p-3.5 border border-stone-100 dark:border-stone-800 flex items-center gap-3">
+          <div className="bg-stone-50 dark:bg-stone-800/80 rounded-2xl p-3.5 border border-stone-100 dark:border-stone-700/80 flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 flex items-center justify-center flex-shrink-0">
               <CheckCircle className="w-5 h-5" />
             </div>
@@ -208,7 +208,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
             </div>
           </div>
 
-          <div className="bg-stone-50 dark:bg-stone-850 rounded-2xl p-3.5 border border-stone-100 dark:border-stone-800 flex items-center gap-3">
+          <div className="bg-stone-50 dark:bg-stone-800/80 rounded-2xl p-3.5 border border-stone-100 dark:border-stone-700/80 flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-red-500/15 text-red-600 dark:text-red-400 flex items-center justify-center flex-shrink-0">
               <BookOpen className="w-5 h-5" />
             </div>
@@ -265,9 +265,9 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
           {!isStandalone ? (
             <button
               onClick={onInstallApp}
-              className="py-2.5 px-4 bg-stone-900 dark:bg-stone-100 hover:bg-stone-800 dark:hover:bg-white text-white dark:text-stone-900 rounded-2xl text-xs font-semibold transition flex items-center justify-center gap-2 active:scale-95 shadow-xs whitespace-nowrap self-start sm:self-center"
+              className="py-2.5 px-4 bg-stone-900 dark:bg-stone-800 hover:bg-stone-800 dark:hover:bg-stone-700 text-white border border-stone-800 dark:border-stone-700 rounded-2xl text-xs font-semibold transition flex items-center justify-center gap-2 active:scale-95 shadow-xs whitespace-nowrap self-start sm:self-center"
             >
-              <Download className="w-4 h-4 text-red-400 dark:text-red-600" />
+              <Download className="w-4 h-4 text-red-400 dark:text-red-400" />
               <span>Install di HP</span>
             </button>
           ) : (
@@ -296,7 +296,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
               <button
                 onClick={onManualSync}
                 disabled={isSyncing}
-                className="py-1.5 px-3 bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-750 text-stone-700 dark:text-stone-300 rounded-xl font-semibold transition active:scale-95 disabled:opacity-50 whitespace-nowrap"
+                className="py-1.5 px-3 bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-300 rounded-xl font-semibold transition active:scale-95 disabled:opacity-50 whitespace-nowrap"
               >
                 {isSyncing ? 'Menyinkronkan...' : 'Sinkronkan'}
               </button>

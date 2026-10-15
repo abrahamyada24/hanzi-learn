@@ -107,7 +107,7 @@ export const CharacterStoriesView: React.FC = () => {
           {/* Custom Dropdown Trigger */}
           <button
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            className="flex-1 bg-white dark:bg-stone-900 hover:bg-stone-50 dark:hover:bg-stone-850 border border-stone-200 dark:border-stone-800 p-2 sm:p-2.5 px-3 sm:px-4 rounded-2xl shadow-xs transition flex items-center justify-between min-w-0 active:scale-[0.99]"
+            className="flex-1 bg-white dark:bg-stone-900 hover:bg-stone-50 dark:hover:bg-stone-800 border border-stone-200 dark:border-stone-800 p-2 sm:p-2.5 px-3 sm:px-4 rounded-2xl shadow-xs transition flex items-center justify-between min-w-0 active:scale-[0.99]"
           >
             <div className="flex items-center gap-2.5 min-w-0">
               <span className="font-serif font-bold text-2xl sm:text-3xl text-stone-900 dark:text-stone-100 flex-shrink-0">
@@ -153,7 +153,7 @@ export const CharacterStoriesView: React.FC = () => {
         {isDropdownOpen && (
           <div className="absolute left-0 right-0 top-full mt-2 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-3xl shadow-2xl z-50 overflow-hidden flex flex-col max-h-[420px] animate-in fade-in zoom-in-95 duration-150">
             {/* Search Header */}
-            <div className="p-3 border-b border-stone-100 dark:border-stone-800 bg-stone-50/80 dark:bg-stone-850/80 sticky top-0 z-10 backdrop-blur-xs space-y-2">
+            <div className="p-3 border-b border-stone-100 dark:border-stone-800 bg-stone-50/90 dark:bg-stone-900/95 sticky top-0 z-10 backdrop-blur-xs space-y-2">
               <div className="relative">
                 <Search className="w-4 h-4 text-stone-400 absolute left-3 top-3 pointer-events-none" />
                 <input
@@ -182,8 +182,8 @@ export const CharacterStoriesView: React.FC = () => {
                     onClick={() => setSelectedTag(tag)}
                     className={`px-2.5 py-1 rounded-lg font-medium whitespace-nowrap transition ${
                       selectedTag === tag
-                        ? 'bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 font-bold'
-                        : 'bg-white dark:bg-stone-800 text-stone-600 dark:text-stone-300 border border-stone-200 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-750'
+                        ? 'bg-red-700 text-white font-bold shadow-xs'
+                        : 'bg-white dark:bg-stone-800 text-stone-600 dark:text-stone-300 border border-stone-200 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-700'
                     }`}
                   >
                     {tag}
@@ -322,7 +322,7 @@ export const CharacterStoriesView: React.FC = () => {
             </h4>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {selectedStory.components.map((comp, idx) => (
-                <div key={idx} className="flex items-center gap-2.5 p-2 bg-stone-50 dark:bg-stone-800/60 rounded-xl border border-stone-100 dark:border-stone-750 text-xs">
+                <div key={idx} className="flex items-center gap-2.5 p-2 bg-stone-50 dark:bg-stone-800/60 rounded-xl border border-stone-100 dark:border-stone-700 text-xs">
                   <span className="font-serif font-bold text-lg text-stone-900 dark:text-stone-100 w-7 h-7 rounded-lg bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 flex items-center justify-center shadow-2xs flex-shrink-0">
                     {comp.char}
                   </span>
@@ -344,7 +344,7 @@ export const CharacterStoriesView: React.FC = () => {
                 <button
                   key={idx}
                   onClick={() => speechManager.speak(item.word)}
-                  className="p-2.5 bg-stone-50 dark:bg-stone-800/70 hover:bg-red-50 dark:hover:bg-red-950/40 hover:border-red-200 dark:hover:border-red-900/50 border border-stone-100 dark:border-stone-750 rounded-2xl text-left transition group active:scale-98"
+                  className="p-2.5 bg-stone-50 dark:bg-stone-800/70 hover:bg-red-50 dark:hover:bg-red-950/40 hover:border-red-200 dark:hover:border-red-900/50 border border-stone-100 dark:border-stone-700 rounded-2xl text-left transition group active:scale-98"
                 >
                   <div className="font-serif font-bold text-base text-stone-900 dark:text-stone-100 group-hover:text-red-700 dark:group-hover:text-red-400 transition">
                     {item.word}

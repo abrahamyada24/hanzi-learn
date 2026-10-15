@@ -2,6 +2,11 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+@theme {
+  --color-stone-750: #383431;
+  --color-stone-850: #201d1b;
+}
+
 @layer base {
   body {
     @apply bg-stone-50 text-stone-900 dark:bg-stone-950 dark:text-stone-100 antialiased min-h-screen transition-colors duration-150;

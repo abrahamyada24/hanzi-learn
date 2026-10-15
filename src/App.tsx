@@ -8,7 +8,9 @@ import {
   Compass,
   LayoutGrid,
   List,
-  Maximize2
+  Maximize2,
+  Cloud,
+  LogOut
 } from 'lucide-react';
 import { HSK1_VOCABULARY } from './data/hsk1';
 import { LESSON_UNITS } from './data/lessonUnits';
@@ -21,6 +23,8 @@ import {
   getBookmarks, 
   toggleBookmark 
 } from './utils/storage';
+import { useAuth } from './context/AuthContext';
+import { syncUserData, saveToCloud } from './utils/cloudSync';
 import { StatsHeader } from './components/StatsHeader';
 import { VocabCard } from './components/VocabCard';
 import { FocusFlashcardView } from './components/FocusFlashcardView';
@@ -36,6 +40,9 @@ type ViewMode = 'focus' | 'compact' | 'grid';
 type FilterStatusType = 'all' | 'new' | 'learning' | 'mastered' | 'bookmarked';
 
 export function App() {
+  const { user, loginWithGoogle, logout } = useAuth();
+  const [showUserMenu, setShowUserMenu] = useState(false);
+
   const [activeTab, setActiveTab] = useState<NavTab>('flashcards');
   const [viewMode, setViewMode] = useState<ViewMode>('focus');
   const [selectedUnitId, setSelectedUnitId] = useState<string>('unit-1'); // Default Bab 1: 10 kata
@@ -51,23 +58,49 @@ export function App() {
   // Modal for writing practice
   const [writingModalVocab, setWritingModalVocab] = useState<VocabItem | null>(null);
 
-  // Load progress and stats on mount
+  // Load local progress on mount
   useEffect(() => {
     setProgress(getAllProgress());
     setStats(getUserStats());
     setBookmarks(getBookmarks());
   }, []);
 
+  // Sync with Firestore when user logs in
+  useEffect(() => {
+    if (user) {
+      syncUserData(
+        user.uid,
+        progress,
+        stats,
+        bookmarks,
+        { email: user.email, displayName: user.displayName }
+      ).then((merged) => {
+        setProgress(merged.progress);
+        setStats(merged.stats);
+        setBookmarks(merged.bookmarks);
+      });
+    }
+  }, [user]);
+
   // Update word mastery status
   const handleStatusChange = (wordId: string, status: MasteryStatus) => {
     const updated = saveWordProgress(wordId, status);
-    setProgress(prev => ({ ...prev, [wordId]: updated }));
+    const newProgress = { ...progress, [wordId]: updated };
+    setProgress(newProgress);
+
+    if (user) {
+      saveToCloud(user.uid, { progress: newProgress });
+    }
   };
 
   // Toggle bookmark star
   const handleToggleBookmark = (wordId: string) => {
     const updated = toggleBookmark(wordId);
     setBookmarks(updated);
+
+    if (user) {
+      saveToCloud(user.uid, { bookmarks: updated });
+    }
   };
 
   // Called when writing canvas finishes a character
@@ -75,6 +108,7 @@ export function App() {
     const newStats = recordActivity(1, 0, 0);
     setStats(newStats);
 
+    let updatedProgress = progress;
     if (writingModalVocab) {
       const currentStatus = progress[writingModalVocab.id]?.status || 'learning';
       const updated = saveWordProgress(
@@ -83,7 +117,12 @@ export function App() {
         1, 
         mistakes
       );
-      setProgress(prev => ({ ...prev, [writingModalVocab.id]: updated }));
+      updatedProgress = { ...progress, [writingModalVocab.id]: updated };
+      setProgress(updatedProgress);
+    }
+
+    if (user) {
+      saveToCloud(user.uid, { stats: newStats, progress: updatedProgress });
     }
   };
 
@@ -91,6 +130,10 @@ export function App() {
   const handleFinishQuiz = (correctCount: number, totalQuestions: number) => {
     const newStats = recordActivity(0, correctCount, totalQuestions);
     setStats(newStats);
+
+    if (user) {
+      saveToCloud(user.uid, { stats: newStats });
+    }
   };
 
   // Filtered vocabulary list
@@ -170,7 +213,7 @@ export function App() {
             </div>
 
             {/* Navigation Tabs (Scrollable on small mobile screens) */}
-            <nav className="flex items-center gap-1 bg-stone-100 p-1 rounded-2xl text-xs sm:text-sm font-medium text-stone-600 overflow-x-auto max-w-[calc(100vw-110px)] sm:max-w-none">
+            <nav className="flex items-center gap-1 bg-stone-100 p-1 rounded-2xl text-xs sm:text-sm font-medium text-stone-600 overflow-x-auto max-w-[calc(100vw-210px)] sm:max-w-none">
               <button
                 onClick={() => setActiveTab('flashcards')}
                 className={`px-2.5 sm:px-3 py-1.5 rounded-xl whitespace-nowrap transition-all flex items-center gap-1.5 ${
@@ -221,6 +264,83 @@ export function App() {
                 <span className="hidden sm:inline">Tulis Bebas</span>
               </button>
             </nav>
+
+            {/* Right Side: Google Login / User Profile */}
+            <div className="flex items-center gap-2 flex-shrink-0">
+              {user ? (
+                <div className="relative">
+                  <button
+                    onClick={() => setShowUserMenu(!showUserMenu)}
+                    className="flex items-center gap-2 p-1 pl-2 bg-stone-100 hover:bg-stone-200 rounded-full transition border border-stone-200 active:scale-95"
+                  >
+                    <span className="text-xs font-semibold text-stone-700 hidden sm:inline max-w-[90px] truncate">
+                      {user.displayName?.split(' ')[0] || 'User'}
+                    </span>
+                    {user.photoURL ? (
+                      <img
+                        src={user.photoURL}
+                        alt="Profile"
+                        className="w-7 h-7 rounded-full object-cover border border-white"
+                      />
+                    ) : (
+                      <div className="w-7 h-7 rounded-full bg-red-700 text-white font-bold text-xs flex items-center justify-center">
+                        {user.email?.[0].toUpperCase() || 'U'}
+                      </div>
+                    )}
+                  </button>
+
+                  {/* User Dropdown Menu */}
+                  {showUserMenu && (
+                    <div className="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-xl border border-stone-200 p-3 z-50 animate-in fade-in">
+                      <div className="pb-2.5 mb-2 border-b border-stone-100">
+                        <div className="font-bold text-sm text-stone-900 truncate">{user.displayName || 'Pengguna'}</div>
+                        <div className="text-xs text-stone-500 truncate">{user.email}</div>
+                        <div className="flex items-center gap-1.5 mt-2 text-[11px] text-emerald-700 bg-emerald-50 px-2 py-1 rounded-lg">
+                          <Cloud className="w-3.5 h-3.5" />
+                          <span>Tersinkron ke Google Cloud</span>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => {
+                          logout();
+                          setShowUserMenu(false);
+                        }}
+                        className="w-full text-left px-3 py-2 text-xs font-semibold text-red-600 hover:bg-red-50 rounded-xl transition flex items-center gap-2"
+                      >
+                        <LogOut className="w-4 h-4" />
+                        <span>Keluar (Logout)</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <button
+                  onClick={() => loginWithGoogle()}
+                  className="flex items-center gap-2 py-1.5 px-3 bg-white hover:bg-stone-50 border border-stone-200 text-stone-800 rounded-xl text-xs font-semibold transition shadow-xs active:scale-95"
+                  title="Masuk dengan Google untuk sinkronkan hafalanmu di semua perangkat"
+                >
+                  <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24">
+                    <path
+                      fill="#4285F4"
+                      d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"
+                    />
+                    <path
+                      fill="#34A853"
+                      d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"
+                    />
+                    <path
+                      fill="#FBBC05"
+                      d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.97 0 12s.45 3.82 1.25 5.42l4.03-3.15z"
+                    />
+                    <path
+                      fill="#EA4335"
+                      d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"
+                    />
+                  </svg>
+                  <span className="hidden sm:inline">Masuk</span>
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </header>

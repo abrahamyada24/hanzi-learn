@@ -39,6 +39,8 @@ import { UnitSelectorDropdown } from './components/UnitSelectorDropdown';
 import { BottomNavBar, type NavTab } from './components/BottomNavBar';
 import { ProfileView } from './components/ProfileView';
 import { Toast, type ToastMessage } from './components/Toast';
+import { FeedbackModal } from './components/FeedbackModal';
+import { AdminDashboardView } from './components/AdminDashboardView';
 
 type ViewMode = 'focus' | 'compact' | 'grid';
 type FilterStatusType = 'all' | 'new' | 'learning' | 'mastered' | 'bookmarked';
@@ -71,6 +73,10 @@ export function App() {
 
   // Modal for writing practice
   const [writingModalVocab, setWritingModalVocab] = useState<VocabItem | null>(null);
+
+  // Feedback & Admin states
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+  const [showAdminDashboard, setShowAdminDashboard] = useState(false);
 
   const showToast = (type: 'success' | 'error' | 'info', message: string) => {
     setToast({ id: Date.now().toString(), type, message });
@@ -291,7 +297,7 @@ export function App() {
         <div className="max-w-6xl mx-auto px-3 sm:px-4">
           <div className="h-16 flex items-center justify-between gap-3">
             {/* Logo */}
-            <div className="flex items-center gap-2.5 flex-shrink-0 cursor-pointer" onClick={() => setActiveTab('home')}>
+            <div className="flex items-center gap-2.5 flex-shrink-0 cursor-pointer" onClick={() => { setShowAdminDashboard(false); setActiveTab('home'); }}>
               <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-red-700 text-white font-serif font-bold text-xl sm:text-2xl flex items-center justify-center shadow-md">
                 汉
               </div>
@@ -306,9 +312,9 @@ export function App() {
             {/* Desktop Navigation Tabs (Hidden on mobile) */}
             <nav className="hidden md:flex items-center gap-1 bg-stone-100 dark:bg-stone-800/80 p-1 rounded-2xl text-xs lg:text-sm font-medium text-stone-600 dark:text-stone-400">
               <button
-                onClick={() => setActiveTab('home')}
+                onClick={() => { setShowAdminDashboard(false); setActiveTab('home'); }}
                 className={`px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 ${
-                  activeTab === 'home' ? 'bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 shadow-xs font-semibold' : 'hover:text-stone-900 dark:hover:text-stone-100'
+                  !showAdminDashboard && activeTab === 'home' ? 'bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 shadow-xs font-semibold' : 'hover:text-stone-900 dark:hover:text-stone-100'
                 }`}
               >
                 <Home className="w-4 h-4 text-red-600 dark:text-red-500 flex-shrink-0" />
@@ -316,9 +322,9 @@ export function App() {
               </button>
 
               <button
-                onClick={() => setActiveTab('flashcards')}
+                onClick={() => { setShowAdminDashboard(false); setActiveTab('flashcards'); }}
                 className={`px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 ${
-                  activeTab === 'flashcards' ? 'bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 shadow-xs font-semibold' : 'hover:text-stone-900 dark:hover:text-stone-100'
+                  !showAdminDashboard && activeTab === 'flashcards' ? 'bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 shadow-xs font-semibold' : 'hover:text-stone-900 dark:hover:text-stone-100'
                 }`}
               >
                 <BookOpen className="w-4 h-4 text-red-600 dark:text-red-500 flex-shrink-0" />
@@ -326,9 +332,9 @@ export function App() {
               </button>
 
               <button
-                onClick={() => setActiveTab('stories')}
+                onClick={() => { setShowAdminDashboard(false); setActiveTab('stories'); }}
                 className={`px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 ${
-                  activeTab === 'stories' ? 'bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 shadow-xs font-semibold' : 'hover:text-stone-900 dark:hover:text-stone-100'
+                  !showAdminDashboard && activeTab === 'stories' ? 'bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 shadow-xs font-semibold' : 'hover:text-stone-900 dark:hover:text-stone-100'
                 }`}
               >
                 <Compass className="w-4 h-4 text-amber-600 dark:text-amber-400 flex-shrink-0" />
@@ -336,9 +342,9 @@ export function App() {
               </button>
 
               <button
-                onClick={() => setActiveTab('quiz')}
+                onClick={() => { setShowAdminDashboard(false); setActiveTab('quiz'); }}
                 className={`px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 ${
-                  activeTab === 'quiz' ? 'bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 shadow-xs font-semibold' : 'hover:text-stone-900 dark:hover:text-stone-100'
+                  !showAdminDashboard && activeTab === 'quiz' ? 'bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 shadow-xs font-semibold' : 'hover:text-stone-900 dark:hover:text-stone-100'
                 }`}
               >
                 <HelpCircle className="w-4 h-4 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
@@ -346,9 +352,9 @@ export function App() {
               </button>
 
               <button
-                onClick={() => setActiveTab('profile')}
+                onClick={() => { setShowAdminDashboard(false); setActiveTab('profile'); }}
                 className={`px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 ${
-                  activeTab === 'profile' ? 'bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 shadow-xs font-semibold' : 'hover:text-stone-900 dark:hover:text-stone-100'
+                  !showAdminDashboard && activeTab === 'profile' ? 'bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 shadow-xs font-semibold' : 'hover:text-stone-900 dark:hover:text-stone-100'
                 }`}
               >
                 <User className="w-4 h-4 text-stone-700 dark:text-stone-300 flex-shrink-0" />
@@ -432,8 +438,12 @@ export function App() {
 
       {/* Main Container */}
       <main className="max-w-6xl mx-auto px-3 sm:px-4 pt-5 pb-24 md:pb-12 space-y-6">
-        {/* TAB 0: BERANDA / DASHBOARD */}
-        {activeTab === 'home' && (
+        {showAdminDashboard ? (
+          <AdminDashboardView onClose={() => setShowAdminDashboard(false)} />
+        ) : (
+          <>
+            {/* TAB 0: BERANDA / DASHBOARD */}
+            {activeTab === 'home' && (
           <HomeDashboardView
             stats={stats}
             totalWords={HSK1_VOCABULARY.length}
@@ -677,8 +687,12 @@ export function App() {
               onResetProgress={handleResetProgress}
               onManualSync={handleManualSync}
               isSyncing={isSyncing}
+              onOpenFeedback={() => setShowFeedbackModal(true)}
+              onOpenAdmin={() => setShowAdminDashboard(true)}
             />
           </div>
+        )}
+          </>
         )}
       </main>
 
@@ -686,6 +700,7 @@ export function App() {
       <BottomNavBar
         activeTab={activeTab}
         onTabChange={(tab) => {
+          setShowAdminDashboard(false);
           setActiveTab(tab);
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }}
@@ -694,6 +709,13 @@ export function App() {
 
       {/* Toast Notification Alert */}
       <Toast toast={toast} onClose={() => setToast(null)} />
+
+      {/* User Feedback & Critique Modal */}
+      <FeedbackModal
+        isOpen={showFeedbackModal}
+        onClose={() => setShowFeedbackModal(false)}
+        onSuccessToast={(msg) => showToast('success', msg)}
+      />
 
       {/* Writing Practice Focused Modal */}
       <WritingModal

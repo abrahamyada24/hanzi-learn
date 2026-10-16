@@ -12,10 +12,13 @@ import {
   Smartphone,
   Moon,
   Sun,
-  Monitor
+  Monitor,
+  MessageSquare,
+  LayoutDashboard
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme, type Theme } from '../context/ThemeContext';
+import { checkIsAdmin } from '../services/adminService';
 import type { UserStats } from '../types';
 import { ConfirmModal } from './ConfirmModal';
 
@@ -29,6 +32,8 @@ interface ProfileViewProps {
   onResetProgress: () => void;
   onManualSync: () => void;
   isSyncing?: boolean;
+  onOpenFeedback: () => void;
+  onOpenAdmin: () => void;
 }
 
 export const ProfileView: React.FC<ProfileViewProps> = ({
@@ -40,12 +45,17 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
   onInstallApp,
   onResetProgress,
   onManualSync,
-  isSyncing = false
+  isSyncing = false,
+  onOpenFeedback,
+  onOpenAdmin
 }) => {
   const { user, loginWithGoogle, logout } = useAuth();
   const { theme, setTheme, isDark } = useTheme();
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [versionClicks, setVersionClicks] = useState(0);
+
+  const isAdmin = checkIsAdmin(user?.email);
 
   const percentMastered = Math.round((masteredCount / totalWords) * 100) || 0;
 
@@ -320,10 +330,81 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
         </div>
       </div>
 
+      {/* 6. KRITIK & SARAN PENGGUNA */}
+      <div className="bg-white dark:bg-stone-900 rounded-3xl p-5 sm:p-6 border border-stone-200 dark:border-stone-800 shadow-xs transition-colors">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-3.5">
+            <div className="w-10 h-10 rounded-2xl bg-red-50 dark:bg-red-950/60 text-red-600 dark:text-red-400 flex items-center justify-center flex-shrink-0">
+              <MessageSquare className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="font-bold text-sm text-stone-900 dark:text-stone-100">
+                Kritik & Saran Pengguna
+              </h3>
+              <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5 leading-relaxed">
+                Punya ide fitur baru, koreksi kata, atau kendala? Masukanmu sangat berharga bagi kami.
+              </p>
+            </div>
+          </div>
+
+          <button
+            onClick={onOpenFeedback}
+            className="py-2.5 px-4 bg-red-700 hover:bg-red-800 text-white rounded-2xl text-xs font-bold transition flex items-center justify-center gap-2 active:scale-95 shadow-xs whitespace-nowrap self-start sm:self-center"
+          >
+            <MessageSquare className="w-4 h-4" />
+            <span>Beri Masukan</span>
+          </button>
+        </div>
+      </div>
+
+      {/* 7. ADMIN DASHBOARD ACCESS (FOR AUTHORIZED ADMINS) */}
+      {isAdmin && (
+        <div className="bg-stone-900 dark:bg-stone-850 text-white rounded-3xl p-5 sm:p-6 border border-stone-800 dark:border-stone-700 shadow-md transition-colors">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-3.5">
+              <div className="w-10 h-10 rounded-2xl bg-red-600/30 text-red-400 flex items-center justify-center flex-shrink-0 border border-red-500/30">
+                <LayoutDashboard className="w-5 h-5" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h3 className="font-bold text-sm text-white">
+                    Panel Admin & Analitik
+                  </h3>
+                  <span className="text-[10px] bg-red-900/80 text-red-200 px-2 py-0.2 rounded-full font-bold">
+                    Akses Admin
+                  </span>
+                </div>
+                <p className="text-xs text-stone-300 mt-0.5">
+                  Pantau statistik pengguna, analitik kosakata, dan baca pesan kritik & saran
+                </p>
+              </div>
+            </div>
+
+            <button
+              onClick={onOpenAdmin}
+              className="py-2.5 px-4 bg-red-600 hover:bg-red-700 text-white rounded-2xl text-xs font-bold transition flex items-center justify-center gap-2 active:scale-95 shadow-xs whitespace-nowrap self-start sm:self-center"
+            >
+              <LayoutDashboard className="w-4 h-4" />
+              <span>Buka Panel Admin</span>
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* FOOTER APP VERSION */}
-      <div className="text-center text-xs text-stone-400 pt-2 pb-6 space-y-1">
+      <div 
+        onClick={() => {
+          const next = versionClicks + 1;
+          setVersionClicks(next);
+          if (next >= 5) {
+            setVersionClicks(0);
+            onOpenAdmin();
+          }
+        }}
+        className="text-center text-xs text-stone-400 pt-2 pb-6 space-y-1 cursor-default select-none"
+      >
         <p className="font-semibold text-stone-500 dark:text-stone-400">HanziLearn &middot; Aksara Mandarin Mandiri</p>
-        <p className="text-[11px]">Dibuat untuk pembelajaran HSK 1 dan Piktogram Aksara</p>
+        <p className="text-[11px]">Dibuat untuk pembelajaran HSK 1 dan Piktogram Aksara &middot; v2.1</p>
       </div>
 
       {/* CONFIRMATION MODALS */}

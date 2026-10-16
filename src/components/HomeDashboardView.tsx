@@ -6,12 +6,15 @@ import {
   PenTool, 
   Compass,
   CheckCircle2,
-  Sparkles
+  Sparkles,
+  BookOpen,
+  Volume2
 } from 'lucide-react';
 import { StatsHeader } from './StatsHeader';
 import { LESSON_UNITS } from '../data/lessonUnits';
 import { CHARACTER_STORIES } from '../data/characterStories';
 import type { UserStats } from '../types';
+import type { StorySubTab } from './StoriesAndRadicalsView';
 
 interface HomeDashboardViewProps {
   stats: UserStats;
@@ -21,7 +24,7 @@ interface HomeDashboardViewProps {
   selectedUnitId: string;
   progress: Record<string, any>;
   onStartUnit: (unitId: string) => void;
-  onNavigateTab: (tab: 'flashcards' | 'stories' | 'quiz' | 'profile', subTab?: 'stories' | 'radicals' | 'sandbox') => void;
+  onNavigateTab: (tab: 'flashcards' | 'stories' | 'quiz' | 'profile', subTab?: StorySubTab) => void;
 }
 
 export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({
@@ -116,6 +119,65 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({
             className="bg-amber-400 h-full transition-all duration-500" 
             style={{ width: `${(activeUnitProgress.learning / activeUnitProgress.total) * 100}%` }}
           />
+        </div>
+      </div>
+
+      {/* 2.5 PANDUAN STANDAR HSK 3.0 (URUTAN GORESAN & NADA) */}
+      <div className="bg-gradient-to-br from-amber-500/10 via-teal-500/5 to-transparent dark:from-amber-950/30 dark:via-teal-950/20 dark:to-transparent rounded-3xl p-5 sm:p-6 border border-amber-200/60 dark:border-stone-800 shadow-xs space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400 bg-amber-100/70 dark:bg-amber-950/80 px-2.5 py-0.5 rounded-full border border-amber-200 dark:border-amber-900/40 flex items-center gap-1">
+              <BookOpen className="w-3 h-3" />
+              <span>Standar Silabus HSK 3.0</span>
+            </span>
+          </div>
+          <span className="text-[11px] text-stone-500 dark:text-stone-400">
+            Sesuai Pedoman CLEC / Hanban (新版考试大纲)
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {/* Card 1: 7 Aturan Urutan Goresan */}
+          <button
+            onClick={() => onNavigateTab('stories', 'stroke-order')}
+            className="bg-white/90 dark:bg-stone-900/90 hover:bg-white dark:hover:bg-stone-900 p-4 rounded-2xl border border-amber-200/70 dark:border-stone-800 shadow-xs text-left transition flex items-start justify-between gap-3 group active:scale-98"
+          >
+            <div className="flex items-start gap-3 min-w-0">
+              <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition border border-amber-200/60 dark:border-amber-900/40">
+                <PenTool className="w-5 h-5" />
+              </div>
+              <div className="min-w-0">
+                <div className="font-bold text-xs sm:text-sm text-stone-900 dark:text-stone-100 group-hover:text-amber-700 dark:group-hover:text-amber-400 transition">
+                  7 Aturan Goresan Hanzi
+                </div>
+                <div className="text-[11px] text-stone-500 dark:text-stone-400 mt-0.5 line-clamp-2">
+                  Kuasai urutan menulis (先横后竖, dll.) & 8 goresan dasar dengan kanvas interaktif.
+                </div>
+              </div>
+            </div>
+            <ArrowRight className="w-4 h-4 text-stone-400 group-hover:text-amber-600 dark:group-hover:text-amber-400 group-hover:translate-x-0.5 transition flex-shrink-0 mt-1" />
+          </button>
+
+          {/* Card 2: 4 Nada & Perubahan Nada (变调) */}
+          <button
+            onClick={() => onNavigateTab('stories', 'tones')}
+            className="bg-white/90 dark:bg-stone-900/90 hover:bg-white dark:hover:bg-stone-900 p-4 rounded-2xl border border-teal-200/70 dark:border-stone-800 shadow-xs text-left transition flex items-start justify-between gap-3 group active:scale-98"
+          >
+            <div className="flex items-start gap-3 min-w-0">
+              <div className="w-10 h-10 rounded-xl bg-teal-50 dark:bg-teal-950/60 text-teal-700 dark:text-teal-400 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition border border-teal-200/60 dark:border-teal-900/40">
+                <Volume2 className="w-5 h-5" />
+              </div>
+              <div className="min-w-0">
+                <div className="font-bold text-xs sm:text-sm text-stone-900 dark:text-stone-100 group-hover:text-teal-700 dark:group-hover:text-teal-400 transition">
+                  4 Nada Pinyin & Perubahan Nada
+                </div>
+                <div className="text-[11px] text-stone-500 dark:text-stone-400 mt-0.5 line-clamp-2">
+                  Panduan kontur 5 nada + aturan perubahan nada (变调: 3+3, 不, 一) dengan audio.
+                </div>
+              </div>
+            </div>
+            <ArrowRight className="w-4 h-4 text-stone-400 group-hover:text-teal-600 dark:group-hover:text-teal-400 group-hover:translate-x-0.5 transition flex-shrink-0 mt-1" />
+          </button>
         </div>
       </div>
 

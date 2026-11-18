@@ -1,10 +1,4 @@
 import { useState, useEffect, useMemo } from 'react';
-import { 
-  Search, 
-  LayoutGrid,
-  List,
-  Maximize2,
-} from 'lucide-react';
 import { useTheme } from './context/ThemeContext';
 import { HSK1_VOCABULARY } from './data/hsk1';
 import { LESSON_UNITS } from './data/lessonUnits';
@@ -408,62 +402,42 @@ export function App() {
 
         {/* TAB 1: KOSAKATA & FLASHCARD */}
         {activeTab === 'flashcards' && (
-          <div className="space-y-4 animate-in fade-in">
-            {/* Bab / Unit Selector Pill Bar (Anti-Overload!) */}
-            <div className="bg-white dark:bg-stone-900 p-3.5 sm:p-4 rounded-3xl border border-stone-200 dark:border-stone-800 shadow-xs space-y-3 transition-colors">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-stone-100 dark:border-stone-800">
+          <div className="space-y-8 animate-in fade-in">
+            <div className="space-y-5">
+              <div className="border-t-2 border-ink pt-3 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
                 <div>
-                  <div className="text-xs text-stone-400 font-semibold uppercase tracking-wider">
-                    Pilih Bab Belajar:
-                  </div>
-                  <h3 className="font-bold text-stone-900 dark:text-stone-100 text-sm sm:text-base flex items-center gap-1.5 mt-0.5">
-                    <span>{currentUnit ? `${currentUnit.icon} ${currentUnit.title}` : 'Semua Bab (130 Kata)'}</span>
-                    {currentUnit && (
-                      <span className="text-xs font-normal text-stone-500 dark:text-stone-400">
-                        &bull; {currentUnit.wordIds.length} kata
-                      </span>
-                    )}
-                  </h3>
+                  <div className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted">Belajar &mdash; pilih bab</div>
+                  <h2 className="mt-1 flex items-baseline gap-3 text-2xl sm:text-3xl font-semibold tracking-tight text-ink">
+                    {currentUnit && <span className="text-vermilion tabular-nums">{String(currentUnit.unitNumber).padStart(2, '0')}</span>}
+                    <span>{currentUnit ? currentUnit.title.replace(/^Bab\s*\d+\s*:\s*/i, '') : 'Semua bab'}</span>
+                    <span className="text-xs font-normal text-muted">{currentUnit ? currentUnit.wordIds.length : 130} kata</span>
+                  </h2>
                 </div>
 
-                {/* View Mode Switcher: Fokus (1 Kartu) vs List Ringkas vs Grid */}
-                <div className="flex items-center gap-1 bg-stone-100 dark:bg-stone-800 p-1 rounded-2xl text-xs font-semibold self-start sm:self-auto">
-                  <button
-                    onClick={() => setViewMode('focus')}
-                    className={`px-3 py-1.5 rounded-xl transition flex items-center gap-1 ${
-                      viewMode === 'focus' ? 'bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 shadow-xs font-bold' : 'text-stone-500 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-200'
-                    }`}
-                    title="Mode fokus belajar 1 kartu per waktu"
-                  >
-                    <Maximize2 className="w-3.5 h-3.5 text-red-600 dark:text-red-500" />
-                    <span>Fokus 1 Kartu</span>
-                  </button>
-
-                  <button
-                    onClick={() => setViewMode('compact')}
-                    className={`px-3 py-1.5 rounded-xl transition flex items-center gap-1 ${
-                      viewMode === 'compact' ? 'bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 shadow-xs font-bold' : 'text-stone-500 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-200'
-                    }`}
-                    title="Tampilan daftar ringkas hemat ruang"
-                  >
-                    <List className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-                    <span>Daftar</span>
-                  </button>
-
-                  <button
-                    onClick={() => setViewMode('grid')}
-                    className={`px-3 py-1.5 rounded-xl transition flex items-center gap-1 ${
-                      viewMode === 'grid' ? 'bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 shadow-xs font-bold' : 'text-stone-500 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-200'
-                    }`}
-                    title="Tampilan grid kartu lengkap"
-                  >
-                    <LayoutGrid className="w-3.5 h-3.5 text-stone-600 dark:text-stone-400" />
-                    <span>Grid</span>
-                  </button>
+                {/* View mode: text tabs */}
+                <div role="tablist" aria-label="Mode tampilan" className="flex gap-5 text-sm self-start sm:self-auto">
+                  {([
+                    ['focus', 'Fokus', 'Mode fokus belajar 1 kartu per waktu'],
+                    ['compact', 'Daftar', 'Tampilan daftar ringkas hemat ruang'],
+                    ['grid', 'Grid', 'Tampilan grid kartu lengkap']
+                  ] as const).map(([mode, label, tip]) => (
+                    <button
+                      key={mode}
+                      role="tab"
+                      aria-selected={viewMode === mode}
+                      onClick={() => setViewMode(mode)}
+                      title={tip}
+                      className={`pb-1 border-b-2 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-vermilion ${
+                        viewMode === mode ? 'border-vermilion text-ink font-semibold' : 'border-transparent text-muted hover:text-ink'
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  ))}
                 </div>
               </div>
 
-              {/* Mobile View: Custom Dropdown with Bab & Vocab Search */}
+              {/* Mobile: dropdown with bab and vocab search */}
               <div className="sm:hidden">
                 <UnitSelectorDropdown
                   selectedUnitId={selectedUnitId}
@@ -477,61 +451,46 @@ export function App() {
                 />
               </div>
 
-              {/* Desktop / Tablet View: Horizontal Pill Bar */}
-              <div className="hidden sm:flex items-center gap-1.5 overflow-x-auto pb-1 text-xs">
-                <button
-                  onClick={() => setSelectedUnitId('all')}
-                  className={`px-3 py-2 rounded-xl whitespace-nowrap transition font-medium ${
-                    selectedUnitId === 'all'
-                      ? 'bg-stone-900 dark:bg-stone-800 text-white shadow-xs font-bold border border-stone-900 dark:border-stone-700'
-                      : 'bg-stone-100 dark:bg-stone-800/80 text-stone-600 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-stone-700'
-                  }`}
-                >
-                  Semua Kata (130)
-                </button>
-
-                {LESSON_UNITS.map((unit) => {
-                  const isSelected = selectedUnitId === unit.id;
+              {/* Desktop / tablet: numbered chapter strip */}
+              <div className="hidden sm:flex flex-wrap items-center gap-x-1 gap-y-1 text-sm" role="tablist" aria-label="Pilih bab">
+                {[{ id: 'all', label: 'Semua' }, ...LESSON_UNITS.map(u => ({ id: u.id, label: String(u.unitNumber).padStart(2, '0') }))].map(({ id, label }) => {
+                  const selected = selectedUnitId === id;
                   return (
                     <button
-                      key={unit.id}
-                      onClick={() => setSelectedUnitId(unit.id)}
-                      className={`px-3 py-2 rounded-xl whitespace-nowrap transition flex items-center gap-1.5 font-medium ${
-                        isSelected
-                          ? 'bg-red-700 text-white shadow-xs font-bold'
-                          : 'bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-stone-700'
+                      key={id}
+                      role="tab"
+                      aria-selected={selected}
+                      onClick={() => setSelectedUnitId(id)}
+                      title={id === 'all' ? 'Semua kata (130)' : LESSON_UNITS.find(u => u.id === id)?.title}
+                      className={`px-3 py-1.5 tabular-nums border transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-vermilion ${
+                        selected ? 'bg-ink text-paper border-ink font-semibold' : 'border-transparent text-muted hover:text-ink hover:border-ink/30'
                       }`}
                     >
-                      <span>{unit.icon}</span>
-                      <span>Bab {unit.unitNumber}</span>
+                      {label}
                     </button>
                   );
                 })}
               </div>
 
-              {/* Optional Search & Status filters if on Compact or Grid view */}
+              {/* Search & status filters on compact / grid views */}
               {viewMode !== 'focus' && (
-                <div className="flex flex-col sm:flex-row gap-2 pt-2 border-t border-stone-100 dark:border-stone-800">
-                  <div className="relative flex-1">
-                    <Search className="w-4 h-4 text-stone-400 absolute left-3 top-3" />
-                    <input
-                      type="text"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder="Cari kata di bab ini..."
-                      className="w-full pl-9 pr-4 py-2 rounded-xl bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-xs text-stone-900 dark:text-stone-100 placeholder-stone-400 dark:placeholder-stone-500 focus:outline-none focus:ring-2 focus:ring-red-600/20"
-                    />
-                  </div>
-
-                  <div className="flex items-center gap-1 overflow-x-auto text-xs">
+                <div className="flex flex-col sm:flex-row sm:items-end gap-4 pt-1">
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Cari kata di bab ini"
+                    aria-label="Cari kata di bab ini"
+                    className="flex-1 bg-transparent border-b border-ink pb-1.5 text-sm text-ink placeholder:text-muted focus:outline-none focus:border-vermilion"
+                  />
+                  <div className="flex items-center gap-4 text-xs overflow-x-auto">
                     {(['all', 'mastered', 'learning', 'bookmarked'] as FilterStatusType[]).map((st) => (
                       <button
                         key={st}
                         onClick={() => setStatusFilter(st)}
-                        className={`px-2.5 py-1.5 rounded-xl border whitespace-nowrap text-xs transition ${
-                          statusFilter === st
-                            ? 'bg-stone-900 dark:bg-stone-800 text-white border-stone-900 dark:border-stone-600 font-semibold shadow-xs'
-                            : 'bg-white dark:bg-stone-800 text-stone-600 dark:text-stone-300 border-stone-200 dark:border-stone-700 hover:bg-stone-50 dark:hover:bg-stone-700'
+                        aria-pressed={statusFilter === st}
+                        className={`whitespace-nowrap pb-1 border-b-2 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-vermilion ${
+                          statusFilter === st ? 'border-vermilion text-ink font-semibold' : 'border-transparent text-muted hover:text-ink'
                         }`}
                       >
                         {st === 'all' ? 'Semua' : st === 'mastered' ? 'Hafal' : st === 'learning' ? 'Belajar' : 'Favorit'}
@@ -570,16 +529,14 @@ export function App() {
                     onOpenWritingPractice={(vocab) => setWritingModalVocab(vocab)}
                   />
                 ) : (
-                  <div className="bg-white dark:bg-stone-900 rounded-3xl p-8 text-center text-stone-400 dark:text-stone-500 border border-stone-200 dark:border-stone-800">
-                    Tidak ada kata yang sesuai.
-                  </div>
+                  <p className="border-y border-ink/20 py-10 text-center text-sm text-muted">Tidak ada kata yang sesuai.</p>
                 )}
               </div>
             )}
 
             {/* VIEW MODE 3: GRID (Kartu Lengkap) */}
             {viewMode === 'grid' && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 animate-in fade-in">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 animate-in fade-in">
                 {filteredVocab.map((item) => (
                   <VocabCard
                     key={item.id}

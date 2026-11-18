@@ -24,7 +24,7 @@ export const StatsHeader: React.FC<StatsHeaderProps> = ({
   ];
 
   return (
-    <header className="border-t-2 border-ink pt-3">
+    <header className="pt-6">
       <div className="flex items-baseline justify-between text-[11px] font-medium uppercase tracking-[0.14em] text-muted">
         <span>HSK 1 &mdash; Belajar Mandiri</span>
         <span>{totalWords} kata dasar</span>

@@ -1,17 +1,9 @@
 import { useState, useEffect, useMemo } from 'react';
 import { 
-  Home,
-  BookOpen, 
-  HelpCircle, 
   Search, 
-  Compass,
   LayoutGrid,
   List,
   Maximize2,
-  Download,
-  User,
-  Sun,
-  Moon
 } from 'lucide-react';
 import { useTheme } from './context/ThemeContext';
 import { HSK1_VOCABULARY } from './data/hsk1';
@@ -291,144 +283,93 @@ export function App() {
   const currentUnit = LESSON_UNITS.find(u => u.id === selectedUnitId);
 
   return (
-    <div className="min-h-screen bg-stone-100/60 dark:bg-stone-950 text-stone-900 dark:text-stone-100 pb-20 font-sans transition-colors duration-150">
-      {/* Top Navbar: Mobile-optimized sticky navigation */}
-      <header className="sticky top-0 z-40 bg-white/95 dark:bg-stone-900/95 backdrop-blur-md border-b border-stone-200 dark:border-stone-800 transition-colors">
+    <div className="min-h-screen bg-paper text-ink pb-20 font-sans">
+      {/* Top Navbar: Swiss editorial masthead */}
+      <header className="sticky top-0 z-40 bg-paper/95 backdrop-blur-sm border-b border-ink">
         <div className="max-w-6xl mx-auto px-3 sm:px-4">
-          <div className="h-16 flex items-center justify-between gap-3">
-            {/* Logo */}
-            <div className="flex items-center gap-2.5 flex-shrink-0 cursor-pointer" onClick={() => { setShowAdminDashboard(false); setActiveTab('home'); }}>
-              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-red-700 text-white font-serif font-bold text-xl sm:text-2xl flex items-center justify-center shadow-md">
-                汉
-              </div>
-              <div>
-                <span className="font-bold text-base sm:text-lg text-stone-900 dark:text-stone-100 tracking-tight">HanziLearn</span>
-                <span className="hidden lg:inline-block ml-2 text-[11px] bg-red-50 dark:bg-red-950/60 text-red-700 dark:text-red-300 font-semibold px-2 py-0.5 rounded-full border border-red-200 dark:border-red-900/50">
-                  HSK 1 & Piktogram
-                </span>
-              </div>
-            </div>
+          <div className="h-14 flex items-center justify-between gap-4">
+            {/* Wordmark */}
+            <button
+              className="flex items-baseline gap-2 flex-shrink-0 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-vermilion"
+              onClick={() => { setShowAdminDashboard(false); setActiveTab('home'); }}
+              aria-label="HanziLearn, ke Beranda"
+            >
+              <span className="font-serif font-black text-2xl leading-none text-vermilion">汉</span>
+              <span className="font-semibold text-base tracking-tight text-ink">HanziLearn</span>
+            </button>
 
-            {/* Desktop Navigation Tabs (Hidden on mobile) */}
-            <nav className="hidden md:flex items-center gap-1 bg-stone-100 dark:bg-stone-800/80 p-1 rounded-2xl text-xs lg:text-sm font-medium text-stone-600 dark:text-stone-400">
-              <button
-                onClick={() => { setShowAdminDashboard(false); setActiveTab('home'); }}
-                className={`px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 ${
-                  !showAdminDashboard && activeTab === 'home' ? 'bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 shadow-xs font-semibold' : 'hover:text-stone-900 dark:hover:text-stone-100'
-                }`}
-              >
-                <Home className="w-4 h-4 text-red-600 dark:text-red-500 flex-shrink-0" />
-                <span>Beranda</span>
-              </button>
-
-              <button
-                onClick={() => { setShowAdminDashboard(false); setActiveTab('flashcards'); }}
-                className={`px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 ${
-                  !showAdminDashboard && activeTab === 'flashcards' ? 'bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 shadow-xs font-semibold' : 'hover:text-stone-900 dark:hover:text-stone-100'
-                }`}
-              >
-                <BookOpen className="w-4 h-4 text-red-600 dark:text-red-500 flex-shrink-0" />
-                <span>Belajar</span>
-              </button>
-
-              <button
-                onClick={() => { setShowAdminDashboard(false); setActiveTab('stories'); }}
-                className={`px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 ${
-                  !showAdminDashboard && activeTab === 'stories' ? 'bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 shadow-xs font-semibold' : 'hover:text-stone-900 dark:hover:text-stone-100'
-                }`}
-              >
-                <Compass className="w-4 h-4 text-amber-600 dark:text-amber-400 flex-shrink-0" />
-                <span>Aksara & Radikal</span>
-              </button>
-
-              <button
-                onClick={() => { setShowAdminDashboard(false); setActiveTab('quiz'); }}
-                className={`px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 ${
-                  !showAdminDashboard && activeTab === 'quiz' ? 'bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 shadow-xs font-semibold' : 'hover:text-stone-900 dark:hover:text-stone-100'
-                }`}
-              >
-                <HelpCircle className="w-4 h-4 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
-                <span>Kuis</span>
-              </button>
-
-              <button
-                onClick={() => { setShowAdminDashboard(false); setActiveTab('profile'); }}
-                className={`px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 ${
-                  !showAdminDashboard && activeTab === 'profile' ? 'bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 shadow-xs font-semibold' : 'hover:text-stone-900 dark:hover:text-stone-100'
-                }`}
-              >
-                <User className="w-4 h-4 text-stone-700 dark:text-stone-300 flex-shrink-0" />
-                <span>Profil</span>
-              </button>
+            {/* Desktop navigation (hidden on mobile) */}
+            <nav className="hidden md:flex items-stretch gap-6 self-stretch text-sm" aria-label="Navigasi utama">
+              {([
+                ['home', 'Beranda'],
+                ['flashcards', 'Belajar'],
+                ['stories', 'Aksara & Radikal'],
+                ['quiz', 'Kuis'],
+                ['profile', 'Profil']
+              ] as const).map(([id, label], i) => {
+                const active = !showAdminDashboard && activeTab === id;
+                return (
+                  <button
+                    key={id}
+                    onClick={() => { setShowAdminDashboard(false); setActiveTab(id); }}
+                    aria-current={active ? 'page' : undefined}
+                    className={`relative flex items-center gap-1.5 transition-colors focus-visible:outline-2 focus-visible:outline-offset-[-4px] focus-visible:outline-vermilion ${
+                      active ? 'text-ink font-semibold' : 'text-muted hover:text-ink'
+                    }`}
+                  >
+                    <span className={`text-[10px] tabular-nums ${active ? 'text-vermilion' : ''}`}>{String(i + 1).padStart(2, '0')}</span>
+                    <span>{label}</span>
+                    {active && <span aria-hidden className="absolute -bottom-px left-0 right-0 h-0.5 bg-vermilion" />}
+                  </button>
+                );
+              })}
             </nav>
 
-            {/* Right Side Actions: Theme Toggle + PWA Install + User Avatar / Login */}
-            <div className="flex items-center gap-2 flex-shrink-0">
-              {/* Quick Theme Toggle Button (Available everywhere) */}
+            {/* Right side: theme, install, account */}
+            <div className="flex items-center gap-4 flex-shrink-0 text-xs font-medium">
               <button
                 onClick={toggleTheme}
-                className="p-2 rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 text-stone-700 dark:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-700 transition active:scale-95 shadow-2xs"
+                className="text-muted hover:text-ink transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-vermilion"
                 title={isDark ? 'Ganti ke Mode Terang' : 'Ganti ke Mode Gelap'}
                 aria-label="Toggle dark mode"
               >
-                {isDark ? (
-                  <Sun className="w-4 h-4 text-amber-400" />
-                ) : (
-                  <Moon className="w-4 h-4 text-stone-600" />
-                )}
+                {isDark ? 'Terang' : 'Gelap'}
               </button>
 
-              {/* Desktop 1-Click PWA Install Button */}
               {!isStandalone && (
                 <button
                   onClick={handleTriggerInstall}
-                  className="hidden sm:flex items-center gap-1.5 py-1.5 px-3 bg-red-50 dark:bg-red-950/50 hover:bg-red-100 dark:hover:bg-red-900/50 text-red-700 dark:text-red-300 border border-red-200/80 dark:border-red-900/60 rounded-xl text-xs font-semibold transition active:scale-95 shadow-xs"
+                  className="hidden sm:inline text-muted hover:text-vermilion underline underline-offset-4 decoration-1 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-vermilion"
                   title="Pasang aplikasi HanziLearn di laptop / HP kamu"
                 >
-                  <Download className="w-3.5 h-3.5" />
-                  <span>Pasang App</span>
+                  Pasang app
                 </button>
               )}
 
-              {/* Google Login / Avatar button (taps directly to Profile tab) */}
               {user ? (
                 <button
                   onClick={() => setActiveTab('profile')}
-                  className={`flex items-center gap-2 p-1 pl-2 rounded-full transition border active:scale-95 ${
-                    activeTab === 'profile'
-                      ? 'bg-red-50 dark:bg-red-950/60 border-red-200 dark:border-red-900 ring-2 ring-red-100 dark:ring-red-950/60'
-                      : 'bg-stone-100 dark:bg-stone-800 hover:bg-stone-200 dark:hover:bg-stone-700 border-stone-200 dark:border-stone-700'
-                  }`}
+                  className="flex items-center gap-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-vermilion"
                   title="Buka profil akun & statistik"
                 >
-                  <span className="text-xs font-semibold text-stone-700 dark:text-stone-300 hidden sm:inline max-w-[90px] truncate">
+                  <span className={`hidden sm:inline max-w-[90px] truncate ${activeTab === 'profile' ? 'text-vermilion' : 'text-ink'}`}>
                     {user.displayName?.split(' ')[0] || 'User'}
                   </span>
                   {user.photoURL ? (
-                    <img
-                      src={user.photoURL}
-                      alt="Profile"
-                      className="w-7 h-7 rounded-full object-cover border border-white dark:border-stone-700"
-                    />
+                    <img src={user.photoURL} alt="Profile" className="w-7 h-7 object-cover border border-ink" />
                   ) : (
-                    <div className="w-7 h-7 rounded-full bg-red-700 text-white font-bold text-xs flex items-center justify-center">
+                    <span className="w-7 h-7 bg-ink text-paper font-semibold text-xs flex items-center justify-center">
                       {user.email?.[0].toUpperCase() || 'U'}
-                    </div>
+                    </span>
                   )}
                 </button>
               ) : (
                 <button
                   onClick={() => loginWithGoogle()}
-                  className="flex items-center gap-1.5 py-1.5 px-3 bg-white dark:bg-stone-800 hover:bg-stone-50 dark:hover:bg-stone-700 border border-stone-200 dark:border-stone-700 text-stone-800 dark:text-stone-200 rounded-xl text-xs font-semibold transition shadow-xs active:scale-95"
+                  className="border border-ink text-ink px-3 py-1.5 hover:bg-ink hover:text-paper transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-vermilion"
                   title="Masuk dengan Google"
                 >
-                  <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24">
-                    <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
-                    <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/>
-                    <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.97 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/>
-                    <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
-                  </svg>
-                  <span>Masuk</span>
+                  Masuk
                 </button>
               )}
             </div>
@@ -704,7 +645,6 @@ export function App() {
           setActiveTab(tab);
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }}
-        userPhotoUrl={user?.photoURL}
       />
 
       {/* Toast Notification Alert */}

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Volume2, Info } from 'lucide-react';
 import { speechManager } from '../utils/speech';
+import { AudioIcon, focusRing } from './ui/marks';
 
 interface ToneItem {
   number: number;
@@ -190,6 +190,26 @@ const SANDHI_RULES: SandhiRule[] = [
   }
 ];
 
+/** Pitch contour on the 5-level Chao scale, e.g. "2-1-4". Real data, not decoration. */
+const ToneContour: React.FC<{ contour: string }> = ({ contour }) => {
+  const levels = contour.split('-').map(Number);
+  const w = 120;
+  const h = 56;
+  const pad = 6;
+  const x = (i: number) => (levels.length === 1 ? w / 2 : pad + (i * (w - pad * 2)) / (levels.length - 1));
+  const y = (lv: number) => pad + ((5 - lv) * (h - pad * 2)) / 4;
+  const pts = levels.map((lv, i) => `${x(i)},${y(lv)}`).join(' ');
+  return (
+    <svg viewBox={`0 0 ${w} ${h}`} className="w-28 h-14 text-ink" role="img" aria-label={`Kontur nada ${contour}`}>
+      {[1, 2, 3, 4, 5].map(lv => (
+        <line key={lv} x1="0" x2={w} y1={y(lv)} y2={y(lv)} stroke="currentColor" strokeOpacity="0.15" strokeWidth="1" />
+      ))}
+      <polyline points={pts} fill="none" stroke="var(--vermilion)" strokeWidth="3" strokeLinejoin="miter" strokeLinecap="butt" />
+      <circle cx={x(0)} cy={y(levels[0])} r="3.5" fill="currentColor" />
+    </svg>
+  );
+};
+
 export const PinyinTonesGuideView: React.FC = () => {
   const [activeCategory, setActiveCategory] = useState<'tones' | 'sandhi'>('tones');
   const [playingKey, setPlayingKey] = useState<string | null>(null);
@@ -202,263 +222,159 @@ export const PinyinTonesGuideView: React.FC = () => {
     }, 1200);
   };
 
+  const label = 'text-[11px] font-medium uppercase tracking-[0.14em] text-muted';
+  const stripNum = (t: string) => t.replace(/^\d+\.\s*/, '');
+  const playBtn = (key: string, text: string, caption: string, title: string) => (
+    <button
+      onClick={() => handlePlayAudio(text, key)}
+      title={title}
+      aria-label={title}
+      className={`flex items-center gap-1.5 border border-ink px-2.5 py-1.5 text-xs font-semibold transition-colors ${focusRing} ${
+        playingKey === key ? 'bg-ink text-paper' : 'text-ink hover:bg-ink hover:text-paper'
+      }`}
+    >
+      <AudioIcon className="w-4 h-4" />
+      <span>{caption}</span>
+    </button>
+  );
+
   return (
-    <div className="space-y-6 pb-6 animate-in fade-in">
-      {/* Official Syllabus Header Banner */}
-      <div className="bg-gradient-to-r from-red-900/90 via-stone-900 to-red-950 text-white rounded-3xl p-5 sm:p-6 border border-red-800/60 shadow-md">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="space-y-1.5">
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] bg-red-600/80 text-white font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
-                Standar Fonetik HSK 3.0
-              </span>
-              <span className="text-xs text-red-300 font-mono">声调与变调</span>
-            </div>
-            <h2 className="text-lg sm:text-xl font-bold tracking-tight">
-              Panduan 4 Nada Pinyin & Aturan Perubahan Nada (Tone Sandhi)
-            </h2>
-            <p className="text-xs text-stone-300 max-w-xl leading-relaxed">
-              Bahasa Mandarin adalah bahasa bernada (tonal language). Perubahan tinggi-rendahnya nada menentukan makna kata secara menyeluruh. Dengarkan audio untuk membedakan karakternya.
+    <div className="space-y-10 pb-6 animate-in fade-in">
+      {/* Masthead */}
+      <header className="border-t-2 border-ink pt-3">
+        <div className="flex items-baseline justify-between">
+          <span className={label}>Standar fonetik HSK 3.0</span>
+          <span className={label}>声调与变调</span>
+        </div>
+        <div className="mt-3 flex flex-col sm:flex-row sm:items-end justify-between gap-5">
+          <div className="max-w-xl">
+            <h2 className="text-3xl sm:text-4xl font-semibold tracking-tight text-ink">4 nada &amp; perubahan nada</h2>
+            <p className="mt-2 text-sm leading-relaxed text-muted">
+              Mandarin adalah bahasa bernada: tinggi-rendahnya suara menentukan makna kata. Dengarkan audio untuk membedakan tiap nada.
             </p>
           </div>
-
-          {/* Sub-mode switcher */}
-          <div className="flex bg-stone-950/70 p-1 rounded-2xl text-xs font-semibold self-start sm:self-center border border-stone-800 flex-shrink-0">
-            <button
-              onClick={() => setActiveCategory('tones')}
-              className={`py-2 px-3 rounded-xl transition ${
-                activeCategory === 'tones' ? 'bg-red-700 text-white shadow-xs font-bold' : 'text-stone-400 hover:text-white'
-              }`}
-            >
-              4 Nada Pokok
-            </button>
-            <button
-              onClick={() => setActiveCategory('sandhi')}
-              className={`py-2 px-3 rounded-xl transition ${
-                activeCategory === 'sandhi' ? 'bg-red-700 text-white shadow-xs font-bold' : 'text-stone-400 hover:text-white'
-              }`}
-            >
-              Aturan Perubahan (变调)
-            </button>
+          <div role="tablist" aria-label="Mode panduan" className="flex gap-5 text-sm flex-shrink-0">
+            {([['tones', '4 nada pokok'], ['sandhi', 'Perubahan nada (变调)']] as const).map(([mode, name]) => (
+              <button
+                key={mode}
+                role="tab"
+                aria-selected={activeCategory === mode}
+                onClick={() => setActiveCategory(mode)}
+                className={`pb-1 border-b-2 transition-colors ${focusRing} ${
+                  activeCategory === mode ? 'border-vermilion text-ink font-semibold' : 'border-transparent text-muted hover:text-ink'
+                }`}
+              >
+                {name}
+              </button>
+            ))}
           </div>
         </div>
-      </div>
+      </header>
 
       {activeCategory === 'tones' ? (
-        <div className="space-y-6">
-          {/* Classic "Ma" Family Demo Card */}
-          <div className="bg-white dark:bg-stone-900 rounded-3xl p-5 sm:p-6 border border-stone-200 dark:border-stone-800 shadow-xs space-y-4 transition-colors">
-            <div className="flex items-center justify-between pb-3 border-b border-stone-100 dark:border-stone-800">
-              <div>
-                <h3 className="font-bold text-sm sm:text-base text-stone-900 dark:text-stone-100">
-                  Studi Kasus: 1 Suku Kata "Ma", 5 Makna Berbeda
-                </h3>
-                <p className="text-xs text-stone-400 mt-0.5">
-                  Klik tiap tombol audio untuk mendengarkan langsung perbedaan nada yang mengubah arti kata:
-                </p>
-              </div>
-              <span className="text-[10px] bg-red-50 dark:bg-red-950/60 text-red-700 dark:text-red-300 font-bold px-2 py-0.5 rounded-full border border-red-200 dark:border-red-900/50">
-                Penting
-              </span>
+        <>
+          {/* Ma family */}
+          <section>
+            <div className="border-t border-ink pt-3">
+              <h3 className="text-lg font-semibold tracking-tight text-ink">Satu suku kata &ldquo;ma&rdquo;, lima makna</h3>
+              <p className="mt-1 text-sm text-muted">Ketuk tiap kolom untuk mendengar bagaimana nada mengubah arti.</p>
             </div>
-
-            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
+            <div className="mt-4 grid grid-cols-2 sm:grid-cols-5 border-y border-ink/20 sm:divide-x divide-ink/20">
               {MA_FAMILY.map((item) => {
                 const isPlaying = playingKey === `ma-${item.tone}`;
                 return (
                   <button
                     key={item.tone}
                     onClick={() => handlePlayAudio(item.hanzi, `ma-${item.tone}`)}
-                    className="p-3 bg-stone-50 dark:bg-stone-800/60 hover:bg-red-50 dark:hover:bg-red-950/40 rounded-2xl border border-stone-200/80 dark:border-stone-700/80 text-center transition group active:scale-95 flex flex-col items-center justify-between"
+                    aria-label={`Dengar ${item.pinyin}, ${item.meaning}`}
+                    className={`group text-left px-3 py-4 transition-colors focus-visible:outline-2 focus-visible:outline-offset-[-3px] focus-visible:outline-vermilion ${isPlaying ? 'bg-ink text-paper' : 'hover:bg-paper-2 text-ink'}`}
                   >
-                    <div className="flex items-center justify-between w-full text-[10px] text-stone-400 font-semibold mb-1">
+                    <span className={`flex justify-between text-[11px] font-medium uppercase tracking-[0.14em] ${isPlaying ? 'text-paper/70' : 'text-muted'}`}>
                       <span>{item.tone === 0 ? 'Netral' : `Nada ${item.tone}`}</span>
-                      <span className="font-mono text-red-700 dark:text-red-400">{item.mark}</span>
-                    </div>
-
-                    <div className="font-serif font-bold text-3xl text-stone-900 dark:text-stone-100 group-hover:text-red-700 dark:group-hover:text-red-400 transition my-1">
-                      {item.hanzi}
-                    </div>
-
-                    <div className="text-sm font-bold text-red-700 dark:text-red-400 font-sans">
-                      {item.pinyin}
-                    </div>
-
-                    <div className="text-[11px] text-stone-600 dark:text-stone-300 font-medium truncate w-full mt-0.5">
-                      {item.meaning}
-                    </div>
-
-                    <div className={`mt-2.5 py-1 px-3 rounded-xl text-xs font-semibold flex items-center gap-1 transition ${
-                      isPlaying 
-                        ? 'bg-red-700 text-white' 
-                        : 'bg-white dark:bg-stone-700 text-stone-700 dark:text-stone-200 border border-stone-200 dark:border-stone-600 group-hover:border-red-300'
-                    }`}>
-                      <Volume2 className={`w-3.5 h-3.5 ${isPlaying ? 'animate-bounce' : ''}`} />
-                      <span>Dengar</span>
-                    </div>
+                      <span aria-hidden className="text-xl leading-none normal-case tracking-normal text-vermilion">{item.mark === 'netral' ? '' : item.mark}</span>
+                    </span>
+                    <span className="block mt-3 font-serif font-black text-5xl leading-none">{item.hanzi}</span>
+                    <span className={`block mt-3 text-base font-semibold ${isPlaying ? 'text-paper' : 'text-vermilion'}`}>{item.pinyin}</span>
+                    <span className={`block text-xs truncate ${isPlaying ? 'text-paper/80' : 'text-muted'}`}>{item.meaning}</span>
                   </button>
                 );
               })}
             </div>
-          </div>
+          </section>
 
-          {/* 4 Primary Tone Deep Dive Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {TONES_DATA.map((tone) => {
-              const isPlaying = playingKey === `tone-${tone.number}`;
-              return (
-                <div 
-                  key={tone.number}
-                  className="bg-white dark:bg-stone-900 rounded-3xl p-5 border border-stone-200 dark:border-stone-800 shadow-xs space-y-3 transition-colors flex flex-col justify-between"
-                >
+          {/* Four tones */}
+          <section className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-10">
+            {TONES_DATA.map((tone) => (
+              <article key={tone.number} className="border-t border-ink pt-3 flex flex-col gap-4">
+                <div className="flex items-start justify-between gap-4">
                   <div>
-                    <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <span className="text-[10px] font-bold text-red-700 dark:text-red-400 font-mono">
-                          {tone.nameZh} &bull; Kontur {tone.contour}
-                        </span>
-                        <h4 className="font-bold text-base text-stone-900 dark:text-stone-100 mt-0.5">
-                          {tone.nameId}
-                        </h4>
-                      </div>
-
-                      <button
-                        onClick={() => handlePlayAudio(tone.sampleHanzi, `tone-${tone.number}`)}
-                        className={`p-2 rounded-2xl border transition active:scale-95 flex items-center gap-1.5 text-xs font-bold ${
-                          isPlaying
-                            ? 'bg-red-700 text-white border-red-700'
-                            : 'bg-red-50 dark:bg-red-950/60 text-red-700 dark:text-red-300 border-red-200 dark:border-red-900/50 hover:bg-red-100'
-                        }`}
-                        title="Dengarkan pelafalan nada"
-                      >
-                        <Volume2 className="w-4 h-4" />
-                        <span>{tone.samplePinyin}</span>
-                      </button>
-                    </div>
-
-                    {/* Analogy & Pitch Desc */}
-                    <div className="space-y-2 mt-3 text-xs">
-                      <div className="p-3 bg-stone-50 dark:bg-stone-800/60 rounded-xl border border-stone-100 dark:border-stone-700/60">
-                        <span className="text-stone-400 font-semibold block text-[10px] uppercase">Analogi Nada:</span>
-                        <span className="text-stone-700 dark:text-stone-300 font-medium">{tone.analogy}</span>
-                      </div>
-
-                      <div className="p-3 bg-stone-50 dark:bg-stone-800/60 rounded-xl border border-stone-100 dark:border-stone-700/60">
-                        <span className="text-stone-400 font-semibold block text-[10px] uppercase">Bentuk Suara:</span>
-                        <span className="text-stone-600 dark:text-stone-400">{tone.pitchDesc}</span>
-                      </div>
-                    </div>
+                    <div className={`${label} text-vermilion`}>{tone.nameZh} · kontur {tone.contour}</div>
+                    <h4 className="mt-1 text-lg font-semibold tracking-tight text-ink">{stripNum(tone.nameId.replace(/^Nada \d+:\s*/, ''))}</h4>
                   </div>
-
-                  <div className="pt-2 border-t border-stone-100 dark:border-stone-800 flex items-center justify-between text-xs">
-                    <span className="text-stone-400 font-medium">Contoh Kata:</span>
-                    <div className="flex items-center gap-2">
-                      <span className="font-serif font-bold text-lg text-stone-900 dark:text-stone-100">{tone.sampleHanzi}</span>
-                      <span className="text-red-700 dark:text-red-400 font-bold">{tone.samplePinyin}</span>
-                      <span className="text-stone-500 dark:text-stone-400">({tone.sampleMeaning})</span>
-                    </div>
-                  </div>
+                  <ToneContour contour={tone.contour} />
                 </div>
-              );
-            })}
-          </div>
-        </div>
+
+                <dl className="space-y-3 text-sm">
+                  <div>
+                    <dt className={label}>Analogi</dt>
+                    <dd className="mt-0.5 text-ink">{tone.analogy}</dd>
+                  </div>
+                  <div>
+                    <dt className={label}>Bentuk suara</dt>
+                    <dd className="mt-0.5 text-muted">{tone.pitchDesc}</dd>
+                  </div>
+                </dl>
+
+                <div className="mt-auto flex items-center justify-between border-t border-ink/20 pt-3">
+                  <div className="flex items-baseline gap-3">
+                    <span className="font-serif font-black text-3xl leading-none text-ink">{tone.sampleHanzi}</span>
+                    <span className="text-sm font-semibold text-vermilion">{tone.samplePinyin}</span>
+                    <span className="text-xs text-muted">{tone.sampleMeaning}</span>
+                  </div>
+                  {playBtn(`tone-${tone.number}`, tone.sampleHanzi, 'Dengar', 'Dengarkan pelafalan nada')}
+                </div>
+              </article>
+            ))}
+          </section>
+        </>
       ) : (
-        /* MODE 2: TONE SANDHI (ATURAN PERUBAHAN NADA) */
-        <div className="space-y-4">
-          <div className="bg-amber-50 dark:bg-amber-950/40 p-4 rounded-3xl border border-amber-200/80 dark:border-amber-900/50 flex items-start gap-3">
-            <Info className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
-            <div className="text-xs space-y-1">
-              <h4 className="font-bold text-amber-900 dark:text-amber-200">
-                Apa itu Tone Sandhi (变调 / Biàndiào)?
-              </h4>
-              <p className="text-amber-800 dark:text-amber-300 leading-relaxed">
-                Di dalam percakapan sehari-hari, beberapa kata mengalami <strong>perubahan nada otomatis saat diucapkan</strong> agar aliran kalimat terasa lebih luwes dan mudah diucapkan. Walaupun nadanya berubah ketika diucapkan, ejaan Pinyin di buku teks biasanya tetap mempertahankan nada aslinya!
-              </p>
-            </div>
+        <>
+          <div className="border-l-2 border-vermilion pl-4 max-w-2xl">
+            <div className={label}>Apa itu tone sandhi (变调 / Biàndiào)?</div>
+            <p className="mt-1 text-sm leading-relaxed text-ink">
+              Dalam percakapan, beberapa kata <strong>berubah nada otomatis saat diucapkan</strong> agar kalimat mengalir lebih luwes. Walau bunyinya berubah, pinyin di buku teks tetap menulis nada aslinya.
+            </p>
           </div>
 
-          <div className="space-y-4">
-            {SANDHI_RULES.map((rule) => (
-              <div 
-                key={rule.id}
-                className="bg-white dark:bg-stone-900 rounded-3xl p-5 sm:p-6 border border-stone-200 dark:border-stone-800 shadow-xs space-y-4 transition-colors"
-              >
-                <div className="border-b border-stone-100 dark:border-stone-800 pb-3">
-                  <div className="flex items-center justify-between gap-2 mb-1">
-                    <span className="text-[10px] font-bold text-red-700 dark:text-red-400 font-mono">
-                      {rule.pinyinRule}
-                    </span>
-                    <span className="text-[10px] bg-red-100 dark:bg-red-950/60 text-red-700 dark:text-red-300 px-2 py-0.5 rounded-full font-bold">
-                      Aturan Wajib
-                    </span>
-                  </div>
-
-                  <h3 className="font-bold text-base text-stone-900 dark:text-stone-100">
-                    {rule.title}
-                  </h3>
-
-                  <div className="mt-2 inline-block px-3 py-1 bg-stone-100 dark:bg-stone-800 rounded-xl font-mono text-xs font-bold text-stone-800 dark:text-stone-200">
-                    {rule.ruleFormula}
-                  </div>
-
-                  <p className="text-xs text-stone-600 dark:text-stone-300 leading-relaxed mt-2">
-                    {rule.description}
-                  </p>
+          <div className="space-y-12">
+            {SANDHI_RULES.map((rule, ri) => (
+              <section key={rule.id} className="border-t-2 border-ink pt-3">
+                <div className="flex items-baseline gap-3">
+                  <span className="text-vermilion text-sm font-semibold tabular-nums">{String(ri + 1).padStart(2, '0')}</span>
+                  <span className={label}>{rule.pinyinRule}</span>
                 </div>
+                <h3 className="mt-2 text-xl font-semibold tracking-tight text-ink">{stripNum(rule.title)}</h3>
+                <div className="mt-3 inline-block border border-ink px-3 py-1.5 text-sm font-semibold text-ink">{rule.ruleFormula}</div>
+                <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted">{rule.description}</p>
 
-                {/* Interactive Audio Examples */}
-                <div className="space-y-2">
-                  <div className="text-xs font-bold text-stone-400 uppercase tracking-wider">
-                    Contoh Praktik & Perbandingan Bunyi:
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                    {rule.examples.map((ex, idx) => {
-                      const isPlaying = playingKey === `${rule.id}-${idx}`;
-                      return (
-                        <div 
-                          key={idx}
-                          className="p-3 bg-stone-50 dark:bg-stone-800/60 rounded-2xl border border-stone-100 dark:border-stone-700/60 flex items-center justify-between gap-3"
-                        >
-                          <div className="flex items-center gap-3 min-w-0">
-                            <span className="font-serif font-bold text-2xl text-stone-900 dark:text-stone-100 flex-shrink-0">
-                              {ex.hanzi}
-                            </span>
-                            <div className="min-w-0">
-                              <div className="text-xs font-bold text-stone-800 dark:text-stone-200">
-                                Tertulis: <span className="text-stone-500 font-mono">{ex.writtenPinyin}</span>
-                              </div>
-                              <div className="text-xs font-bold text-red-700 dark:text-red-400 font-mono">
-                                Diucapkan: {ex.spokenPinyin}
-                              </div>
-                              <div className="text-[11px] text-stone-400 truncate mt-0.5">
-                                {ex.meaning}
-                              </div>
-                            </div>
-                          </div>
-
-                          <button
-                            onClick={() => handlePlayAudio(ex.hanzi, `${rule.id}-${idx}`)}
-                            className={`p-2 rounded-xl border transition active:scale-95 flex items-center gap-1 text-xs font-bold flex-shrink-0 ${
-                              isPlaying
-                                ? 'bg-red-700 text-white border-red-700'
-                                : 'bg-white dark:bg-stone-800 text-red-700 dark:text-red-400 border-stone-200 dark:border-stone-700 hover:bg-red-50'
-                            }`}
-                            title="Dengarkan pengucapan asli"
-                          >
-                            <Volume2 className="w-3.5 h-3.5" />
-                            <span>Audio</span>
-                          </button>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
+                <div className={`${label} mt-6`}>Contoh &amp; perbandingan bunyi</div>
+                <ul className="mt-2 grid grid-cols-1 sm:grid-cols-2 border-t border-ink sm:gap-x-10">
+                  {rule.examples.map((ex, idx) => (
+                    <li key={idx} className="border-b border-ink/20 py-3 grid grid-cols-[4.5rem_1fr_auto] items-center gap-3">
+                      <span className="font-serif font-black text-2xl leading-none text-ink whitespace-nowrap">{ex.hanzi}</span>
+                      <span className="min-w-0 text-xs">
+                        <span className="block text-muted">Tertulis <span className="text-ink font-semibold">{ex.writtenPinyin}</span></span>
+                        <span className="block text-muted">Diucapkan <span className="text-vermilion font-semibold">{ex.spokenPinyin}</span></span>
+                        <span className="block text-muted truncate">{ex.meaning}</span>
+                      </span>
+                      {playBtn(`${rule.id}-${idx}`, ex.hanzi, 'Audio', 'Dengarkan pengucapan asli')}
+                    </li>
+                  ))}
+                </ul>
+              </section>
             ))}
           </div>
-        </div>
+        </>
       )}
     </div>
   );

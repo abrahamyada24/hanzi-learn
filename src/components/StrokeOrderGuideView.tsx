@@ -1,10 +1,6 @@
 import React, { useState } from 'react';
-import { 
-  PenTool, 
-  Info,
-  ArrowRight
-} from 'lucide-react';
 import { HanziWriterCanvas } from './HanziWriterCanvas';
+import { focusRing } from './ui/marks';
 
 interface StrokeRule {
   id: string;
@@ -157,219 +153,143 @@ export const StrokeOrderGuideView: React.FC = () => {
     setActiveChar(rule.demoChar);
   };
 
+  const label = 'text-[11px] font-medium uppercase tracking-[0.14em] text-muted';
+  const stripNum = (t: string) => t.replace(/^\d+\.\s*/, '');
+
   return (
-    <div className="space-y-6 pb-6 animate-in fade-in">
-      {/* Official Syllabus Header Banner */}
-      <div className="bg-gradient-to-r from-red-900/90 via-stone-900 to-red-950 text-white rounded-3xl p-5 sm:p-6 border border-red-800/60 shadow-md">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="space-y-1.5">
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] bg-red-600/80 text-white font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
-                Standar Resmi HSK 3.0
-              </span>
-              <span className="text-xs text-red-300 font-mono">GF 0025-2021</span>
-            </div>
-            <h2 className="text-lg sm:text-xl font-bold tracking-tight">
-              Panduan 7 Aturan Urutan Goresan Hanzi
-            </h2>
-            <p className="text-xs text-stone-300 max-w-xl leading-relaxed">
-              Karakter Mandarin tidak digambar bebas, melainkan disusun menurut urutan goresan baku (笔顺 / Bǐshùn). Mengikuti aturan ini membuat tulisanmu rapi, proporsional, dan mudah dibaca oleh penutur asli.
+    <div className="space-y-10 pb-6 animate-in fade-in">
+      {/* Masthead */}
+      <header className="border-t-2 border-ink pt-3">
+        <div className="flex items-baseline justify-between">
+          <span className={label}>Standar resmi HSK 3.0</span>
+          <span className={`${label} tabular-nums`}>GF 0025-2021</span>
+        </div>
+        <div className="mt-3 flex flex-col sm:flex-row sm:items-end justify-between gap-5">
+          <div className="max-w-xl">
+            <h2 className="text-3xl sm:text-4xl font-semibold tracking-tight text-ink">7 aturan urutan goresan</h2>
+            <p className="mt-2 text-sm leading-relaxed text-muted">
+              Karakter Mandarin tidak digambar bebas, melainkan disusun menurut urutan goresan baku (笔顺 / Bǐshùn). Mengikuti aturan ini membuat tulisanmu rapi, proporsional, dan mudah dibaca penutur asli.
             </p>
           </div>
-
-          {/* Sub-mode switcher */}
-          <div className="flex bg-stone-950/70 p-1 rounded-2xl text-xs font-semibold self-start sm:self-center border border-stone-800 flex-shrink-0">
-            <button
-              onClick={() => setViewMode('rules')}
-              className={`py-2 px-3 rounded-xl transition ${
-                viewMode === 'rules' ? 'bg-red-700 text-white shadow-xs font-bold' : 'text-stone-400 hover:text-white'
-              }`}
-            >
-              7 Aturan Baku
-            </button>
-            <button
-              onClick={() => setViewMode('strokes')}
-              className={`py-2 px-3 rounded-xl transition ${
-                viewMode === 'strokes' ? 'bg-red-700 text-white shadow-xs font-bold' : 'text-stone-400 hover:text-white'
-              }`}
-            >
-              8 Goresan Dasar
-            </button>
+          <div role="tablist" aria-label="Mode panduan" className="flex gap-5 text-sm flex-shrink-0">
+            {([['rules', '7 aturan baku'], ['strokes', '8 goresan dasar']] as const).map(([mode, name]) => (
+              <button
+                key={mode}
+                role="tab"
+                aria-selected={viewMode === mode}
+                onClick={() => setViewMode(mode)}
+                className={`pb-1 border-b-2 transition-colors ${focusRing} ${
+                  viewMode === mode ? 'border-vermilion text-ink font-semibold' : 'border-transparent text-muted hover:text-ink'
+                }`}
+              >
+                {name}
+              </button>
+            ))}
           </div>
         </div>
-      </div>
+      </header>
 
       {viewMode === 'rules' ? (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
-          {/* Left Column: 7 Rules Selector List (5 Cols) */}
-          <div className="lg:col-span-5 space-y-2">
-            <div className="text-xs font-bold text-stone-400 uppercase tracking-wider px-1">
-              Daftar 7 Aturan Pokok (笔顺规则):
-            </div>
-
-            <div className="space-y-2">
-              {STROKE_RULES.map((rule) => {
-                const isSelected = rule.id === selectedRuleId;
-                return (
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-x-10 gap-y-8 items-start">
+          {/* Rule list */}
+          <ol className="lg:col-span-5 border-t border-ink">
+            {STROKE_RULES.map((rule, i) => {
+              const selected = rule.id === selectedRuleId;
+              return (
+                <li key={rule.id} className="border-b border-ink/20">
                   <button
-                    key={rule.id}
                     onClick={() => handleSelectRule(rule)}
-                    className={`w-full p-3.5 rounded-2xl border text-left transition-all flex items-center justify-between gap-3 active:scale-[0.99] ${
-                      isSelected
-                        ? 'bg-white dark:bg-stone-900 border-red-600 dark:border-red-600 shadow-sm ring-1 ring-red-500/20'
-                        : 'bg-white/80 dark:bg-stone-900/60 border-stone-200 dark:border-stone-800 hover:bg-stone-50 dark:hover:bg-stone-800/80'
+                    aria-current={selected ? 'true' : undefined}
+                    className={`group relative w-full grid grid-cols-[2rem_3rem_1fr] items-center gap-3 py-3.5 text-left transition-colors focus-visible:outline-2 focus-visible:outline-offset-[-3px] focus-visible:outline-vermilion ${
+                      selected ? 'bg-paper-2' : 'hover:bg-paper-2'
                     }`}
                   >
-                    <div className="flex items-center gap-3 min-w-0">
-                      <div className={`w-9 h-9 rounded-xl flex items-center justify-center font-serif font-bold text-lg flex-shrink-0 border ${
-                        isSelected 
-                          ? 'bg-red-700 text-white border-red-700' 
-                          : 'bg-stone-100 dark:bg-stone-800 text-stone-900 dark:text-stone-100 border-stone-200 dark:border-stone-700'
-                      }`}>
-                        {rule.demoChar}
-                      </div>
-                      <div className="min-w-0">
-                        <div className="font-bold text-xs text-stone-900 dark:text-stone-100 truncate">
-                          {rule.ruleNameId}
-                        </div>
-                        <div className="text-[11px] text-red-700 dark:text-red-400 font-mono">
-                          {rule.ruleNameZh} &bull; {rule.pinyin}
-                        </div>
-                      </div>
-                    </div>
-
-                    <ArrowRight className={`w-4 h-4 flex-shrink-0 transition-transform ${
-                      isSelected ? 'text-red-600 translate-x-0.5' : 'text-stone-300 dark:text-stone-600'
-                    }`} />
+                    {selected && <span aria-hidden className="absolute left-0 top-0 bottom-0 w-1 bg-vermilion" />}
+                    <span className={`pl-3 text-xs tabular-nums ${selected ? 'text-vermilion font-semibold' : 'text-muted'}`}>{String(i + 1).padStart(2, '0')}</span>
+                    <span className="font-serif font-black text-3xl leading-none text-ink text-center">{rule.demoChar}</span>
+                    <span className="min-w-0 pr-2">
+                      <span className="block text-sm font-semibold text-ink">{stripNum(rule.ruleNameId)}</span>
+                      <span className="block text-xs text-muted truncate">{rule.ruleNameZh} · {rule.pinyin}</span>
+                    </span>
                   </button>
-                );
-              })}
-            </div>
-          </div>
+                </li>
+              );
+            })}
+          </ol>
 
-          {/* Right Column: Interactive Practice & Deep Logic (7 Cols) */}
-          <div className="lg:col-span-7 bg-white dark:bg-stone-900 rounded-3xl p-5 sm:p-6 border border-stone-200 dark:border-stone-800 shadow-xs space-y-5 transition-colors">
-            {/* Rule Header */}
-            <div className="pb-4 border-b border-stone-100 dark:border-stone-800">
-              <div className="flex items-center justify-between gap-2 mb-1">
-                <span className="text-[11px] font-bold text-red-700 dark:text-red-400 font-mono">
-                  {activeRule.ruleNameZh} ({activeRule.pinyin})
-                </span>
-                <span className="text-[10px] bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 px-2 py-0.5 rounded-full font-semibold">
-                  Aturan Baku
-                </span>
-              </div>
-              <h3 className="text-base sm:text-lg font-bold text-stone-900 dark:text-stone-100">
-                {activeRule.ruleNameId}
-              </h3>
-              <p className="text-xs text-stone-600 dark:text-stone-300 leading-relaxed mt-1">
-                {activeRule.summary}
-              </p>
+          {/* Detail */}
+          <div className="lg:col-span-7 space-y-8">
+            <div>
+              <div className={`${label} text-vermilion`}>{activeRule.ruleNameZh} · {activeRule.pinyin}</div>
+              <h3 className="mt-1 text-2xl font-semibold tracking-tight text-ink">{stripNum(activeRule.ruleNameId)}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-muted">{activeRule.summary}</p>
             </div>
 
-            {/* Hanzi Writer Interactive Canvas */}
-            <div className="flex flex-col items-center justify-center py-1">
-              <div className="text-xs font-bold text-stone-500 dark:text-stone-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                <PenTool className="w-3.5 h-3.5 text-red-600 dark:text-red-400" />
-                <span>Uji Urutan Goresan Karakter: {activeChar}</span>
+            <div>
+              <div className={`${label} mb-3`}>Uji urutan goresan &mdash; <span className="font-serif text-ink normal-case tracking-normal text-sm">{activeChar}</span></div>
+              <div className="flex justify-center">
+                <HanziWriterCanvas text={activeChar} size={230} />
               </div>
-              <HanziWriterCanvas
-                text={activeChar}
-                size={230}
-              />
             </div>
 
-            {/* Quick Practice Chips */}
-            <div className="space-y-2 pt-2 border-t border-stone-100 dark:border-stone-800">
-              <div className="text-xs font-bold text-stone-500 dark:text-stone-400 uppercase tracking-wider">
-                Coba Contoh Karakter Lain dengan Aturan Ini:
-              </div>
-              <div className="grid grid-cols-3 gap-2">
+            <div>
+              <div className={`${label} border-t border-ink pt-3`}>Coba karakter lain dengan aturan ini</div>
+              <div className="grid grid-cols-4 divide-x divide-ink/20 border-b border-ink/20">
                 {[
                   { char: activeRule.demoChar, pinyin: activeRule.demoPinyin, meaning: activeRule.demoMeaning },
                   ...activeRule.otherExamples
-                ].map((item) => (
-                  <button
-                    key={item.char}
-                    onClick={() => setActiveChar(item.char)}
-                    className={`p-2.5 rounded-2xl border text-center transition-all ${
-                      activeChar === item.char
-                        ? 'bg-red-50 dark:bg-red-950/60 border-red-300 dark:border-red-900/60 shadow-2xs'
-                        : 'bg-stone-50 dark:bg-stone-800/60 border-stone-100 dark:border-stone-700/60 hover:bg-stone-100 dark:hover:bg-stone-700'
-                    }`}
-                  >
-                    <div className="font-serif font-bold text-2xl text-stone-900 dark:text-stone-100">
-                      {item.char}
-                    </div>
-                    <div className="text-xs font-semibold text-red-700 dark:text-red-400">{item.pinyin}</div>
-                    <div className="text-[10px] text-stone-400 truncate">{item.meaning}</div>
-                  </button>
-                ))}
+                ].map((item) => {
+                  const on = activeChar === item.char;
+                  return (
+                    <button
+                      key={item.char}
+                      onClick={() => setActiveChar(item.char)}
+                      aria-pressed={on}
+                      className={`py-4 px-2 text-center transition-colors focus-visible:outline-2 focus-visible:outline-offset-[-3px] focus-visible:outline-vermilion ${on ? 'bg-ink text-paper' : 'hover:bg-paper-2 text-ink'}`}
+                    >
+                      <span className="block font-serif font-black text-3xl leading-none">{item.char}</span>
+                      <span className={`block mt-2 text-xs font-semibold ${on ? 'text-paper' : 'text-vermilion'}`}>{item.pinyin}</span>
+                      <span className={`block text-[10px] truncate ${on ? 'text-paper/70' : 'text-muted'}`}>{item.meaning}</span>
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
-            {/* Why This Rule Exists (Educational Logic) */}
-            <div className="bg-stone-50 dark:bg-stone-800/50 p-4 rounded-2xl border border-stone-100 dark:border-stone-800 space-y-1 text-xs">
-              <div className="font-bold text-stone-800 dark:text-stone-200 flex items-center gap-1.5">
-                <Info className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-                <span>Mengapa Aturan Ini Penting?</span>
-              </div>
-              <p className="text-stone-600 dark:text-stone-300 leading-relaxed pt-0.5">
-                {activeRule.explanation}
-              </p>
+            <div className="border-l-2 border-vermilion pl-4">
+              <div className={label}>Mengapa aturan ini penting</div>
+              <p className="mt-1 text-sm leading-relaxed text-ink">{activeRule.explanation}</p>
             </div>
           </div>
         </div>
       ) : (
-        /* MODE 2: 8 BENTUK GORESAN DASAR (BASIC STROKES) */
-        <div className="bg-white dark:bg-stone-900 rounded-3xl p-5 sm:p-6 border border-stone-200 dark:border-stone-800 shadow-xs space-y-4 transition-colors">
-          <div className="border-b border-stone-100 dark:border-stone-800 pb-3">
-            <h3 className="font-bold text-sm sm:text-base text-stone-900 dark:text-stone-100">
-              8 Bentuk Goresan Dasar Huruf Hanzi (基本笔画)
-            </h3>
-            <p className="text-xs text-stone-400 mt-0.5">
-              Ribuan aksara Mandarin yang tampak rumit sebenarnya hanya dibangun dari 8 bentuk goresan primer berikut:
+        <section>
+          <div className="max-w-xl">
+            <h3 className="text-xl font-semibold tracking-tight text-ink">8 bentuk goresan dasar (基本笔画)</h3>
+            <p className="mt-1 text-sm text-muted">
+              Ribuan aksara yang tampak rumit sebenarnya hanya dibangun dari 8 bentuk goresan primer berikut.
             </p>
           </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 border-t border-ink">
             {BASIC_STROKES.map((stroke, idx) => (
-              <div 
-                key={idx}
-                className="bg-stone-50 dark:bg-stone-800/60 rounded-2xl p-4 border border-stone-100 dark:border-stone-700/60 space-y-2 flex flex-col justify-between"
-              >
+              <div key={idx} className="py-5 sm:px-5 sm:first:pl-0 border-b border-ink/20 lg:[&:nth-child(4n+1)]:pl-0 sm:border-l sm:border-ink/20 sm:[&:nth-child(2n+1)]:border-l-0 lg:[&:nth-child(2n+1)]:border-l lg:[&:nth-child(4n+1)]:border-l-0 flex flex-col justify-between gap-4">
                 <div>
-                  <div className="flex items-center justify-between">
-                    <span className="font-serif font-bold text-3xl text-red-700 dark:text-red-400">
-                      {stroke.symbol}
-                    </span>
-                    <span className="text-[10px] bg-white dark:bg-stone-800 px-2 py-0.5 rounded-full border border-stone-200 dark:border-stone-700 text-stone-500 dark:text-stone-400 font-mono">
-                      #{idx + 1}
-                    </span>
+                  <div className="flex items-start justify-between">
+                    <span className="font-serif font-black text-6xl leading-none text-ink">{stroke.symbol}</span>
+                    <span className="text-xs tabular-nums text-muted">{String(idx + 1).padStart(2, '0')}</span>
                   </div>
-
-                  <div className="mt-1">
-                    <div className="font-bold text-sm text-stone-900 dark:text-stone-100">
-                      {stroke.nameId} ({stroke.nameZh})
-                    </div>
-                    <div className="text-xs text-red-700 dark:text-red-400 font-mono font-semibold">
-                      {stroke.pinyin}
-                    </div>
-                  </div>
-
-                  <p className="text-[11px] text-stone-600 dark:text-stone-300 leading-relaxed mt-1.5">
-                    {stroke.desc}
-                  </p>
+                  <div className="mt-3 text-sm font-semibold text-ink">{stroke.nameId} ({stroke.nameZh})</div>
+                  <div className="text-xs font-semibold text-vermilion">{stroke.pinyin}</div>
+                  <p className="mt-2 text-xs leading-relaxed text-muted">{stroke.desc}</p>
                 </div>
-
-                <div className="pt-2 border-t border-stone-200/60 dark:border-stone-700/60 text-[11px]">
-                  <span className="text-stone-400 font-medium">Contoh Kata: </span>
-                  <span className="font-serif font-bold text-stone-800 dark:text-stone-200">{stroke.example}</span>
+                <div className="text-xs border-t border-ink/20 pt-2">
+                  <span className="text-muted">Contoh: </span>
+                  <span className="font-serif font-bold text-ink">{stroke.example}</span>
                 </div>
               </div>
             ))}
           </div>
-        </div>
+        </section>
       )}
     </div>
   );

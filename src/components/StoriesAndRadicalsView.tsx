@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Compass, Layers, PenTool, Music, Sparkles } from 'lucide-react';
 import { CharacterStoriesView } from './CharacterStoriesView';
 import { RadicalsView } from './RadicalsView';
 import { CustomCharacterSandbox } from './CustomCharacterSandbox';
@@ -32,42 +31,42 @@ export const StoriesAndRadicalsView: React.FC<StoriesAndRadicalsViewProps> = ({
     }
   };
 
-  const tabs: { id: StorySubTab; label: string; icon: React.FC<{ className?: string }>; activeColor: string }[] = [
-    { id: 'stories', label: 'Asal-Usul Huruf', icon: Compass, activeColor: 'bg-red-700 text-white' },
-    { id: 'stroke-order', label: 'Urutan Goresan', icon: PenTool, activeColor: 'bg-amber-700 text-white' },
-    { id: 'tones', label: 'Nada Pinyin', icon: Music, activeColor: 'bg-teal-700 text-white' },
-    { id: 'radicals', label: '16 Radikal', icon: Layers, activeColor: 'bg-blue-700 text-white' },
-    { id: 'sandbox', label: 'Tulis Bebas', icon: Sparkles, activeColor: 'bg-purple-700 text-white' },
+  const tabs: { id: StorySubTab; label: string; glyph: string }[] = [
+    { id: 'stories', label: 'Asal-usul huruf', glyph: '源' },
+    { id: 'stroke-order', label: 'Urutan goresan', glyph: '笔' },
+    { id: 'tones', label: 'Nada pinyin', glyph: '调' },
+    { id: 'radicals', label: '16 radikal', glyph: '部' },
+    { id: 'sandbox', label: 'Tulis bebas', glyph: '写' },
   ];
 
   return (
-    <div className="space-y-4 animate-in fade-in">
-      {/* Top Segmented Control Switcher (Scrollable on small mobile) */}
-      <div className="flex justify-center">
-        <div className="w-full max-w-3xl overflow-x-auto no-scrollbar py-0.5">
-          <div className="bg-white dark:bg-stone-900 p-1.5 sm:p-2 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs flex items-center justify-start sm:justify-between gap-1 min-w-max sm:min-w-0 transition-colors">
-            {tabs.map((tab) => {
-              const Icon = tab.icon;
-              const isActive = currentSubTab === tab.id;
-
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => handleSelectTab(tab.id)}
-                  className={`py-2 px-3 sm:px-3.5 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center justify-center gap-1.5 whitespace-nowrap active:scale-95 ${
-                    isActive
-                      ? `${tab.activeColor} shadow-xs font-bold`
-                      : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 hover:bg-stone-50 dark:hover:bg-stone-800'
-                  }`}
-                >
-                  <Icon className="w-4 h-4 flex-shrink-0" />
-                  <span>{tab.label}</span>
-                </button>
-              );
-            })}
-          </div>
+    <div className="space-y-8 animate-in fade-in">
+      {/* Section index: hanzi glyph + label, active marked by rule and vermilion */}
+      <nav aria-label="Bagian Aksara" className="overflow-x-auto no-scrollbar -mx-3 px-3 sm:mx-0 sm:px-0">
+        <div role="tablist" className="flex min-w-max sm:min-w-0 border-t-2 border-ink sm:grid sm:grid-cols-5 sm:divide-x sm:divide-ink/20 border-b border-ink/20">
+          {tabs.map((tab, i) => {
+            const isActive = currentSubTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                role="tab"
+                aria-selected={isActive}
+                onClick={() => handleSelectTab(tab.id)}
+                className={`relative flex items-center gap-3 px-4 py-3 text-left whitespace-nowrap transition-colors focus-visible:outline-2 focus-visible:outline-offset-[-3px] focus-visible:outline-vermilion ${
+                  isActive ? 'text-ink' : 'text-muted hover:text-ink hover:bg-paper-2'
+                }`}
+              >
+                {isActive && <span aria-hidden className="absolute -top-0.5 left-0 right-0 h-0.5 bg-vermilion" />}
+                <span className={`font-serif font-black text-2xl leading-none ${isActive ? 'text-vermilion' : ''}`}>{tab.glyph}</span>
+                <span className="text-sm">
+                  <span className="block text-[10px] tabular-nums opacity-70">{String(i + 1).padStart(2, '0')}</span>
+                  <span className={isActive ? 'font-semibold' : ''}>{tab.label}</span>
+                </span>
+              </button>
+            );
+          })}
         </div>
-      </div>
+      </nav>
 
       {/* Content based on sub-tab */}
       <div className="animate-in fade-in duration-150">

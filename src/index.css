@@ -46,25 +46,16 @@
   }
 }
 
-/* Mi Zi Ge (Rice character grid) calligraphy background for character canvas */
+/* Mi Zi Ge (rice character grid) calligraphy background for the character canvas */
 .mizige-bg {
-  background-color: #faf9f5;
-  background-image: 
-    linear-gradient(to right, rgba(220, 38, 38, 0.15) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(220, 38, 38, 0.15) 1px, transparent 1px),
-    linear-gradient(45deg, transparent 49.5%, rgba(220, 38, 38, 0.1) 49.5%, rgba(220, 38, 38, 0.1) 50.5%, transparent 50.5%),
-    linear-gradient(-45deg, transparent 49.5%, rgba(220, 38, 38, 0.1) 49.5%, rgba(220, 38, 38, 0.1) 50.5%, transparent 50.5%);
-  background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%;
-  background-position: center;
-}
-
-.dark .mizige-bg {
-  background-color: #1c1917;
-  background-image: 
-    linear-gradient(to right, rgba(239, 68, 68, 0.22) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(239, 68, 68, 0.22) 1px, transparent 1px),
-    linear-gradient(45deg, transparent 49.5%, rgba(239, 68, 68, 0.14) 49.5%, rgba(239, 68, 68, 0.14) 50.5%, transparent 50.5%),
-    linear-gradient(-45deg, transparent 49.5%, rgba(239, 68, 68, 0.14) 49.5%, rgba(239, 68, 68, 0.14) 50.5%, transparent 50.5%);
+  --grid: color-mix(in srgb, var(--vermilion) 26%, transparent);
+  --diag: color-mix(in srgb, var(--vermilion) 14%, transparent);
+  background-color: var(--paper);
+  background-image:
+    linear-gradient(to right, transparent calc(50% - 0.5px), var(--grid) calc(50% - 0.5px), var(--grid) calc(50% + 0.5px), transparent calc(50% + 0.5px)),
+    linear-gradient(to bottom, transparent calc(50% - 0.5px), var(--grid) calc(50% - 0.5px), var(--grid) calc(50% + 0.5px), transparent calc(50% + 0.5px)),
+    linear-gradient(45deg, transparent 49.5%, var(--diag) 49.5%, var(--diag) 50.5%, transparent 50.5%),
+    linear-gradient(-45deg, transparent 49.5%, var(--diag) 49.5%, var(--diag) 50.5%, transparent 50.5%);
 }
 
 /* Custom scrollbar for vocab lists */

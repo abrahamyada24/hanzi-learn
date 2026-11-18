@@ -37,15 +37,11 @@ interface AdminDashboardViewProps {
 }
 
 export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({ onClose }) => {
-  const { user } = useAuth();
-
-  const [isAdminUnlocked, setIsAdminUnlocked] = useState<boolean>(() => {
-    return checkIsAdmin(user?.email);
-  });
-  const [pinInput, setPinInput] = useState<string>('');
-  const [pinError, setPinError] = useState<string | null>(null);
+  const { user, loading: authLoading } = useAuth();
+  const isAdmin = checkIsAdmin(user);
 
   const [loading, setLoading] = useState<boolean>(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [data, setData] = useState<AdminAnalyticsData | null>(null);
   const [activeTab, setActiveTab] = useState<'feedback' | 'users' | 'vocab'>('feedback');
   
@@ -59,33 +55,29 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({ onClose 
 
   const loadData = async () => {
     setLoading(true);
+    setLoadError(null);
     try {
       const res = await fetchAdminAnalytics();
       setData(res);
       setLastRefreshedTime(new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
     } catch (err) {
       console.error('Failed to load admin analytics:', err);
+      const code = (err as { code?: string })?.code;
+      setLoadError(
+        code === 'permission-denied'
+          ? 'Firestore menolak akses. Pastikan kamu masuk dengan akun Google admin yang emailnya terverifikasi dan firestore.rules sudah di-deploy.'
+          : 'Gagal memuat data. Periksa koneksi internet lalu coba segarkan.'
+      );
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    if (isAdminUnlocked) {
+    if (isAdmin) {
       loadData();
     }
-  }, [isAdminUnlocked]);
-
-  const handleUnlockPin = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (pinInput.trim() === '8888') {
-      sessionStorage.setItem('hanzilearn_admin_unlocked', 'true');
-      setIsAdminUnlocked(true);
-      setPinError(null);
-    } else {
-      setPinError('PIN salah. Hubungi pemilik untuk kode akses admin.');
-    }
-  };
+  }, [isAdmin]);
 
   const handleUpdateStatus = async (feedbackId: string, newStatus: FeedbackStatus) => {
     try {
@@ -132,36 +124,23 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({ onClose 
   const tabBtn = (on: boolean) =>
     `pb-1 border-b-2 whitespace-nowrap transition-colors ${focusRing} ${on ? 'border-vermilion text-ink font-semibold' : 'border-transparent text-muted hover:text-ink'}`;
 
-  // PIN verification gate
-  if (!isAdminUnlocked) {
+  // Akses: hanya akun admin. Penegakan sebenarnya ada di firestore.rules.
+  if (authLoading) {
+    return <p className="py-16 text-center text-sm text-muted">Memeriksa akses…</p>;
+  }
+
+  if (!isAdmin) {
     return (
       <div className="max-w-md mx-auto py-8 animate-in fade-in">
         <div className="border-t-2 border-ink pt-3">
           <span className={label}>Akses terbatas</span>
           <h2 className="mt-2 text-3xl font-semibold tracking-tight text-ink">Panel admin</h2>
-          <p className="mt-2 text-sm text-muted">Halaman ini dikhususkan untuk pengembang dan pemilik aplikasi.</p>
-
-          {user && (
-            <p className="mt-4 text-xs text-muted">
-              Masuk sebagai <span className="font-semibold text-ink">{user.email}</span>
-            </p>
-          )}
-
-          <form onSubmit={handleUnlockPin} className="mt-6 space-y-5">
-            <input
-              type="password"
-              value={pinInput}
-              onChange={(e) => setPinInput(e.target.value)}
-              placeholder="Masukkan PIN Admin (Bawaan: 8888)"
-              aria-label="PIN admin"
-              className="w-full bg-transparent border-b-2 border-ink pb-2 text-center font-mono tracking-widest text-sm text-ink placeholder:text-muted focus:outline-none focus:border-vermilion"
-            />
-            {pinError && <p role="alert" className="border-l-2 border-vermilion pl-3 text-xs text-vermilion">{pinError}</p>}
-            <div className="grid grid-cols-2 gap-3">
-              <button type="button" onClick={onClose} className={lineBtn}>Kembali</button>
-              <button type="submit" className={solidBtn}>Buka panel</button>
-            </div>
-          </form>
+          <p className="mt-2 text-sm text-muted">
+            {user
+              ? <>Akun <span className="font-semibold text-ink">{user.email}</span> tidak memiliki akses admin.</>
+              : 'Masuk dengan akun Google admin di tab Profil untuk membuka halaman ini.'}
+          </p>
+          <button type="button" onClick={onClose} className={`mt-6 ${lineBtn}`}>Kembali</button>
         </div>
       </div>
     );
@@ -212,6 +191,10 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({ onClose 
           </div>
         </div>
       </header>
+
+      {loadError && (
+        <div role="alert" className="border-l-2 border-vermilion pl-3 text-sm text-vermilion max-w-2xl">{loadError}</div>
+      )}
 
       {/* Figures */}
       <dl className="grid grid-cols-2 lg:grid-cols-4 border-t border-ink">

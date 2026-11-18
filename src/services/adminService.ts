@@ -4,6 +4,8 @@ import { HSK1_VOCABULARY } from '../data/hsk1';
 import { getFeedbackList } from './feedbackService';
 import type { FeedbackData } from './feedbackService';
 
+// Hanya untuk menampilkan UI admin. Penegakan akses yang sebenarnya ada di firestore.rules
+// (daftar email di sana harus tetap sama dengan daftar ini).
 export const ADMIN_EMAILS = [
   'abrahamyadaa24@gmail.com',
   'abrahamyada24@gmail.com',
@@ -203,14 +205,11 @@ export async function fetchAdminAnalytics(): Promise<AdminAnalyticsData> {
 }
 
 /**
- * Check if a given email or session has admin privilege
+ * Apakah akun yang sedang login adalah admin? Hanya untuk menampilkan/menyembunyikan UI;
+ * Firestore tetap menolak pembacaan data admin untuk akun non-admin lewat firestore.rules.
  */
-export function checkIsAdmin(email?: string | null): boolean {
-  if (!email) {
-    // Check if session pin unlocked
-    return sessionStorage.getItem('hanzilearn_admin_unlocked') === 'true';
-  }
-  const cleanEmail = email.toLowerCase().trim();
-  const emailMatched = ADMIN_EMAILS.some(adm => adm.toLowerCase().trim() === cleanEmail);
-  return emailMatched || sessionStorage.getItem('hanzilearn_admin_unlocked') === 'true';
+export function checkIsAdmin(user?: { email?: string | null; emailVerified?: boolean } | null): boolean {
+  if (!user?.email || user.emailVerified !== true) return false;
+  const cleanEmail = user.email.toLowerCase().trim();
+  return ADMIN_EMAILS.some(adm => adm.toLowerCase().trim() === cleanEmail);
 }

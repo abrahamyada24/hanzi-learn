@@ -1,18 +1,4 @@
 import { useState, useEffect, useMemo } from 'react';
-import { 
-  Home,
-  BookOpen, 
-  HelpCircle, 
-  Search, 
-  Compass,
-  LayoutGrid,
-  List,
-  Maximize2,
-  Download,
-  User,
-  Sun,
-  Moon
-} from 'lucide-react';
 import { useTheme } from './context/ThemeContext';
 import { HSK1_VOCABULARY } from './data/hsk1';
 import { LESSON_UNITS } from './data/lessonUnits';
@@ -291,144 +277,93 @@ export function App() {
   const currentUnit = LESSON_UNITS.find(u => u.id === selectedUnitId);
 
   return (
-    <div className="min-h-screen bg-stone-100/60 dark:bg-stone-950 text-stone-900 dark:text-stone-100 pb-20 font-sans transition-colors duration-150">
-      {/* Top Navbar: Mobile-optimized sticky navigation */}
-      <header className="sticky top-0 z-40 bg-white/95 dark:bg-stone-900/95 backdrop-blur-md border-b border-stone-200 dark:border-stone-800 transition-colors">
+    <div className="min-h-screen bg-paper text-ink pb-20 font-sans">
+      {/* Top Navbar: Swiss editorial masthead */}
+      <header className="sticky top-0 z-40 bg-paper/95 backdrop-blur-sm border-b border-ink">
         <div className="max-w-6xl mx-auto px-3 sm:px-4">
-          <div className="h-16 flex items-center justify-between gap-3">
-            {/* Logo */}
-            <div className="flex items-center gap-2.5 flex-shrink-0 cursor-pointer" onClick={() => { setShowAdminDashboard(false); setActiveTab('home'); }}>
-              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-red-700 text-white font-serif font-bold text-xl sm:text-2xl flex items-center justify-center shadow-md">
-                汉
-              </div>
-              <div>
-                <span className="font-bold text-base sm:text-lg text-stone-900 dark:text-stone-100 tracking-tight">HanziLearn</span>
-                <span className="hidden lg:inline-block ml-2 text-[11px] bg-red-50 dark:bg-red-950/60 text-red-700 dark:text-red-300 font-semibold px-2 py-0.5 rounded-full border border-red-200 dark:border-red-900/50">
-                  HSK 1 & Piktogram
-                </span>
-              </div>
-            </div>
+          <div className="h-14 flex items-center justify-between gap-4">
+            {/* Wordmark */}
+            <button
+              className="flex items-baseline gap-2 flex-shrink-0 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-vermilion"
+              onClick={() => { setShowAdminDashboard(false); setActiveTab('home'); }}
+              aria-label="HanziLearn, ke Beranda"
+            >
+              <span className="font-serif font-black text-2xl leading-none text-vermilion">汉</span>
+              <span className="font-semibold text-base tracking-tight text-ink">HanziLearn</span>
+            </button>
 
-            {/* Desktop Navigation Tabs (Hidden on mobile) */}
-            <nav className="hidden md:flex items-center gap-1 bg-stone-100 dark:bg-stone-800/80 p-1 rounded-2xl text-xs lg:text-sm font-medium text-stone-600 dark:text-stone-400">
-              <button
-                onClick={() => { setShowAdminDashboard(false); setActiveTab('home'); }}
-                className={`px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 ${
-                  !showAdminDashboard && activeTab === 'home' ? 'bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 shadow-xs font-semibold' : 'hover:text-stone-900 dark:hover:text-stone-100'
-                }`}
-              >
-                <Home className="w-4 h-4 text-red-600 dark:text-red-500 flex-shrink-0" />
-                <span>Beranda</span>
-              </button>
-
-              <button
-                onClick={() => { setShowAdminDashboard(false); setActiveTab('flashcards'); }}
-                className={`px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 ${
-                  !showAdminDashboard && activeTab === 'flashcards' ? 'bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 shadow-xs font-semibold' : 'hover:text-stone-900 dark:hover:text-stone-100'
-                }`}
-              >
-                <BookOpen className="w-4 h-4 text-red-600 dark:text-red-500 flex-shrink-0" />
-                <span>Belajar</span>
-              </button>
-
-              <button
-                onClick={() => { setShowAdminDashboard(false); setActiveTab('stories'); }}
-                className={`px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 ${
-                  !showAdminDashboard && activeTab === 'stories' ? 'bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 shadow-xs font-semibold' : 'hover:text-stone-900 dark:hover:text-stone-100'
-                }`}
-              >
-                <Compass className="w-4 h-4 text-amber-600 dark:text-amber-400 flex-shrink-0" />
-                <span>Aksara & Radikal</span>
-              </button>
-
-              <button
-                onClick={() => { setShowAdminDashboard(false); setActiveTab('quiz'); }}
-                className={`px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 ${
-                  !showAdminDashboard && activeTab === 'quiz' ? 'bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 shadow-xs font-semibold' : 'hover:text-stone-900 dark:hover:text-stone-100'
-                }`}
-              >
-                <HelpCircle className="w-4 h-4 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
-                <span>Kuis</span>
-              </button>
-
-              <button
-                onClick={() => { setShowAdminDashboard(false); setActiveTab('profile'); }}
-                className={`px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 ${
-                  !showAdminDashboard && activeTab === 'profile' ? 'bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 shadow-xs font-semibold' : 'hover:text-stone-900 dark:hover:text-stone-100'
-                }`}
-              >
-                <User className="w-4 h-4 text-stone-700 dark:text-stone-300 flex-shrink-0" />
-                <span>Profil</span>
-              </button>
+            {/* Desktop navigation (hidden on mobile) */}
+            <nav className="hidden md:flex items-stretch gap-6 self-stretch text-sm" aria-label="Navigasi utama">
+              {([
+                ['home', 'Beranda'],
+                ['flashcards', 'Belajar'],
+                ['stories', 'Aksara & Radikal'],
+                ['quiz', 'Kuis'],
+                ['profile', 'Profil']
+              ] as const).map(([id, label], i) => {
+                const active = !showAdminDashboard && activeTab === id;
+                return (
+                  <button
+                    key={id}
+                    onClick={() => { setShowAdminDashboard(false); setActiveTab(id); }}
+                    aria-current={active ? 'page' : undefined}
+                    className={`relative flex items-center gap-1.5 transition-colors focus-visible:outline-2 focus-visible:outline-offset-[-4px] focus-visible:outline-vermilion ${
+                      active ? 'text-ink font-semibold' : 'text-muted hover:text-ink'
+                    }`}
+                  >
+                    <span className={`text-[10px] tabular-nums ${active ? 'text-vermilion' : ''}`}>{String(i + 1).padStart(2, '0')}</span>
+                    <span>{label}</span>
+                    {active && <span aria-hidden className="absolute -bottom-px left-0 right-0 h-0.5 bg-vermilion" />}
+                  </button>
+                );
+              })}
             </nav>
 
-            {/* Right Side Actions: Theme Toggle + PWA Install + User Avatar / Login */}
-            <div className="flex items-center gap-2 flex-shrink-0">
-              {/* Quick Theme Toggle Button (Available everywhere) */}
+            {/* Right side: theme, install, account */}
+            <div className="flex items-center gap-4 flex-shrink-0 text-xs font-medium">
               <button
                 onClick={toggleTheme}
-                className="p-2 rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 text-stone-700 dark:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-700 transition active:scale-95 shadow-2xs"
+                className="text-muted hover:text-ink transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-vermilion"
                 title={isDark ? 'Ganti ke Mode Terang' : 'Ganti ke Mode Gelap'}
                 aria-label="Toggle dark mode"
               >
-                {isDark ? (
-                  <Sun className="w-4 h-4 text-amber-400" />
-                ) : (
-                  <Moon className="w-4 h-4 text-stone-600" />
-                )}
+                {isDark ? 'Terang' : 'Gelap'}
               </button>
 
-              {/* Desktop 1-Click PWA Install Button */}
               {!isStandalone && (
                 <button
                   onClick={handleTriggerInstall}
-                  className="hidden sm:flex items-center gap-1.5 py-1.5 px-3 bg-red-50 dark:bg-red-950/50 hover:bg-red-100 dark:hover:bg-red-900/50 text-red-700 dark:text-red-300 border border-red-200/80 dark:border-red-900/60 rounded-xl text-xs font-semibold transition active:scale-95 shadow-xs"
+                  className="hidden sm:inline text-muted hover:text-vermilion underline underline-offset-4 decoration-1 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-vermilion"
                   title="Pasang aplikasi HanziLearn di laptop / HP kamu"
                 >
-                  <Download className="w-3.5 h-3.5" />
-                  <span>Pasang App</span>
+                  Pasang app
                 </button>
               )}
 
-              {/* Google Login / Avatar button (taps directly to Profile tab) */}
               {user ? (
                 <button
                   onClick={() => setActiveTab('profile')}
-                  className={`flex items-center gap-2 p-1 pl-2 rounded-full transition border active:scale-95 ${
-                    activeTab === 'profile'
-                      ? 'bg-red-50 dark:bg-red-950/60 border-red-200 dark:border-red-900 ring-2 ring-red-100 dark:ring-red-950/60'
-                      : 'bg-stone-100 dark:bg-stone-800 hover:bg-stone-200 dark:hover:bg-stone-700 border-stone-200 dark:border-stone-700'
-                  }`}
+                  className="flex items-center gap-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-vermilion"
                   title="Buka profil akun & statistik"
                 >
-                  <span className="text-xs font-semibold text-stone-700 dark:text-stone-300 hidden sm:inline max-w-[90px] truncate">
+                  <span className={`hidden sm:inline max-w-[90px] truncate ${activeTab === 'profile' ? 'text-vermilion' : 'text-ink'}`}>
                     {user.displayName?.split(' ')[0] || 'User'}
                   </span>
                   {user.photoURL ? (
-                    <img
-                      src={user.photoURL}
-                      alt="Profile"
-                      className="w-7 h-7 rounded-full object-cover border border-white dark:border-stone-700"
-                    />
+                    <img src={user.photoURL} alt="Profile" className="w-7 h-7 object-cover border border-ink" />
                   ) : (
-                    <div className="w-7 h-7 rounded-full bg-red-700 text-white font-bold text-xs flex items-center justify-center">
+                    <span className="w-7 h-7 bg-ink text-paper font-semibold text-xs flex items-center justify-center">
                       {user.email?.[0].toUpperCase() || 'U'}
-                    </div>
+                    </span>
                   )}
                 </button>
               ) : (
                 <button
                   onClick={() => loginWithGoogle()}
-                  className="flex items-center gap-1.5 py-1.5 px-3 bg-white dark:bg-stone-800 hover:bg-stone-50 dark:hover:bg-stone-700 border border-stone-200 dark:border-stone-700 text-stone-800 dark:text-stone-200 rounded-xl text-xs font-semibold transition shadow-xs active:scale-95"
+                  className="border border-ink text-ink px-3 py-1.5 hover:bg-ink hover:text-paper transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-vermilion"
                   title="Masuk dengan Google"
                 >
-                  <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24">
-                    <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
-                    <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/>
-                    <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.97 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/>
-                    <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
-                  </svg>
-                  <span>Masuk</span>
+                  Masuk
                 </button>
               )}
             </div>
@@ -467,62 +402,42 @@ export function App() {
 
         {/* TAB 1: KOSAKATA & FLASHCARD */}
         {activeTab === 'flashcards' && (
-          <div className="space-y-4 animate-in fade-in">
-            {/* Bab / Unit Selector Pill Bar (Anti-Overload!) */}
-            <div className="bg-white dark:bg-stone-900 p-3.5 sm:p-4 rounded-3xl border border-stone-200 dark:border-stone-800 shadow-xs space-y-3 transition-colors">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-stone-100 dark:border-stone-800">
+          <div className="space-y-8 animate-in fade-in">
+            <div className="space-y-5">
+              <div className="border-t-2 border-ink pt-3 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
                 <div>
-                  <div className="text-xs text-stone-400 font-semibold uppercase tracking-wider">
-                    Pilih Bab Belajar:
-                  </div>
-                  <h3 className="font-bold text-stone-900 dark:text-stone-100 text-sm sm:text-base flex items-center gap-1.5 mt-0.5">
-                    <span>{currentUnit ? `${currentUnit.icon} ${currentUnit.title}` : 'Semua Bab (130 Kata)'}</span>
-                    {currentUnit && (
-                      <span className="text-xs font-normal text-stone-500 dark:text-stone-400">
-                        &bull; {currentUnit.wordIds.length} kata
-                      </span>
-                    )}
-                  </h3>
+                  <div className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted">Belajar &mdash; pilih bab</div>
+                  <h2 className="mt-1 flex items-baseline gap-3 text-2xl sm:text-3xl font-semibold tracking-tight text-ink">
+                    {currentUnit && <span className="text-vermilion tabular-nums">{String(currentUnit.unitNumber).padStart(2, '0')}</span>}
+                    <span>{currentUnit ? currentUnit.title.replace(/^Bab\s*\d+\s*:\s*/i, '') : 'Semua bab'}</span>
+                    <span className="text-xs font-normal text-muted">{currentUnit ? currentUnit.wordIds.length : 130} kata</span>
+                  </h2>
                 </div>
 
-                {/* View Mode Switcher: Fokus (1 Kartu) vs List Ringkas vs Grid */}
-                <div className="flex items-center gap-1 bg-stone-100 dark:bg-stone-800 p-1 rounded-2xl text-xs font-semibold self-start sm:self-auto">
-                  <button
-                    onClick={() => setViewMode('focus')}
-                    className={`px-3 py-1.5 rounded-xl transition flex items-center gap-1 ${
-                      viewMode === 'focus' ? 'bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 shadow-xs font-bold' : 'text-stone-500 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-200'
-                    }`}
-                    title="Mode fokus belajar 1 kartu per waktu"
-                  >
-                    <Maximize2 className="w-3.5 h-3.5 text-red-600 dark:text-red-500" />
-                    <span>Fokus 1 Kartu</span>
-                  </button>
-
-                  <button
-                    onClick={() => setViewMode('compact')}
-                    className={`px-3 py-1.5 rounded-xl transition flex items-center gap-1 ${
-                      viewMode === 'compact' ? 'bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 shadow-xs font-bold' : 'text-stone-500 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-200'
-                    }`}
-                    title="Tampilan daftar ringkas hemat ruang"
-                  >
-                    <List className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-                    <span>Daftar</span>
-                  </button>
-
-                  <button
-                    onClick={() => setViewMode('grid')}
-                    className={`px-3 py-1.5 rounded-xl transition flex items-center gap-1 ${
-                      viewMode === 'grid' ? 'bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 shadow-xs font-bold' : 'text-stone-500 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-200'
-                    }`}
-                    title="Tampilan grid kartu lengkap"
-                  >
-                    <LayoutGrid className="w-3.5 h-3.5 text-stone-600 dark:text-stone-400" />
-                    <span>Grid</span>
-                  </button>
+                {/* View mode: text tabs */}
+                <div role="tablist" aria-label="Mode tampilan" className="flex gap-5 text-sm self-start sm:self-auto">
+                  {([
+                    ['focus', 'Fokus', 'Mode fokus belajar 1 kartu per waktu'],
+                    ['compact', 'Daftar', 'Tampilan daftar ringkas hemat ruang'],
+                    ['grid', 'Grid', 'Tampilan grid kartu lengkap']
+                  ] as const).map(([mode, label, tip]) => (
+                    <button
+                      key={mode}
+                      role="tab"
+                      aria-selected={viewMode === mode}
+                      onClick={() => setViewMode(mode)}
+                      title={tip}
+                      className={`pb-1 border-b-2 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-vermilion ${
+                        viewMode === mode ? 'border-vermilion text-ink font-semibold' : 'border-transparent text-muted hover:text-ink'
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  ))}
                 </div>
               </div>
 
-              {/* Mobile View: Custom Dropdown with Bab & Vocab Search */}
+              {/* Mobile: dropdown with bab and vocab search */}
               <div className="sm:hidden">
                 <UnitSelectorDropdown
                   selectedUnitId={selectedUnitId}
@@ -536,61 +451,46 @@ export function App() {
                 />
               </div>
 
-              {/* Desktop / Tablet View: Horizontal Pill Bar */}
-              <div className="hidden sm:flex items-center gap-1.5 overflow-x-auto pb-1 text-xs">
-                <button
-                  onClick={() => setSelectedUnitId('all')}
-                  className={`px-3 py-2 rounded-xl whitespace-nowrap transition font-medium ${
-                    selectedUnitId === 'all'
-                      ? 'bg-stone-900 dark:bg-stone-800 text-white shadow-xs font-bold border border-stone-900 dark:border-stone-700'
-                      : 'bg-stone-100 dark:bg-stone-800/80 text-stone-600 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-stone-700'
-                  }`}
-                >
-                  Semua Kata (130)
-                </button>
-
-                {LESSON_UNITS.map((unit) => {
-                  const isSelected = selectedUnitId === unit.id;
+              {/* Desktop / tablet: numbered chapter strip */}
+              <div className="hidden sm:flex flex-wrap items-center gap-x-1 gap-y-1 text-sm" role="tablist" aria-label="Pilih bab">
+                {[{ id: 'all', label: 'Semua' }, ...LESSON_UNITS.map(u => ({ id: u.id, label: String(u.unitNumber).padStart(2, '0') }))].map(({ id, label }) => {
+                  const selected = selectedUnitId === id;
                   return (
                     <button
-                      key={unit.id}
-                      onClick={() => setSelectedUnitId(unit.id)}
-                      className={`px-3 py-2 rounded-xl whitespace-nowrap transition flex items-center gap-1.5 font-medium ${
-                        isSelected
-                          ? 'bg-red-700 text-white shadow-xs font-bold'
-                          : 'bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-stone-700'
+                      key={id}
+                      role="tab"
+                      aria-selected={selected}
+                      onClick={() => setSelectedUnitId(id)}
+                      title={id === 'all' ? 'Semua kata (130)' : LESSON_UNITS.find(u => u.id === id)?.title}
+                      className={`px-3 py-1.5 tabular-nums border transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-vermilion ${
+                        selected ? 'bg-ink text-paper border-ink font-semibold' : 'border-transparent text-muted hover:text-ink hover:border-ink/30'
                       }`}
                     >
-                      <span>{unit.icon}</span>
-                      <span>Bab {unit.unitNumber}</span>
+                      {label}
                     </button>
                   );
                 })}
               </div>
 
-              {/* Optional Search & Status filters if on Compact or Grid view */}
+              {/* Search & status filters on compact / grid views */}
               {viewMode !== 'focus' && (
-                <div className="flex flex-col sm:flex-row gap-2 pt-2 border-t border-stone-100 dark:border-stone-800">
-                  <div className="relative flex-1">
-                    <Search className="w-4 h-4 text-stone-400 absolute left-3 top-3" />
-                    <input
-                      type="text"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder="Cari kata di bab ini..."
-                      className="w-full pl-9 pr-4 py-2 rounded-xl bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-xs text-stone-900 dark:text-stone-100 placeholder-stone-400 dark:placeholder-stone-500 focus:outline-none focus:ring-2 focus:ring-red-600/20"
-                    />
-                  </div>
-
-                  <div className="flex items-center gap-1 overflow-x-auto text-xs">
+                <div className="flex flex-col sm:flex-row sm:items-end gap-4 pt-1">
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Cari kata di bab ini"
+                    aria-label="Cari kata di bab ini"
+                    className="flex-1 bg-transparent border-b border-ink pb-1.5 text-sm text-ink placeholder:text-muted focus:outline-none focus:border-vermilion"
+                  />
+                  <div className="flex items-center gap-4 text-xs overflow-x-auto">
                     {(['all', 'mastered', 'learning', 'bookmarked'] as FilterStatusType[]).map((st) => (
                       <button
                         key={st}
                         onClick={() => setStatusFilter(st)}
-                        className={`px-2.5 py-1.5 rounded-xl border whitespace-nowrap text-xs transition ${
-                          statusFilter === st
-                            ? 'bg-stone-900 dark:bg-stone-800 text-white border-stone-900 dark:border-stone-600 font-semibold shadow-xs'
-                            : 'bg-white dark:bg-stone-800 text-stone-600 dark:text-stone-300 border-stone-200 dark:border-stone-700 hover:bg-stone-50 dark:hover:bg-stone-700'
+                        aria-pressed={statusFilter === st}
+                        className={`whitespace-nowrap pb-1 border-b-2 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-vermilion ${
+                          statusFilter === st ? 'border-vermilion text-ink font-semibold' : 'border-transparent text-muted hover:text-ink'
                         }`}
                       >
                         {st === 'all' ? 'Semua' : st === 'mastered' ? 'Hafal' : st === 'learning' ? 'Belajar' : 'Favorit'}
@@ -629,16 +529,14 @@ export function App() {
                     onOpenWritingPractice={(vocab) => setWritingModalVocab(vocab)}
                   />
                 ) : (
-                  <div className="bg-white dark:bg-stone-900 rounded-3xl p-8 text-center text-stone-400 dark:text-stone-500 border border-stone-200 dark:border-stone-800">
-                    Tidak ada kata yang sesuai.
-                  </div>
+                  <p className="border-y border-ink/20 py-10 text-center text-sm text-muted">Tidak ada kata yang sesuai.</p>
                 )}
               </div>
             )}
 
             {/* VIEW MODE 3: GRID (Kartu Lengkap) */}
             {viewMode === 'grid' && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 animate-in fade-in">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 animate-in fade-in">
                 {filteredVocab.map((item) => (
                   <VocabCard
                     key={item.id}
@@ -704,7 +602,6 @@ export function App() {
           setActiveTab(tab);
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }}
-        userPhotoUrl={user?.photoURL}
       />
 
       {/* Toast Notification Alert */}

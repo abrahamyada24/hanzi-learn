@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Search, Volume2, Sparkles, AlertCircle } from 'lucide-react';
 import { HanziWriterCanvas } from './HanziWriterCanvas';
 import { speechManager } from '../utils/speech';
+import { AudioButton } from './ui/marks';
+import { focusRing } from './ui/tokens';
 
 const POPULAR_SUGGESTIONS = [
   { char: '永', note: '8 Prinsip Dasar Goresan Hanzi (Yǒng)' },
@@ -14,18 +15,16 @@ const POPULAR_SUGGESTIONS = [
   { char: '美', note: 'Indah / Cantik (Měi)' },
 ];
 
+const label = 'text-[11px] font-medium uppercase tracking-[0.14em] text-muted';
+
 export const CustomCharacterSandbox: React.FC = () => {
   const [inputText, setInputText] = useState('永');
   const [activeText, setActiveText] = useState('永');
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!inputText.trim()) return;
-    // Keep only Chinese characters
-    const hanziOnly = inputText.trim();
-    if (hanziOnly) {
-      setActiveText(hanziOnly);
-    }
+    const value = inputText.trim();
+    if (value) setActiveText(value);
   };
 
   const handleSelectSuggestion = (char: string) => {
@@ -35,96 +34,78 @@ export const CustomCharacterSandbox: React.FC = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6 animate-in fade-in">
-      {/* Search Input Box */}
-      <div className="bg-white dark:bg-stone-900 p-6 rounded-3xl border border-stone-200 dark:border-stone-800 shadow-sm transition-colors">
-        <div className="mb-4">
-          <h3 className="font-bold text-lg text-stone-900 dark:text-stone-100 flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-red-600 dark:text-red-400" />
-            <span>Ketik / Tempel Karakter Mandarin Apa Saja</span>
-          </h3>
-          <p className="text-stone-500 dark:text-stone-400 text-xs mt-1">
-            Mau coba karakter di luar HSK 1? Masukkan karakter Hanzi apa pun dari lagu, film, atau nama kamu untuk melihat animasi urutan goresan dan berlatih menulisnya.
-          </p>
-        </div>
+    <div className="max-w-2xl mx-auto space-y-10 animate-in fade-in">
+      <header className="border-t-2 border-ink pt-3">
+        <span className={label}>Tulis bebas</span>
+        <h2 className="mt-2 text-3xl sm:text-4xl font-semibold tracking-tight text-ink">Karakter apa saja</h2>
+        <p className="mt-2 max-w-xl text-sm leading-relaxed text-muted">
+          Mau coba karakter di luar HSK 1? Masukkan Hanzi dari lagu, film, atau namamu untuk melihat animasi urutan goresan dan berlatih menulisnya.
+        </p>
 
-        <form onSubmit={handleSearch} className="flex gap-2">
+        <form onSubmit={handleSearch} className="mt-6 flex items-end gap-4">
           <div className="relative flex-1">
             <input
               type="text"
               value={inputText}
-              onChange={(e) => setInputText(e.target.value)}
-              placeholder="Ketik karakter Hanzi (contoh: 龙, 梦, 谢谢)..."
-              className="w-full pl-4 pr-10 py-3 rounded-2xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-stone-900 dark:text-stone-100 placeholder-stone-400 dark:placeholder-stone-500 focus:outline-none focus:ring-2 focus:ring-red-600/20 focus:border-red-600 text-base font-serif"
+              onChange={e => setInputText(e.target.value)}
+              placeholder="龙, 梦, 谢谢"
+              aria-label="Karakter Hanzi"
+              className="w-full bg-transparent border-b-2 border-ink pb-2 pr-10 font-serif font-black text-4xl text-ink placeholder:text-muted/50 focus:outline-none focus:border-vermilion"
             />
             {inputText && (
-              <button
-                type="button"
+              <AudioButton
                 onClick={() => speechManager.speak(inputText)}
-                className="absolute right-3 top-3 text-stone-400 dark:text-stone-500 hover:text-red-700 dark:hover:text-red-400 transition"
-                title="Dengar pelafalan"
-              >
-                <Volume2 className="w-5 h-5" />
-              </button>
+                label="Dengar pelafalan"
+                className="absolute right-0 bottom-3"
+              />
             )}
           </div>
-
           <button
             type="submit"
-            className="px-6 py-3 bg-red-700 text-white font-semibold text-sm rounded-2xl hover:bg-red-800 transition shadow-sm flex items-center gap-1.5 active:scale-95 flex-shrink-0"
+            className={`bg-ink text-paper px-5 py-3 text-sm font-semibold hover:bg-vermilion transition-colors flex-shrink-0 ${focusRing}`}
           >
-            <Search className="w-4 h-4" />
-            <span>Lihat Goresan</span>
+            Lihat goresan
           </button>
         </form>
 
-        {/* Popular Suggestions */}
-        <div className="mt-4 pt-3 border-t border-stone-100 dark:border-stone-800">
-          <span className="text-xs text-stone-400 dark:text-stone-500 font-medium mr-2">Coba Karakter Populer:</span>
-          <div className="flex flex-wrap gap-1.5 mt-2">
-            {POPULAR_SUGGESTIONS.map((item) => (
-              <button
-                key={item.char}
-                onClick={() => handleSelectSuggestion(item.char)}
-                className={`px-2.5 py-1 rounded-xl text-xs font-medium border transition-all ${
-                  activeText === item.char
-                    ? 'bg-red-50 dark:bg-red-950/60 text-red-800 dark:text-red-300 border-red-300 dark:border-red-900/60 font-bold'
-                    : 'bg-stone-50 dark:bg-stone-800 text-stone-700 dark:text-stone-300 border-stone-200 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-700'
-                }`}
-                title={item.note}
-              >
-                <span className="font-serif text-sm mr-1">{item.char}</span>
-                <span className="text-[10px] text-stone-500 dark:text-stone-400 font-sans">{item.note.split(' ')[0]}</span>
-              </button>
-            ))}
-          </div>
+        <div className="mt-6 border-t border-ink/20 pt-3">
+          <span className={label}>Coba karakter populer</span>
+          <ul className="mt-2 flex flex-wrap border-l border-t border-ink/20 w-fit max-w-full">
+            {POPULAR_SUGGESTIONS.map(item => {
+              const on = activeText === item.char;
+              return (
+                <li key={item.char} className="border-r border-b border-ink/20">
+                  <button
+                    onClick={() => handleSelectSuggestion(item.char)}
+                    aria-pressed={on}
+                    title={item.note}
+                    className={`px-4 py-2.5 text-center transition-colors focus-visible:outline-2 focus-visible:outline-offset-[-3px] focus-visible:outline-vermilion ${on ? 'bg-ink text-paper' : 'hover:bg-paper-2 text-ink'}`}
+                  >
+                    <span className="block font-serif font-black text-2xl leading-none">{item.char}</span>
+                    <span className={`block mt-1 text-[10px] ${on ? 'text-paper/70' : 'text-muted'}`}>{item.note.match(/\(([^)]+)\)/)?.[1] ?? item.char}</span>
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
         </div>
-      </div>
+      </header>
 
-      {/* Writing Canvas Display */}
       {activeText && (
         <div className="flex justify-center animate-in fade-in">
-          <HanziWriterCanvas
-            text={activeText}
-            size={280}
-            className="shadow-md"
-          />
+          <HanziWriterCanvas text={activeText} size={280} />
         </div>
       )}
 
-      {/* Info Notice */}
-      <div className="bg-amber-50/60 dark:bg-stone-900 border border-amber-200/80 dark:border-amber-900/40 rounded-2xl p-4 text-xs text-amber-900 dark:text-amber-300 flex items-start gap-2.5 transition-colors">
-        <AlertCircle className="w-4 h-4 text-amber-700 dark:text-amber-400 flex-shrink-0 mt-0.5" />
-        <div>
-          <span className="font-semibold">Tips Menulis Aksara Mandarin:</span>
-          <ul className="list-disc pl-4 mt-1 space-y-0.5 text-stone-700 dark:text-stone-300">
-            <li>Goresan selalu dimulai dari <strong>atas ke bawah</strong> (上到下).</li>
-            <li>Dari <strong>kiri ke kanan</strong> (左到右).</li>
-            <li>Garis horizontal sebelum vertikal (先横后竖).</li>
-            <li>Masuk ke dalam kotak sebelum menutup pintunya (先进入后关门).</li>
-          </ul>
-        </div>
-      </div>
+      <section className="border-l-2 border-vermilion pl-4">
+        <div className={label}>Tips menulis aksara Mandarin</div>
+        <ol className="mt-2 space-y-1 text-sm text-ink list-decimal list-inside marker:text-muted">
+          <li>Goresan dimulai dari <strong>atas ke bawah</strong> (上到下).</li>
+          <li>Dari <strong>kiri ke kanan</strong> (左到右).</li>
+          <li>Garis horizontal sebelum vertikal (先横后竖).</li>
+          <li>Masuk ke dalam kotak sebelum menutup pintunya (先进入后关门).</li>
+        </ol>
+      </section>
     </div>
   );
 };

@@ -1,15 +1,4 @@
 import React, { useMemo } from 'react';
-import { 
-  ArrowRight, 
-  Layers, 
-  HelpCircle, 
-  PenTool, 
-  Compass,
-  CheckCircle2,
-  Sparkles,
-  BookOpen,
-  Volume2
-} from 'lucide-react';
 import { StatsHeader } from './StatsHeader';
 import { LESSON_UNITS } from '../data/lessonUnits';
 import { CHARACTER_STORIES } from '../data/characterStories';
@@ -27,6 +16,21 @@ interface HomeDashboardViewProps {
   onNavigateTab: (tab: 'flashcards' | 'stories' | 'quiz' | 'profile', subTab?: StorySubTab) => void;
 }
 
+const pad = (n: number) => String(n).padStart(2, '0');
+const stripChapter = (title: string) => title.replace(/^Bab\s*\d+\s*:\s*/i, '');
+
+const SectionLabel: React.FC<{ index: string; children: React.ReactNode; aside?: string }> = ({ index, children, aside }) => (
+  <div className="flex items-baseline justify-between border-t-2 border-ink pt-3 text-[11px] font-medium uppercase tracking-[0.14em]">
+    <span className="flex gap-3">
+      <span className="text-vermilion">{index}</span>
+      <span className="text-ink">{children}</span>
+    </span>
+    {aside && <span className="text-muted normal-case tracking-normal">{aside}</span>}
+  </div>
+);
+
+const focusRing = 'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-vermilion';
+
 export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({
   stats,
   totalWords,
@@ -37,34 +41,40 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({
   onStartUnit,
   onNavigateTab
 }) => {
-  // Current active unit for quick resume
-  const activeUnit = useMemo(() => {
-    const found = LESSON_UNITS.find(u => u.id === selectedUnitId);
-    return found || LESSON_UNITS[0];
+  const activeIndex = useMemo(() => {
+    const i = LESSON_UNITS.findIndex(u => u.id === selectedUnitId);
+    return i >= 0 ? i : 0;
   }, [selectedUnitId]);
+  const activeUnit = LESSON_UNITS[activeIndex];
 
-  // Compute progress for the active unit
   const activeUnitProgress = useMemo(() => {
     const mastered = activeUnit.wordIds.filter(id => progress[id]?.status === 'mastered').length;
     const learning = activeUnit.wordIds.filter(id => progress[id]?.status === 'learning').length;
     const total = activeUnit.wordIds.length;
-    const percent = Math.round((mastered / total) * 100);
-    return { mastered, learning, total, percent };
+    return { mastered, learning, total };
   }, [activeUnit, progress]);
 
   // Hanzi of the Day (deterministic based on day of year)
   const dailyStory = useMemo(() => {
     const now = new Date();
     const start = new Date(now.getFullYear(), 0, 0);
-    const diff = now.getTime() - start.getTime();
-    const oneDay = 1000 * 60 * 60 * 24;
-    const dayOfYear = Math.floor(diff / oneDay);
-    return CHARACTER_STORIES[dayOfYear % CHARACTER_STORIES.length];
+    const dayOfYear = Math.floor((now.getTime() - start.getTime()) / 86400000);
+    return { ...CHARACTER_STORIES[dayOfYear % CHARACTER_STORIES.length], dayOfYear };
   }, []);
 
+  const guides = [
+    { glyph: '笔', title: '7 Aturan Goresan Hanzi', desc: 'Urutan menulis (先横后竖, dll.) dan 8 goresan dasar dengan kanvas interaktif.', sub: 'stroke-order' as StorySubTab },
+    { glyph: '调', title: '4 Nada Pinyin & Perubahan Nada', desc: 'Kontur 5 nada dan aturan 变调 (3+3, 不, 一) dengan audio.', sub: 'tones' as StorySubTab }
+  ];
+
+  const tools = [
+    { glyph: '部', title: '16 Radikal Kunci', desc: 'Fondasi pembentuk aksara', go: () => onNavigateTab('stories', 'radicals') },
+    { glyph: '测', title: 'Kuis Interaktif', desc: 'Tebak arti dan kuis tulis', go: () => onNavigateTab('quiz') },
+    { glyph: '写', title: 'Kanvas Tulis Bebas', desc: 'Coba karakter apa saja', go: () => onNavigateTab('stories', 'sandbox') }
+  ];
+
   return (
-    <div className="space-y-6 animate-in fade-in pb-4">
-      {/* 1. STATS BANNER UTAMA (Desain Asli Favorit Pengguna) */}
+    <div className="space-y-14 pb-6">
       <StatsHeader
         stats={stats}
         totalWords={totalWords}
@@ -72,287 +82,142 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({
         learningCount={learningCount}
       />
 
-      {/* 2. KARTU "LANJUTKAN BELAJAR" (QUICK RESUME) */}
-      <div className="bg-white dark:bg-stone-900 rounded-3xl p-5 sm:p-6 border border-stone-200 dark:border-stone-800 shadow-xs relative overflow-hidden transition-colors">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="flex items-start gap-3.5 min-w-0">
-            <div className="w-12 h-12 rounded-2xl bg-red-50 dark:bg-stone-800 text-2xl flex items-center justify-center flex-shrink-0 shadow-xs border border-red-100 dark:border-stone-700">
-              {activeUnit.icon}
-            </div>
+      {/* 01 Lanjutkan */}
+      <section className="space-y-5">
+        <SectionLabel index="01">Lanjutkan belajar</SectionLabel>
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6">
+          <div className="flex items-start gap-5 min-w-0">
+            <span className="text-7xl sm:text-8xl font-semibold tracking-tighter leading-[0.8] text-vermilion">
+              {pad(activeIndex + 1)}
+            </span>
             <div className="min-w-0">
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-950/60 px-2 py-0.5 rounded-full border border-red-200/50 dark:border-red-900/40">
-                  Lanjutkan Belajar
-                </span>
-                <span className="text-xs text-stone-400 dark:text-stone-500">
-                  {activeUnitProgress.mastered} dari {activeUnitProgress.total} kata hafal
-                </span>
-              </div>
-              <h2 className="text-base sm:text-lg font-bold text-stone-900 dark:text-stone-100 mt-1 truncate">
-                {activeUnit.title}
-              </h2>
-              <p className="text-xs text-stone-500 dark:text-stone-400 truncate mt-0.5">
-                {activeUnit.subtitle}
+              <h2 className="text-xl sm:text-2xl font-semibold tracking-tight text-ink">{stripChapter(activeUnit.title)}</h2>
+              <p className="mt-1 text-sm text-muted">{activeUnit.subtitle}</p>
+              <p className="mt-3 text-xs text-muted">
+                <span className="text-ink font-semibold">{activeUnitProgress.mastered}</span> / {activeUnitProgress.total} kata dikuasai
               </p>
             </div>
           </div>
-
           <button
             onClick={() => {
               onStartUnit(activeUnit.id);
               onNavigateTab('flashcards');
             }}
-            className="w-full sm:w-auto py-3 px-6 bg-red-700 hover:bg-red-800 text-white rounded-2xl text-xs sm:text-sm font-bold shadow-md transition flex items-center justify-center gap-2 active:scale-98 flex-shrink-0"
+            className={`bg-ink text-paper px-6 py-3.5 text-sm font-semibold tracking-wide hover:bg-vermilion transition-colors flex items-center justify-between gap-8 sm:min-w-52 ${focusRing}`}
           >
-            <span>Mulai Sekarang</span>
-            <ArrowRight className="w-4 h-4" />
+            <span>Mulai sekarang</span>
+            <span aria-hidden>&rarr;</span>
           </button>
         </div>
+      </section>
 
-        {/* Progress bar inside resume card */}
-        <div className="w-full bg-stone-100 dark:bg-stone-800 h-2 rounded-full mt-4 overflow-hidden flex">
-          <div 
-            className="bg-emerald-500 h-full transition-all duration-500" 
-            style={{ width: `${activeUnitProgress.percent}%` }}
-          />
-          <div 
-            className="bg-amber-400 h-full transition-all duration-500" 
-            style={{ width: `${(activeUnitProgress.learning / activeUnitProgress.total) * 100}%` }}
-          />
-        </div>
-      </div>
+      {/* 02 Pedoman */}
+      <section>
+        <SectionLabel index="02" aside="Silabus HSK 3.0 (新版考试大纲)">Pedoman</SectionLabel>
+        <ul>
+          {guides.map(g => (
+            <li key={g.sub} className="border-b border-ink/20">
+              <button
+                onClick={() => onNavigateTab('stories', g.sub)}
+                className={`group w-full flex items-center gap-5 py-5 text-left ${focusRing}`}
+              >
+                <span className="font-serif font-black text-5xl w-14 text-center text-ink group-hover:text-vermilion transition-colors">{g.glyph}</span>
+                <span className="flex-1 min-w-0">
+                  <span className="block text-base font-semibold text-ink">{g.title}</span>
+                  <span className="block mt-0.5 text-sm text-muted">{g.desc}</span>
+                </span>
+                <span aria-hidden className="text-ink group-hover:text-vermilion group-hover:translate-x-1 transition">&rarr;</span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      </section>
 
-      {/* 2.5 PANDUAN STANDAR HSK 3.0 (URUTAN GORESAN & NADA) */}
-      <div className="bg-gradient-to-br from-amber-500/10 via-teal-500/5 to-transparent dark:from-amber-950/30 dark:via-teal-950/20 dark:to-transparent rounded-3xl p-5 sm:p-6 border border-amber-200/60 dark:border-stone-800 shadow-xs space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400 bg-amber-100/70 dark:bg-amber-950/80 px-2.5 py-0.5 rounded-full border border-amber-200 dark:border-amber-900/40 flex items-center gap-1">
-              <BookOpen className="w-3 h-3" />
-              <span>Standar Silabus HSK 3.0</span>
-            </span>
-          </div>
-          <span className="text-[11px] text-stone-500 dark:text-stone-400">
-            Sesuai Pedoman CLEC / Hanban (新版考试大纲)
-          </span>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {/* Card 1: 7 Aturan Urutan Goresan */}
-          <button
-            onClick={() => onNavigateTab('stories', 'stroke-order')}
-            className="bg-white/90 dark:bg-stone-900/90 hover:bg-white dark:hover:bg-stone-900 p-4 rounded-2xl border border-amber-200/70 dark:border-stone-800 shadow-xs text-left transition flex items-start justify-between gap-3 group active:scale-98"
-          >
-            <div className="flex items-start gap-3 min-w-0">
-              <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition border border-amber-200/60 dark:border-amber-900/40">
-                <PenTool className="w-5 h-5" />
-              </div>
-              <div className="min-w-0">
-                <div className="font-bold text-xs sm:text-sm text-stone-900 dark:text-stone-100 group-hover:text-amber-700 dark:group-hover:text-amber-400 transition">
-                  7 Aturan Goresan Hanzi
-                </div>
-                <div className="text-[11px] text-stone-500 dark:text-stone-400 mt-0.5 line-clamp-2">
-                  Kuasai urutan menulis (先横后竖, dll.) & 8 goresan dasar dengan kanvas interaktif.
-                </div>
-              </div>
-            </div>
-            <ArrowRight className="w-4 h-4 text-stone-400 group-hover:text-amber-600 dark:group-hover:text-amber-400 group-hover:translate-x-0.5 transition flex-shrink-0 mt-1" />
-          </button>
-
-          {/* Card 2: 4 Nada & Perubahan Nada (变调) */}
-          <button
-            onClick={() => onNavigateTab('stories', 'tones')}
-            className="bg-white/90 dark:bg-stone-900/90 hover:bg-white dark:hover:bg-stone-900 p-4 rounded-2xl border border-teal-200/70 dark:border-stone-800 shadow-xs text-left transition flex items-start justify-between gap-3 group active:scale-98"
-          >
-            <div className="flex items-start gap-3 min-w-0">
-              <div className="w-10 h-10 rounded-xl bg-teal-50 dark:bg-teal-950/60 text-teal-700 dark:text-teal-400 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition border border-teal-200/60 dark:border-teal-900/40">
-                <Volume2 className="w-5 h-5" />
-              </div>
-              <div className="min-w-0">
-                <div className="font-bold text-xs sm:text-sm text-stone-900 dark:text-stone-100 group-hover:text-teal-700 dark:group-hover:text-teal-400 transition">
-                  4 Nada Pinyin & Perubahan Nada
-                </div>
-                <div className="text-[11px] text-stone-500 dark:text-stone-400 mt-0.5 line-clamp-2">
-                  Panduan kontur 5 nada + aturan perubahan nada (变调: 3+3, 不, 一) dengan audio.
-                </div>
-              </div>
-            </div>
-            <ArrowRight className="w-4 h-4 text-stone-400 group-hover:text-teal-600 dark:group-hover:text-teal-400 group-hover:translate-x-0.5 transition flex-shrink-0 mt-1" />
-          </button>
-        </div>
-      </div>
-
-      {/* 3. PINTASAN FITUR UTAMA (3 KOLOM) */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        {/* Radikal Dasar */}
-        <button
-          onClick={() => onNavigateTab('stories', 'radicals')}
-          className="bg-white hover:bg-stone-50 dark:bg-stone-900 dark:hover:bg-stone-800 p-4 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs text-left transition flex items-center gap-3.5 group active:scale-98"
-        >
-          <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition border border-blue-100 dark:border-blue-900/40">
-            <Layers className="w-5 h-5" />
-          </div>
-          <div className="min-w-0">
-            <div className="font-bold text-xs text-stone-900 dark:text-stone-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition">
-              16 Radikal Kunci
-            </div>
-            <div className="text-[11px] text-stone-500 dark:text-stone-400 truncate mt-0.5">
-              Fondasi pembentuk aksara
-            </div>
-          </div>
-        </button>
-
-        {/* Kuis Interaktif */}
-        <button
-          onClick={() => onNavigateTab('quiz')}
-          className="bg-white hover:bg-stone-50 dark:bg-stone-900 dark:hover:bg-stone-800 p-4 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs text-left transition flex items-center gap-3.5 group active:scale-98"
-        >
-          <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition border border-emerald-100 dark:border-emerald-900/40">
-            <HelpCircle className="w-5 h-5" />
-          </div>
-          <div className="min-w-0">
-            <div className="font-bold text-xs text-stone-900 dark:text-stone-100 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition">
-              Kuis Interaktif
-            </div>
-            <div className="text-[11px] text-stone-500 dark:text-stone-400 truncate mt-0.5">
-              Tebak arti & kuis tulis
-            </div>
-          </div>
-        </button>
-
-        {/* Tulis Bebas (Sandbox) */}
-        <button
-          onClick={() => onNavigateTab('stories', 'sandbox')}
-          className="bg-white hover:bg-stone-50 dark:bg-stone-900 dark:hover:bg-stone-800 p-4 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs text-left transition flex items-center gap-3.5 group active:scale-98"
-        >
-          <div className="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition border border-purple-100 dark:border-purple-900/40">
-            <PenTool className="w-5 h-5" />
-          </div>
-          <div className="min-w-0">
-            <div className="font-bold text-xs text-stone-900 dark:text-stone-100 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition">
-              Kanvas Tulis Bebas
-            </div>
-            <div className="text-[11px] text-stone-500 dark:text-stone-400 truncate mt-0.5">
-              Coba karakter apa saja
-            </div>
-          </div>
-        </button>
-      </div>
-
-      {/* 4. AKSARA HARI INI (HANZI OF THE DAY) */}
-      {dailyStory && (
-        <div className="bg-gradient-to-br from-amber-50/80 via-white to-stone-50 dark:from-stone-900 dark:via-stone-900/95 dark:to-stone-900 rounded-3xl p-5 sm:p-6 border border-amber-200/70 dark:border-stone-800 shadow-xs relative overflow-hidden transition-colors">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div className="flex items-start gap-4">
-              {/* Big Hanzi Character */}
-              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-white dark:bg-stone-800 text-stone-900 dark:text-stone-100 font-serif font-bold text-4xl sm:text-5xl flex items-center justify-center shadow-sm border border-amber-200/80 dark:border-stone-700 flex-shrink-0">
-                {dailyStory.character}
-              </div>
-
-              <div>
-                <div className="flex items-center gap-1.5 text-amber-700 dark:text-amber-400 text-[11px] font-bold">
-                  <Sparkles className="w-3.5 h-3.5" />
-                  <span>Aksara & Piktogram Hari Ini</span>
-                </div>
-                <div className="flex items-baseline gap-2 mt-0.5">
-                  <span className="text-sm sm:text-base font-bold text-red-700 dark:text-red-400">{dailyStory.pinyin}</span>
-                  <span className="text-xs text-stone-600 dark:text-stone-300 font-medium">&bull; {dailyStory.meaning}</span>
-                </div>
-                <p className="text-xs text-stone-500 dark:text-stone-400 mt-1.5 leading-relaxed line-clamp-2 max-w-xl">
-                  {dailyStory.story}
-                </p>
-              </div>
-            </div>
-
+      {/* 03 Alat */}
+      <section>
+        <SectionLabel index="03">Latihan</SectionLabel>
+        <div className="grid grid-cols-1 sm:grid-cols-3 sm:divide-x divide-ink/20 border-b border-ink/20">
+          {tools.map((t, i) => (
             <button
-              onClick={() => onNavigateTab('stories', 'stories')}
-              className="py-2 px-4 bg-white dark:bg-stone-800 hover:bg-amber-50 dark:hover:bg-stone-700 text-stone-800 dark:text-stone-200 border border-amber-200 dark:border-stone-700 rounded-xl text-xs font-semibold transition flex items-center justify-center gap-1.5 self-start sm:self-center active:scale-95 whitespace-nowrap shadow-2xs"
+              key={t.title}
+              onClick={t.go}
+              className={`group text-left py-5 sm:py-6 ${i > 0 ? 'border-t border-ink/20 sm:border-t-0 sm:pl-5' : ''} ${i < 2 ? 'sm:pr-5' : ''} ${focusRing}`}
             >
-              <Compass className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
-              <span>Buka Cerita Lengkap</span>
+              <span className="font-serif font-black text-6xl leading-none text-ink group-hover:text-vermilion transition-colors">{t.glyph}</span>
+              <span className="mt-4 block text-sm font-semibold text-ink">{t.title}</span>
+              <span className="block text-xs text-muted mt-0.5">{t.desc}</span>
             </button>
-          </div>
+          ))}
         </div>
+      </section>
+
+      {/* 04 Aksara hari ini */}
+      {dailyStory && (
+        <section>
+          <SectionLabel index="04" aside={`Hari ke-${dailyStory.dayOfYear}`}>
+            Aksara hari ini
+          </SectionLabel>
+          <div className="grid grid-cols-1 sm:grid-cols-[auto_1fr] gap-x-12 gap-y-4 pt-6 items-end">
+            <div className="font-serif font-black text-ink leading-[0.85] text-[9rem] sm:text-[12rem]">{dailyStory.character}</div>
+            <div className="pb-2">
+              <div className="flex items-baseline gap-3">
+                <span className="text-2xl font-semibold tracking-tight text-vermilion">{dailyStory.pinyin}</span>
+                <span className="text-sm text-ink">{dailyStory.meaning}</span>
+              </div>
+              <p className="mt-3 text-sm leading-relaxed text-muted line-clamp-4 max-w-xl">{dailyStory.story}</p>
+              <button
+                onClick={() => onNavigateTab('stories', 'stories')}
+                className={`mt-4 text-sm font-semibold text-ink underline underline-offset-4 decoration-1 hover:text-vermilion ${focusRing}`}
+              >
+                Baca cerita lengkap &rarr;
+              </button>
+            </div>
+          </div>
+        </section>
       )}
 
-      {/* 5. PETA 10 BAB HSK 1 (LEARNING ROADMAP) */}
-      <div className="bg-white dark:bg-stone-900 rounded-3xl p-5 sm:p-6 border border-stone-200 dark:border-stone-800 shadow-xs space-y-4 transition-colors">
-        <div>
-          <div className="text-[10px] font-bold uppercase tracking-wider text-stone-400">
-            Kurikulum Pembelajaran
-          </div>
-          <h2 className="text-base sm:text-lg font-bold text-stone-900 dark:text-stone-100 mt-0.5">
-            Peta 10 Bab HSK 1 (130 Kata Dasar)
-          </h2>
-          <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">
-            Pilih salah satu bab untuk mulai latihan kosakata dan urutan goresan menulisnya:
-          </p>
-        </div>
-
-        {/* 10 Bab Cards Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-          {LESSON_UNITS.map((unit) => {
-            const masteredInUnit = unit.wordIds.filter(id => progress[id]?.status === 'mastered').length;
-            const learningInUnit = unit.wordIds.filter(id => progress[id]?.status === 'learning').length;
-            const totalInUnit = unit.wordIds.length;
-            const isCompleted = masteredInUnit === totalInUnit && totalInUnit > 0;
-            const isCurrent = unit.id === selectedUnitId;
+      {/* 05 Kurikulum */}
+      <section>
+        <SectionLabel index="05" aside={`${LESSON_UNITS.length} bab · ${totalWords} kata`}>Kurikulum</SectionLabel>
+        <ol>
+          {LESSON_UNITS.map((unit, i) => {
+            const mastered = unit.wordIds.filter(id => progress[id]?.status === 'mastered').length;
+            const learning = unit.wordIds.filter(id => progress[id]?.status === 'learning').length;
+            const total = unit.wordIds.length;
+            const done = total > 0 && mastered === total;
+            const current = unit.id === selectedUnitId;
 
             return (
-              <button
-                key={unit.id}
-                onClick={() => {
-                  onStartUnit(unit.id);
-                  onNavigateTab('flashcards');
-                }}
-                className={`p-3.5 sm:p-4 rounded-2xl border text-left transition flex items-center justify-between gap-3 group active:scale-[0.99] ${
-                  isCurrent 
-                    ? 'border-red-300 dark:border-red-900/80 bg-red-50/40 dark:bg-red-950/30 shadow-xs ring-1 ring-red-200 dark:ring-red-900/50' 
-                    : 'border-stone-200 dark:border-stone-800 bg-stone-50/50 dark:bg-stone-800/40 hover:bg-stone-50 dark:hover:bg-stone-800/80'
-                }`}
-              >
-                <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-10 h-10 rounded-xl bg-white dark:bg-stone-800 text-xl flex items-center justify-center flex-shrink-0 shadow-2xs border border-stone-200 dark:border-stone-700 group-hover:scale-105 transition">
-                    {unit.icon}
-                  </div>
-                  <div className="min-w-0">
-                    <div className="font-bold text-xs sm:text-sm text-stone-900 dark:text-stone-100 truncate group-hover:text-red-700 dark:group-hover:text-red-400 transition">
-                      {unit.title}
-                    </div>
-                    <div className="text-[10px] text-stone-400 truncate mt-0.5">
-                      {unit.subtitle}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="text-right flex-shrink-0">
-                  {isCompleted ? (
-                    <div className="flex items-center gap-1 text-[11px] text-emerald-700 dark:text-emerald-300 font-bold bg-emerald-50 dark:bg-emerald-950/60 px-2 py-1 rounded-lg border border-emerald-200/80 dark:border-emerald-800/60">
-                      <CheckCircle2 className="w-3.5 h-3.5" />
-                      <span>Khatam</span>
-                    </div>
-                  ) : (
-                    <div>
-                      <div className="text-[11px] font-bold text-stone-700 dark:text-stone-300">
-                        {masteredInUnit}/{totalInUnit} <span className="text-[9px] font-normal text-stone-400">kata</span>
-                      </div>
-                      <div className="w-14 bg-stone-200 dark:bg-stone-700 h-1.5 rounded-full mt-1 overflow-hidden flex">
-                        <div 
-                          className="bg-emerald-500 h-full" 
-                          style={{ width: `${(masteredInUnit / totalInUnit) * 100}%` }}
-                        />
-                        <div 
-                          className="bg-amber-400 h-full" 
-                          style={{ width: `${(learningInUnit / totalInUnit) * 100}%` }}
-                        />
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </button>
+              <li key={unit.id} className="border-b border-ink/20">
+                <button
+                  onClick={() => {
+                    onStartUnit(unit.id);
+                    onNavigateTab('flashcards');
+                  }}
+                  aria-current={current ? 'true' : undefined}
+                  className={`group relative w-full grid grid-cols-[3rem_1fr_auto] sm:grid-cols-[4rem_1fr_9rem] items-center gap-3 py-4 text-left ${focusRing}`}
+                >
+                  {current && <span aria-hidden className="absolute -left-3 top-0 bottom-0 w-1 bg-vermilion" />}
+                  <span className={`text-2xl font-semibold tracking-tighter ${current ? 'text-vermilion' : 'text-muted'}`}>{pad(i + 1)}</span>
+                  <span className="min-w-0">
+                    <span className="block truncate text-sm sm:text-base font-semibold text-ink group-hover:text-vermilion transition-colors">{stripChapter(unit.title)}</span>
+                    <span className="block truncate text-xs text-muted mt-0.5">{unit.subtitle}</span>
+                  </span>
+                  <span className="text-right">
+                    <span className="block text-xs font-semibold text-ink">
+                      {done ? 'Khatam' : <>{mastered}<span className="text-muted font-normal"> / {total}</span></>}
+                    </span>
+                    <span className="mt-1.5 flex h-1 w-full bg-ink/10 ml-auto sm:w-full min-w-14">
+                      <span className="bg-ink h-full" style={{ width: `${(mastered / total) * 100}%` }} />
+                      <span className="hatch h-full" style={{ width: `${(learning / total) * 100}%` }} />
+                    </span>
+                  </span>
+                </button>
+              </li>
             );
           })}
-        </div>
-      </div>
+        </ol>
+      </section>
     </div>
   );
 };

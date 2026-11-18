@@ -68,7 +68,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     // Update mobile PWA status bar theme-color
     const metaThemeColor = document.querySelector('meta[name="theme-color"]');
     if (metaThemeColor) {
-      metaThemeColor.setAttribute('content', isDark ? '#0c0a09' : '#b91c1c');
+      metaThemeColor.setAttribute('content', isDark ? '#151210' : '#c0301c');
     }
   }, [isDark]);
 

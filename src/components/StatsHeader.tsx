@@ -1,5 +1,4 @@
 import React from 'react';
-import { Flame, CheckCircle, PenTool, BookOpen } from 'lucide-react';
 import type { UserStats } from '../types';
 
 interface StatsHeaderProps {
@@ -17,90 +16,56 @@ export const StatsHeader: React.FC<StatsHeaderProps> = ({
 }) => {
   const percentMastered = Math.round((masteredCount / totalWords) * 100) || 0;
 
+  const figures = [
+    { label: 'Streak', value: stats.streakDays, unit: 'hari' },
+    { label: 'Ditulis', value: stats.charactersWritten, unit: 'karakter' },
+    { label: 'Dikuasai', value: masteredCount, unit: `dari ${totalWords} kata` },
+    { label: 'Progres', value: percentMastered, unit: '%' }
+  ];
+
   return (
-    <div className="bg-gradient-to-r from-red-900 via-stone-900 to-red-950 text-white rounded-3xl p-6 shadow-xl relative overflow-hidden">
-      {/* Decorative Traditional Chinese character background */}
-      <div className="absolute right-4 -bottom-6 text-9xl font-serif text-white/5 select-none pointer-events-none">
-        漢
+    <header className="pt-6">
+      <div className="flex items-baseline justify-between text-[11px] font-medium uppercase tracking-[0.14em] text-muted">
+        <span>HSK 1 &mdash; Belajar Mandiri</span>
+        <span>{totalWords} kata dasar</span>
       </div>
 
-      <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="bg-red-500/20 text-red-300 text-xs px-2.5 py-0.5 rounded-full font-semibold border border-red-500/30">
-              Belajar Mandiri HSK 1
-            </span>
-            <span className="text-xs text-stone-300">Target 150 Kata Dasar</span>
+      <h1 className="mt-4 flex items-end gap-4 leading-none">
+        <span className="font-serif font-black text-ink text-[5.5rem] sm:text-[8rem] tracking-tight">学汉字</span>
+      </h1>
+      <p className="mt-3 max-w-md text-sm leading-relaxed text-muted">
+        Kosakata, pelafalan, urutan goresan, dan kuis menulis aksara Hanzi.
+      </p>
+
+      <dl className="mt-8 grid grid-cols-2 sm:grid-cols-4 border-t border-ink">
+        {figures.map((f, i) => (
+          <div
+            key={f.label}
+            className={`py-4 pr-4 ${i % 2 === 1 ? 'pl-4' : ''} ${i > 0 ? 'sm:pl-4' : ''} ${i % 2 === 1 ? 'border-l border-ink/20' : ''} ${i > 0 ? 'sm:border-l sm:border-ink/20' : ''} ${i >= 2 ? 'border-t border-ink/20 sm:border-t-0' : ''}`}
+          >
+            <dt className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted">{f.label}</dt>
+            <dd className="mt-1 flex items-baseline gap-1.5">
+              <span className="text-5xl sm:text-6xl font-semibold tracking-tighter text-ink leading-none">{f.value}</span>
+              <span className="text-xs text-muted">{f.unit}</span>
+            </dd>
           </div>
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
-            Mandarin Master &middot; <span className="font-serif font-normal text-red-300">学汉字</span>
-          </h1>
-          <p className="text-stone-300 text-sm mt-1 max-w-xl">
-            Latihan kosakata, pelafalan audio, urutan goresan, dan kuis menulis aksara Hanzi interaktif.
-          </p>
+        ))}
+      </dl>
+
+      <div className="mt-2">
+        <div
+          className="flex h-1.5 w-full bg-ink/10"
+          role="img"
+          aria-label={`${masteredCount} dikuasai, ${learningCount} sedang dipelajari, dari ${totalWords} kata`}
+        >
+          <div className="bg-ink h-full transition-all duration-500" style={{ width: `${(masteredCount / totalWords) * 100}%` }} />
+          <div className="hatch h-full transition-all duration-500" style={{ width: `${(learningCount / totalWords) * 100}%` }} />
         </div>
-
-        {/* Quick Stat Badges */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          {/* Streak */}
-          <div className="bg-white/10 backdrop-blur-md rounded-2xl p-3 border border-white/10 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center">
-              <Flame className="w-5 h-5 fill-amber-400" />
-            </div>
-            <div>
-              <div className="text-xs text-stone-300 font-medium">Streak</div>
-              <div className="text-lg font-bold text-white">{stats.streakDays} Hari</div>
-            </div>
-          </div>
-
-          {/* Characters Written */}
-          <div className="bg-white/10 backdrop-blur-md rounded-2xl p-3 border border-white/10 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center">
-              <PenTool className="w-5 h-5" />
-            </div>
-            <div>
-              <div className="text-xs text-stone-300 font-medium">Ditulis</div>
-              <div className="text-lg font-bold text-white">{stats.charactersWritten} Karakter</div>
-            </div>
-          </div>
-
-          {/* Mastered Words */}
-          <div className="bg-white/10 backdrop-blur-md rounded-2xl p-3 border border-white/10 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
-              <CheckCircle className="w-5 h-5" />
-            </div>
-            <div>
-              <div className="text-xs text-stone-300 font-medium">Dikuasai</div>
-              <div className="text-lg font-bold text-white">{masteredCount} Kata</div>
-            </div>
-          </div>
-
-          {/* Progress % */}
-          <div className="bg-white/10 backdrop-blur-md rounded-2xl p-3 border border-white/10 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-red-500/20 text-red-400 flex items-center justify-center">
-              <BookOpen className="w-5 h-5" />
-            </div>
-            <div>
-              <div className="text-xs text-stone-300 font-medium">Progres</div>
-              <div className="text-lg font-bold text-white">{percentMastered}%</div>
-            </div>
-          </div>
+        <div className="mt-2 flex gap-5 text-[11px] text-muted">
+          <span className="flex items-center gap-1.5"><span className="inline-block h-2 w-4 bg-ink" />Dikuasai {masteredCount}</span>
+          <span className="flex items-center gap-1.5"><span className="hatch inline-block h-2 w-4 border border-vermilion" />Dipelajari {learningCount}</span>
         </div>
       </div>
-
-      {/* Progress Bar */}
-      <div className="w-full bg-white/15 h-2 rounded-full mt-5 overflow-hidden flex">
-        <div 
-          className="bg-emerald-500 h-full transition-all duration-500"
-          style={{ width: `${(masteredCount / totalWords) * 100}%` }}
-          title={`Dikuasai: ${masteredCount}`}
-        />
-        <div 
-          className="bg-amber-400 h-full transition-all duration-500"
-          style={{ width: `${(learningCount / totalWords) * 100}%` }}
-          title={`Sedang Belajar: ${learningCount}`}
-        />
-      </div>
-    </div>
+    </header>
   );
 };

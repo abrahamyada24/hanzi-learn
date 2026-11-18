@@ -7,10 +7,42 @@
   --color-stone-850: #201d1b;
 }
 
+/* Swiss editorial tokens: warm paper, ink, one vermilion accent */
+:root {
+  --paper: #f4efe4;
+  --paper-2: #ebe4d3;
+  --ink: #1b1816;
+  --muted: #6e655a;
+  --vermilion: #c0301c;
+}
+.dark {
+  --paper: #151210;
+  --paper-2: #1e1a17;
+  --ink: #efe8da;
+  --muted: #9b9185;
+  --vermilion: #e8553f;
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-paper-2: var(--paper-2);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-vermilion: var(--vermilion);
+  --font-sans: 'Inter', system-ui, -apple-system, 'Noto Sans SC', 'PingFang SC', sans-serif;
+  --font-serif: 'Noto Serif SC', 'Songti SC', 'SimSun', serif;
+}
+
+/* Learning state shown as hatching, not as another colour */
+.hatch {
+  background-image: repeating-linear-gradient(135deg, var(--vermilion) 0 1px, transparent 1px 4px);
+}
+
 @layer base {
   body {
-    @apply bg-stone-50 text-stone-900 dark:bg-stone-950 dark:text-stone-100 antialiased min-h-screen transition-colors duration-150;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans SC', 'PingFang SC', sans-serif;
+    @apply bg-paper text-ink antialiased min-h-screen transition-colors duration-150;
+    font-family: 'Inter', system-ui, -apple-system, 'Noto Sans SC', 'PingFang SC', sans-serif;
+    font-feature-settings: 'tnum' 1, 'cv11' 1;
   }
 }
 

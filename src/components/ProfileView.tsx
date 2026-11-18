@@ -1,26 +1,10 @@
 import React, { useState } from 'react';
-import { 
-  Cloud, 
-  LogOut, 
-  Download, 
-  Flame, 
-  CheckCircle, 
-  PenTool, 
-  BookOpen, 
-  RotateCcw,
-  Sparkles,
-  Smartphone,
-  Moon,
-  Sun,
-  Monitor,
-  MessageSquare,
-  LayoutDashboard
-} from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme, type Theme } from '../context/ThemeContext';
 import { checkIsAdmin } from '../services/adminService';
 import type { UserStats } from '../types';
 import { ConfirmModal } from './ConfirmModal';
+import { focusRing } from './ui/marks';
 
 interface ProfileViewProps {
   stats: UserStats;
@@ -35,6 +19,16 @@ interface ProfileViewProps {
   onOpenFeedback: () => void;
   onOpenAdmin: () => void;
 }
+
+const Section: React.FC<{ index: string; title: string; aside?: string; children: React.ReactNode }> = ({ index, title, aside, children }) => (
+  <section>
+    <div className="flex items-baseline justify-between border-t-2 border-ink pt-3 text-[11px] font-medium uppercase tracking-[0.14em]">
+      <span className="flex gap-3"><span className="text-vermilion">{index}</span><span className="text-ink">{title}</span></span>
+      {aside && <span className="text-muted normal-case tracking-normal">{aside}</span>}
+    </div>
+    <div className="pt-4">{children}</div>
+  </section>
+);
 
 export const ProfileView: React.FC<ProfileViewProps> = ({
   stats,
@@ -59,340 +53,196 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
 
   const percentMastered = Math.round((masteredCount / totalWords) * 100) || 0;
 
-  const themeOptions: { id: Theme; label: string; icon: React.FC<{ className?: string }> }[] = [
-    { id: 'light', label: 'Terang', icon: Sun },
-    { id: 'system', label: 'Sistem', icon: Monitor },
-    { id: 'dark', label: 'Gelap', icon: Moon }
+  const themeOptions: { id: Theme; label: string }[] = [
+    { id: 'light', label: 'Terang' },
+    { id: 'system', label: 'Sistem' },
+    { id: 'dark', label: 'Gelap' }
+  ];
+
+  const label = 'text-[11px] font-medium uppercase tracking-[0.14em] text-muted';
+  const rowBtn = `border border-ink px-4 py-2 text-xs font-semibold text-ink hover:bg-ink hover:text-paper transition-colors whitespace-nowrap disabled:opacity-40 disabled:pointer-events-none ${focusRing}`;
+
+  const figures = [
+    { label: 'Streak', value: stats.streakDays, unit: 'hari' },
+    { label: 'Ditulis', value: stats.charactersWritten, unit: 'karakter' },
+    { label: 'Dikuasai', value: masteredCount, unit: 'kata' },
+    { label: 'Diproses', value: learningCount, unit: 'kata' }
   ];
 
   return (
-    <div className="max-w-2xl mx-auto space-y-5 animate-in fade-in">
-      {/* 1. USER IDENTITY CARD */}
-      <div className="bg-white dark:bg-stone-900 rounded-3xl p-5 sm:p-6 border border-stone-200 dark:border-stone-800 shadow-xs relative overflow-hidden transition-colors">
+    <div className="max-w-2xl mx-auto space-y-12 animate-in fade-in pb-4">
+      {/* 01 Akun */}
+      <Section index="01" title="Akun" aside={user ? 'Terhubung ke Google' : 'Belum masuk'}>
         {user ? (
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5">
+            <div className="flex items-center gap-4 min-w-0">
               {user.photoURL ? (
-                <img
-                  src={user.photoURL}
-                  alt={user.displayName || 'User'}
-                  className="w-16 h-16 rounded-2xl object-cover border-2 border-red-100 dark:border-red-950 shadow-xs"
-                />
+                <img src={user.photoURL} alt={user.displayName || 'User'} className="w-16 h-16 object-cover border border-ink flex-shrink-0" />
               ) : (
-                <div className="w-16 h-16 rounded-2xl bg-red-700 text-white font-serif font-bold text-2xl flex items-center justify-center shadow-xs">
+                <div className="w-16 h-16 bg-ink text-paper font-serif font-black text-3xl flex items-center justify-center flex-shrink-0">
                   {user.email?.[0].toUpperCase() || 'U'}
                 </div>
               )}
-
-              <div>
-                <div className="flex items-center gap-2">
-                  <h2 className="text-lg font-bold text-stone-900 dark:text-stone-100">
-                    {user.displayName || 'Pengguna HanziLearn'}
-                  </h2>
-                </div>
-                <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">{user.email}</p>
-                <div className="inline-flex items-center gap-1.5 mt-2 bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 px-2.5 py-0.5 rounded-full text-[11px] font-semibold border border-emerald-200/80 dark:border-emerald-800/60">
-                  <Cloud className="w-3.5 h-3.5" />
-                  <span>Akun Google Terhubung</span>
-                </div>
+              <div className="min-w-0">
+                <h2 className="text-xl font-semibold tracking-tight text-ink truncate">{user.displayName || 'Pengguna HanziLearn'}</h2>
+                <p className="text-xs text-muted truncate">{user.email}</p>
               </div>
             </div>
-
-            <button
-              onClick={() => setShowLogoutConfirm(true)}
-              className="self-start sm:self-center py-2 px-3.5 bg-stone-50 dark:bg-stone-800 hover:bg-red-50 dark:hover:bg-red-950/40 text-stone-600 dark:text-stone-300 hover:text-red-600 dark:hover:text-red-400 border border-stone-200 dark:border-stone-700 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 active:scale-95"
-            >
-              <LogOut className="w-3.5 h-3.5" />
-              <span>Keluar</span>
+            <button onClick={() => setShowLogoutConfirm(true)} className={`${rowBtn} self-start sm:self-center`}>
+              Keluar
             </button>
           </div>
         ) : (
-          <div className="text-center py-4 space-y-3">
-            <div className="w-12 h-12 rounded-2xl bg-red-50 dark:bg-red-950/60 text-red-700 dark:text-red-400 flex items-center justify-center mx-auto">
-              <Cloud className="w-6 h-6" />
-            </div>
-            <div>
-              <h2 className="text-base font-bold text-stone-900 dark:text-stone-100">
-                Hubungkan Akun Google
-              </h2>
-              <p className="text-xs text-stone-500 dark:text-stone-400 mt-1 max-w-md mx-auto leading-relaxed">
-                Sinkronkan progres hafalan kata, jumlah goresan, dan hari belajar secara otomatis di semua perangkatmu (HP & Laptop).
-              </p>
-            </div>
+          <div>
+            <h2 className="text-2xl font-semibold tracking-tight text-ink">Hubungkan akun Google</h2>
+            <p className="mt-2 max-w-md text-sm leading-relaxed text-muted">
+              Sinkronkan progres hafalan kata, jumlah goresan, dan hari belajar secara otomatis di semua perangkatmu (HP dan laptop).
+            </p>
             <button
               onClick={() => loginWithGoogle()}
-              className="inline-flex items-center gap-2 py-2.5 px-5 bg-white dark:bg-stone-800 hover:bg-stone-50 dark:hover:bg-stone-700 border border-stone-300 dark:border-stone-700 text-stone-800 dark:text-stone-100 rounded-2xl text-xs font-bold transition shadow-xs active:scale-95"
+              className={`mt-5 bg-ink text-paper px-6 py-3 text-sm font-semibold flex items-center gap-8 hover:bg-vermilion transition-colors ${focusRing}`}
             >
-              <svg className="w-4 h-4" viewBox="0 0 24 24">
-                <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
-                <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/>
-                <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.97 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/>
-                <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
-              </svg>
               <span>Masuk dengan Google</span>
+              <span aria-hidden>&rarr;</span>
             </button>
           </div>
         )}
-      </div>
+      </Section>
 
-      {/* 2. PENGATURAN TEMA & TAMPILAN (DARK MODE) */}
-      <div className="bg-white dark:bg-stone-900 rounded-3xl p-5 sm:p-6 border border-stone-200 dark:border-stone-800 shadow-xs space-y-4 transition-colors">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-xl bg-red-50 dark:bg-red-950/60 text-red-600 dark:text-red-400 flex items-center justify-center">
-              {isDark ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
+      {/* 02 Statistik */}
+      <Section index="02" title="Statistik belajar HSK 1" aside={`${percentMastered}% selesai`}>
+        <dl className="grid grid-cols-2 sm:grid-cols-4 border-t border-ink">
+          {figures.map((f, i) => (
+            <div
+              key={f.label}
+              className={`py-4 pr-3 ${i % 2 === 1 ? 'pl-4 border-l border-ink/20' : ''} ${i > 0 ? 'sm:pl-4 sm:border-l sm:border-ink/20' : ''} ${i >= 2 ? 'border-t border-ink/20 sm:border-t-0' : ''}`}
+            >
+              <dt className={label}>{f.label}</dt>
+              <dd className="mt-1 flex items-baseline gap-1.5">
+                <span className="text-5xl font-semibold tracking-tighter leading-none text-ink">{f.value}</span>
+                <span className="text-xs text-muted">{f.unit}</span>
+              </dd>
             </div>
-            <div>
-              <h3 className="font-bold text-sm text-stone-900 dark:text-stone-100">
-                Tema & Mode Tampilan
-              </h3>
-              <p className="text-[11px] text-stone-400">
-                Sesuaikan kenyamanan mata saat membaca dan menulis aksara
-              </p>
-            </div>
+          ))}
+        </dl>
+
+        <div className="mt-2">
+          <div className="flex justify-between text-xs text-muted mb-1.5">
+            <span>Kemajuan HSK 1</span>
+            <span><span className="text-ink font-semibold">{masteredCount}</span> dari {totalWords} kata</span>
+          </div>
+          <div
+            className="flex h-1.5 w-full bg-ink/10"
+            role="img"
+            aria-label={`${masteredCount} dikuasai, ${learningCount} sedang diproses, dari ${totalWords} kata`}
+          >
+            <div className="bg-ink h-full transition-all duration-500" style={{ width: `${(masteredCount / totalWords) * 100}%` }} />
+            <div className="hatch h-full transition-all duration-500" style={{ width: `${(learningCount / totalWords) * 100}%` }} />
           </div>
         </div>
+      </Section>
 
-        {/* 3-Segment Theme Switcher */}
-        <div className="grid grid-cols-3 gap-2 bg-stone-100 dark:bg-stone-800/80 p-1.5 rounded-2xl">
-          {themeOptions.map((opt) => {
-            const Icon = opt.icon;
-            const isSelected = theme === opt.id;
+      {/* 03 Tampilan */}
+      <Section index="03" title="Tampilan" aside={isDark ? 'Mode gelap aktif' : 'Mode terang aktif'}>
+        <p className="text-sm text-muted mb-3">Sesuaikan kenyamanan mata saat membaca dan menulis aksara.</p>
+        <div role="group" aria-label="Tema" className="grid grid-cols-3 border border-ink divide-x divide-ink">
+          {themeOptions.map(opt => {
+            const on = theme === opt.id;
             return (
               <button
                 key={opt.id}
                 onClick={() => setTheme(opt.id)}
-                className={`py-2 px-3 rounded-xl text-xs font-semibold transition-all flex items-center justify-center gap-1.5 active:scale-95 ${
-                  isSelected
-                    ? 'bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 shadow-xs font-bold'
-                    : 'text-stone-500 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-200'
+                aria-pressed={on}
+                className={`py-3 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-[-3px] focus-visible:outline-vermilion ${
+                  on ? 'bg-ink text-paper font-semibold' : 'text-muted hover:text-ink'
                 }`}
               >
-                <Icon className={`w-3.5 h-3.5 ${isSelected ? (opt.id === 'dark' ? 'text-amber-400' : 'text-red-600') : ''}`} />
-                <span>{opt.label}</span>
+                {opt.label}
               </button>
             );
           })}
         </div>
-      </div>
+      </Section>
 
-      {/* 3. STATISTIK BELAJAR RINCI */}
-      <div className="bg-white dark:bg-stone-900 rounded-3xl p-5 sm:p-6 border border-stone-200 dark:border-stone-800 shadow-xs space-y-4 transition-colors">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-amber-500" />
-            <h3 className="font-bold text-sm text-stone-900 dark:text-stone-100">Statistik Belajar HSK 1</h3>
-          </div>
-          <span className="text-xs text-stone-400 font-semibold">{percentMastered}% Selesai</span>
-        </div>
-
-        {/* 4 Stats Cards */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <div className="bg-stone-50 dark:bg-stone-800/80 rounded-2xl p-3.5 border border-stone-100 dark:border-stone-700/80 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-amber-500/15 text-amber-600 dark:text-amber-400 flex items-center justify-center flex-shrink-0">
-              <Flame className="w-5 h-5 fill-amber-500" />
-            </div>
-            <div>
-              <div className="text-[10px] text-stone-400 font-semibold uppercase">Streak</div>
-              <div className="text-base font-bold text-stone-900 dark:text-stone-100">{stats.streakDays} Hari</div>
-            </div>
-          </div>
-
-          <div className="bg-stone-50 dark:bg-stone-800/80 rounded-2xl p-3.5 border border-stone-100 dark:border-stone-700/80 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-blue-500/15 text-blue-600 dark:text-blue-400 flex items-center justify-center flex-shrink-0">
-              <PenTool className="w-5 h-5" />
-            </div>
-            <div>
-              <div className="text-[10px] text-stone-400 font-semibold uppercase">Ditulis</div>
-              <div className="text-base font-bold text-stone-900 dark:text-stone-100">{stats.charactersWritten} Karakter</div>
-            </div>
-          </div>
-
-          <div className="bg-stone-50 dark:bg-stone-800/80 rounded-2xl p-3.5 border border-stone-100 dark:border-stone-700/80 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 flex items-center justify-center flex-shrink-0">
-              <CheckCircle className="w-5 h-5" />
-            </div>
-            <div>
-              <div className="text-[10px] text-stone-400 font-semibold uppercase">Dikuasai</div>
-              <div className="text-base font-bold text-stone-900 dark:text-stone-100">{masteredCount} Kata</div>
-            </div>
-          </div>
-
-          <div className="bg-stone-50 dark:bg-stone-800/80 rounded-2xl p-3.5 border border-stone-100 dark:border-stone-700/80 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-red-500/15 text-red-600 dark:text-red-400 flex items-center justify-center flex-shrink-0">
-              <BookOpen className="w-5 h-5" />
-            </div>
-            <div>
-              <div className="text-[10px] text-stone-400 font-semibold uppercase">Diproses</div>
-              <div className="text-base font-bold text-stone-900 dark:text-stone-100">{learningCount} Kata</div>
-            </div>
-          </div>
-        </div>
-
-        {/* Progress Bar */}
-        <div className="space-y-1.5 pt-2">
-          <div className="flex justify-between text-xs text-stone-500 dark:text-stone-400">
-            <span>Kemajuan HSK 1</span>
-            <span className="font-semibold text-stone-900 dark:text-stone-100">{masteredCount} dari {totalWords} kata</span>
-          </div>
-          <div className="w-full bg-stone-100 dark:bg-stone-800 h-2.5 rounded-full overflow-hidden flex">
-            <div 
-              className="bg-emerald-500 h-full transition-all duration-500"
-              style={{ width: `${(masteredCount / totalWords) * 100}%` }}
-            />
-            <div 
-              className="bg-amber-400 h-full transition-all duration-500"
-              style={{ width: `${(learningCount / totalWords) * 100}%` }}
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* 4. PWA APP INSTALLATION */}
-      <div className="bg-white dark:bg-stone-900 rounded-3xl p-5 sm:p-6 border border-stone-200 dark:border-stone-800 shadow-xs transition-colors">
+      {/* 04 Aplikasi */}
+      <Section index="04" title="Aplikasi" aside={isStandalone ? 'Terpasang' : undefined}>
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="flex items-center gap-3.5">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-red-600 to-red-800 text-white font-serif font-bold text-2xl flex items-center justify-center shadow-xs flex-shrink-0">
-              汉
-            </div>
+          <div className="flex items-center gap-4">
+            <span className="font-serif font-black text-5xl leading-none text-vermilion">汉</span>
             <div>
-              <h3 className="font-bold text-sm text-stone-900 dark:text-stone-100 flex items-center gap-1.5">
-                <span>Aplikasi HanziLearn (PWA)</span>
-                {isStandalone && (
-                  <span className="text-[10px] bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 font-bold px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800">
-                    Terpasang
-                  </span>
-                )}
-              </h3>
-              <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5 leading-relaxed">
-                {isStandalone 
-                  ? 'Aplikasi sedang berjalan dalam mode layar penuh (standalone).' 
-                  : 'Pasang ke layar utama HP atau desktop agar bisa diakses cepat layaknya aplikasi native.'}
+              <h3 className="text-sm font-semibold text-ink">HanziLearn (PWA)</h3>
+              <p className="text-xs text-muted max-w-sm mt-0.5 leading-relaxed">
+                {isStandalone
+                  ? 'Berjalan dalam mode layar penuh (standalone).'
+                  : 'Pasang ke layar utama HP atau desktop agar bisa diakses cepat seperti aplikasi bawaan.'}
               </p>
             </div>
           </div>
-
-          {!isStandalone ? (
-            <button
-              onClick={onInstallApp}
-              className="py-2.5 px-4 bg-stone-900 dark:bg-stone-800 hover:bg-stone-800 dark:hover:bg-stone-700 text-white border border-stone-800 dark:border-stone-700 rounded-2xl text-xs font-semibold transition flex items-center justify-center gap-2 active:scale-95 shadow-xs whitespace-nowrap self-start sm:self-center"
-            >
-              <Download className="w-4 h-4 text-red-400 dark:text-red-400" />
-              <span>Install di HP</span>
+          {!isStandalone && (
+            <button onClick={onInstallApp} className={`bg-ink text-paper px-5 py-2.5 text-xs font-semibold hover:bg-vermilion transition-colors self-start sm:self-center whitespace-nowrap ${focusRing}`}>
+              Install di HP
             </button>
-          ) : (
-            <div className="text-xs text-emerald-700 dark:text-emerald-400 font-semibold flex items-center gap-1.5">
-              <Smartphone className="w-4 h-4" />
-              <span>Aktif di Perangkat</span>
-            </div>
           )}
         </div>
-      </div>
+      </Section>
 
-      {/* 5. UTILITY & DANGER ZONE */}
-      <div className="bg-white dark:bg-stone-900 rounded-3xl p-5 sm:p-6 border border-stone-200 dark:border-stone-800 shadow-xs space-y-3 transition-colors">
-        <h3 className="font-bold text-xs uppercase tracking-wider text-stone-400">
-          Sinkronisasi & Pengaturan Data
-        </h3>
-
-        <div className="divide-y divide-stone-100 dark:divide-stone-800 text-xs">
-          {/* Manual Sync */}
+      {/* 05 Data */}
+      <Section index="05" title="Sinkronisasi & data">
+        <ul className="border-t border-ink">
           {user && (
-            <div className="py-3 flex items-center justify-between gap-3">
+            <li className="border-b border-ink/20 py-4 flex items-center justify-between gap-4">
               <div>
-                <div className="font-semibold text-stone-800 dark:text-stone-200">Sinkronisasi Cloud Sekarang</div>
-                <div className="text-stone-400 text-[11px]">Unggah dan gabungkan progres lokal terbaru ke server</div>
+                <div className="text-sm font-semibold text-ink">Sinkronisasi cloud sekarang</div>
+                <div className="text-xs text-muted">Unggah dan gabungkan progres lokal terbaru ke server</div>
               </div>
-              <button
-                onClick={onManualSync}
-                disabled={isSyncing}
-                className="py-1.5 px-3 bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-300 rounded-xl font-semibold transition active:scale-95 disabled:opacity-50 whitespace-nowrap"
-              >
-                {isSyncing ? 'Menyinkronkan...' : 'Sinkronkan'}
+              <button onClick={onManualSync} disabled={isSyncing} className={rowBtn}>
+                {isSyncing ? 'Menyinkronkan…' : 'Sinkronkan'}
               </button>
-            </div>
+            </li>
           )}
-
-          {/* Reset Local Data */}
-          <div className="py-3 flex items-center justify-between gap-3">
+          <li className="border-b border-ink/20 py-4 flex items-center justify-between gap-4">
             <div>
-              <div className="font-semibold text-stone-800 dark:text-stone-200">Reset Progres Belajar Lokal</div>
-              <div className="text-stone-400 text-[11px]">Mengosongkan cache hafalan dan streak pada perangkat ini</div>
+              <div className="text-sm font-semibold text-ink">Reset progres belajar lokal</div>
+              <div className="text-xs text-muted">Mengosongkan cache hafalan dan streak pada perangkat ini</div>
             </div>
             <button
               onClick={() => setShowResetConfirm(true)}
-              className="py-1.5 px-3 bg-red-50 hover:bg-red-100 dark:bg-red-950/40 dark:hover:bg-red-900/60 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-900/60 rounded-xl font-semibold transition active:scale-95 whitespace-nowrap flex items-center gap-1.5"
+              className={`border border-vermilion px-4 py-2 text-xs font-semibold text-vermilion hover:bg-vermilion hover:text-paper transition-colors whitespace-nowrap ${focusRing}`}
             >
-              <RotateCcw className="w-3.5 h-3.5" />
-              <span>Reset</span>
+              Reset
             </button>
-          </div>
-        </div>
-      </div>
+          </li>
+        </ul>
+      </Section>
 
-      {/* 6. KRITIK & SARAN PENGGUNA */}
-      <div className="bg-white dark:bg-stone-900 rounded-3xl p-5 sm:p-6 border border-stone-200 dark:border-stone-800 shadow-xs transition-colors">
+      {/* 06 Masukan */}
+      <Section index="06" title="Kritik & saran">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="flex items-center gap-3.5">
-            <div className="w-10 h-10 rounded-2xl bg-red-50 dark:bg-red-950/60 text-red-600 dark:text-red-400 flex items-center justify-center flex-shrink-0">
-              <MessageSquare className="w-5 h-5" />
-            </div>
-            <div>
-              <h3 className="font-bold text-sm text-stone-900 dark:text-stone-100">
-                Kritik & Saran Pengguna
-              </h3>
-              <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5 leading-relaxed">
-                Punya ide fitur baru, koreksi kata, atau kendala? Masukanmu sangat berharga bagi kami.
-              </p>
-            </div>
-          </div>
-
-          <button
-            onClick={onOpenFeedback}
-            className="py-2.5 px-4 bg-red-700 hover:bg-red-800 text-white rounded-2xl text-xs font-bold transition flex items-center justify-center gap-2 active:scale-95 shadow-xs whitespace-nowrap self-start sm:self-center"
-          >
-            <MessageSquare className="w-4 h-4" />
-            <span>Beri Masukan</span>
+          <p className="max-w-sm text-sm leading-relaxed text-muted">
+            Punya ide fitur baru, koreksi kata, atau kendala? Masukanmu sangat berharga bagi kami.
+          </p>
+          <button onClick={onOpenFeedback} className={`bg-ink text-paper px-5 py-2.5 text-xs font-semibold hover:bg-vermilion transition-colors self-start sm:self-center whitespace-nowrap ${focusRing}`}>
+            Beri masukan
           </button>
         </div>
-      </div>
+      </Section>
 
-      {/* 7. ADMIN DASHBOARD ACCESS (FOR AUTHORIZED ADMINS) */}
+      {/* 07 Admin */}
       {isAdmin && (
-        <div className="bg-stone-900 dark:bg-stone-850 text-white rounded-3xl p-5 sm:p-6 border border-stone-800 dark:border-stone-700 shadow-md transition-colors">
+        <Section index="07" title="Admin" aside="Akses admin">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div className="flex items-center gap-3.5">
-              <div className="w-10 h-10 rounded-2xl bg-red-600/30 text-red-400 flex items-center justify-center flex-shrink-0 border border-red-500/30">
-                <LayoutDashboard className="w-5 h-5" />
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <h3 className="font-bold text-sm text-white">
-                    Panel Admin & Analitik
-                  </h3>
-                  <span className="text-[10px] bg-red-900/80 text-red-200 px-2 py-0.2 rounded-full font-bold">
-                    Akses Admin
-                  </span>
-                </div>
-                <p className="text-xs text-stone-300 mt-0.5">
-                  Pantau statistik pengguna, analitik kosakata, dan baca pesan kritik & saran
-                </p>
-              </div>
-            </div>
-
-            <button
-              onClick={onOpenAdmin}
-              className="py-2.5 px-4 bg-red-600 hover:bg-red-700 text-white rounded-2xl text-xs font-bold transition flex items-center justify-center gap-2 active:scale-95 shadow-xs whitespace-nowrap self-start sm:self-center"
-            >
-              <LayoutDashboard className="w-4 h-4" />
-              <span>Buka Panel Admin</span>
+            <p className="max-w-sm text-sm leading-relaxed text-muted">
+              Pantau statistik pengguna, analitik kosakata, dan baca pesan kritik dan saran.
+            </p>
+            <button onClick={onOpenAdmin} className={`bg-ink text-paper px-5 py-2.5 text-xs font-semibold hover:bg-vermilion transition-colors self-start sm:self-center whitespace-nowrap ${focusRing}`}>
+              Buka panel admin
             </button>
           </div>
-        </div>
+        </Section>
       )}
 
-      {/* FOOTER APP VERSION */}
-      <div 
+      {/* Footer */}
+      <div
         onClick={() => {
           const next = versionClicks + 1;
           setVersionClicks(next);
@@ -401,18 +251,18 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
             onOpenAdmin();
           }
         }}
-        className="text-center text-xs text-stone-400 pt-2 pb-6 space-y-1 cursor-default select-none"
+        className="border-t border-ink/20 pt-4 pb-4 text-xs text-muted space-y-0.5 cursor-default select-none"
       >
-        <p className="font-semibold text-stone-500 dark:text-stone-400">HanziLearn &middot; Aksara Mandarin Mandiri</p>
-        <p className="text-[11px]">Dibuat untuk pembelajaran HSK 1 dan Piktogram Aksara &middot; v2.1</p>
+        <p className="font-semibold text-ink">HanziLearn &middot; Aksara Mandarin Mandiri</p>
+        <p>Dibuat untuk pembelajaran HSK 1 dan piktogram aksara &middot; v2.1</p>
       </div>
 
-      {/* CONFIRMATION MODALS */}
+      {/* Confirmation modals */}
       <ConfirmModal
         isOpen={showLogoutConfirm}
-        title="Keluar dari Akun?"
+        title="Keluar dari akun?"
         message="Progres belajarmu telah tersimpan aman di Google Cloud. Kamu dapat masuk kembali kapan saja untuk melanjutkan."
-        confirmLabel="Ya, Keluar"
+        confirmLabel="Ya, keluar"
         cancelLabel="Batal"
         isDestructive={false}
         onConfirm={() => {
@@ -424,9 +274,9 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
 
       <ConfirmModal
         isOpen={showResetConfirm}
-        title="Reset Progres Belajar?"
-        message="Perhatian: Tindakan ini akan mengosongkan statistik belajar, hafalan kata, dan streak pada perangkat ini. Apakah kamu yakin?"
-        confirmLabel="Hapus Progres"
+        title="Reset progres belajar?"
+        message="Perhatian: tindakan ini akan mengosongkan statistik belajar, hafalan kata, dan streak pada perangkat ini. Apakah kamu yakin?"
+        confirmLabel="Hapus progres"
         cancelLabel="Batal"
         isDestructive={true}
         onConfirm={() => {

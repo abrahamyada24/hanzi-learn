@@ -47,9 +47,8 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
   const { theme, setTheme, isDark } = useTheme();
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
-  const [versionClicks, setVersionClicks] = useState(0);
 
-  const isAdmin = checkIsAdmin(user?.email);
+  const isAdmin = checkIsAdmin(user);
 
   const percentMastered = Math.round((masteredCount / totalWords) * 100) || 0;
 
@@ -242,17 +241,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
       )}
 
       {/* Footer */}
-      <div
-        onClick={() => {
-          const next = versionClicks + 1;
-          setVersionClicks(next);
-          if (next >= 5) {
-            setVersionClicks(0);
-            onOpenAdmin();
-          }
-        }}
-        className="border-t border-ink/20 pt-4 pb-4 text-xs text-muted space-y-0.5 cursor-default select-none"
-      >
+      <div className="border-t border-ink/20 pt-4 pb-4 text-xs text-muted space-y-0.5 select-none">
         <p className="font-semibold text-ink">HanziLearn &middot; Aksara Mandarin Mandiri</p>
         <p>Dibuat untuk pembelajaran HSK 1 dan piktogram aksara &middot; v2.1</p>
       </div>

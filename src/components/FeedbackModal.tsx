@@ -178,6 +178,7 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
               <textarea
                 id="feedback-text"
                 rows={4}
+                maxLength={2000}
                 value={message}
                 onChange={e => setMessage(e.target.value)}
                 placeholder={
@@ -210,6 +211,7 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
                       onChange={e => setGuestName(e.target.value)}
                       placeholder="Nama atau panggilan (opsional)"
                       aria-label="Nama atau panggilan"
+                      maxLength={100}
                       disabled={isAnonymous}
                       className={`mt-1 ${field}`}
                     />

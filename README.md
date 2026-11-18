@@ -106,3 +106,33 @@ d:\hsk/
 ├── netlify.toml                    # Konfigurasi deploy Netlify
 └── package.json
 ```
+
+
+---
+
+## 🔐 Keamanan: Firestore Rules
+
+Akses data diatur oleh `firestore.rules` (bukan oleh kode klien):
+
+| Koleksi | Siapa yang boleh |
+|---|---|
+| `users/{uid}` | Pemilik: baca/tulis dokumennya sendiri. Admin: baca semua (untuk analitik). Tidak ada yang bisa menghapus lewat klien. |
+| `feedback/{id}` | **Kirim:** siapa pun (termasuk tamu), dengan validasi isi. **Baca, ubah status, hapus:** hanya admin. |
+| path lain | Ditolak. |
+
+Admin ditentukan dari email akun Google yang **sudah terverifikasi** di token Firebase Auth. Daftar email ada di dua tempat yang harus sama: `firestore.rules` (penegakan) dan `ADMIN_EMAILS` di `src/services/adminService.ts` (hanya untuk menampilkan UI).
+
+**Deploy rules** (perlu akses ke project Firebase `mandarin-learn`):
+
+```bash
+npx firebase-tools login
+npx firebase-tools deploy --only firestore:rules --project mandarin-learn
+```
+
+**Uji rules** di emulator lokal (butuh Java):
+
+```bash
+npm run test:rules
+```
+
+> Anti-spam pada pengiriman feedback tidak bisa dijamin oleh rules saja. Jika dibutuhkan, aktifkan Firebase App Check.

@@ -1,0 +1,92 @@
+rules_version = '2';
+
+// HanziLearn Firestore rules.
+//
+// Collections:
+//   users/{uid}   progres belajar satu pengguna. Pemilik: baca/tulis. Admin: baca semua (analitik).
+//   feedback/{id} kritik & saran. Siapa pun boleh KIRIM (termasuk tamu), hanya admin yang boleh
+//                 membaca, mengubah status, dan menghapus.
+// Semua path lain ditolak.
+//
+// Admin ditentukan dari email akun Google yang SUDAH terverifikasi di token Firebase Auth,
+// bukan dari PIN atau sesuatu yang bisa diubah klien. Daftar ini harus sama dengan
+// ADMIN_EMAILS di src/services/adminService.ts (di klien hanya dipakai untuk menampilkan UI).
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---------- helpers ----------
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return signedIn()
+        && request.auth.token.email_verified == true
+        && request.auth.token.email.lower() in [
+          'abrahamyadaa24@gmail.com',
+          'abrahamyada24@gmail.com',
+          'bram.simrs@gmail.com'
+        ];
+    }
+
+    function isOwner(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    // ---------- users/{uid} ----------
+    match /users/{uid} {
+      function validUserDoc() {
+        let d = request.resource.data;
+        return d.keys().hasOnly(['progress', 'stats', 'bookmarks', 'lastSynced', 'email', 'displayName'])
+          && (!('progress' in d) || (d.progress is map && d.progress.size() <= 500))
+          && (!('stats' in d) || d.stats is map)
+          && (!('bookmarks' in d) || (d.bookmarks is list && d.bookmarks.size() <= 500))
+          && (!('lastSynced' in d) || (d.lastSynced is string && d.lastSynced.size() <= 40))
+          && (!('displayName' in d) || (d.displayName is string && d.displayName.size() <= 200))
+          // email hanya boleh kosong atau sama dengan email akun, supaya tidak bisa menyamar di panel admin
+          && (!('email' in d)
+              || (d.email is string
+                  && (d.email == '' || d.email.lower() == request.auth.token.email.lower())));
+      }
+
+      allow get: if isOwner(uid) || isAdmin();
+      // list dipakai panel admin (getDocs seluruh koleksi)
+      allow list: if isAdmin();
+      allow create, update: if isOwner(uid) && validUserDoc();
+      allow delete: if false;
+    }
+
+    // ---------- feedback/{id} ----------
+    match /feedback/{id} {
+      function validNewFeedback() {
+        let d = request.resource.data;
+        return d.keys().hasOnly(['category', 'rating', 'message', 'userName', 'userEmail', 'userId', 'deviceInfo', 'status', 'createdAt'])
+          && d.keys().hasAll(['category', 'rating', 'message', 'userName', 'status', 'createdAt'])
+          && d.category in ['suggestion', 'bug', 'correction', 'review', 'other']
+          && d.rating is int && d.rating >= 1 && d.rating <= 5
+          && d.message is string && d.message.size() > 0 && d.message.size() <= 2000
+          && d.userName is string && d.userName.size() <= 100
+          && d.status == 'new'
+          && d.createdAt == request.time
+          // userId: kosong, atau sama dengan akun yang sedang login (tidak boleh mengaku sebagai orang lain)
+          && (!('userId' in d) || d.userId == null || (signedIn() && d.userId == request.auth.uid))
+          // userEmail: kosong, atau sama dengan email akun yang sedang login
+          && (!('userEmail' in d) || d.userEmail == null
+              || (signedIn() && d.userEmail is string && d.userEmail.lower() == request.auth.token.email.lower()))
+          && (!('deviceInfo' in d) || (d.deviceInfo is map && d.deviceInfo.size() <= 6));
+      }
+
+      // Kirim: terbuka untuk tamu dan pengguna login, tetapi harus lolos validasi.
+      allow create: if validNewFeedback();
+
+      // Baca, tandai, hapus: hanya admin.
+      allow get, list: if isAdmin();
+      allow update: if isAdmin()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'adminNote'])
+        && request.resource.data.status in ['new', 'reviewed', 'resolved']
+        && (!('adminNote' in request.resource.data)
+            || (request.resource.data.adminNote is string && request.resource.data.adminNote.size() <= 2000));
+      allow delete: if isAdmin();
+    }
+  }
+}

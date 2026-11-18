@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { HanziWriterCanvas } from './HanziWriterCanvas';
 import { speechManager } from '../utils/speech';
-import { AudioButton, focusRing } from './ui/marks';
+import { AudioButton } from './ui/marks';
+import { focusRing } from './ui/tokens';
 
 const POPULAR_SUGGESTIONS = [
   { char: '永', note: '8 Prinsip Dasar Goresan Hanzi (Yǒng)' },

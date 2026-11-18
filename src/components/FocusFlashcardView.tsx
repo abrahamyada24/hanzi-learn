@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import type { VocabItem, MasteryStatus } from '../types';
 import { speechManager } from '../utils/speech';
 import { HanziWriterCanvas } from './HanziWriterCanvas';
-import { AudioButton, BookmarkIcon, StatusSwitch, focusRing } from './ui/marks';
+import { AudioButton, BookmarkIcon, StatusSwitch } from './ui/marks';
+import { focusRing } from './ui/tokens';
 
 interface FocusFlashcardViewProps {
   vocabList: VocabItem[];

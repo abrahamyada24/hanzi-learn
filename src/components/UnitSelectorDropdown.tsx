@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
-import { focusRing } from './ui/marks';
+import { focusRing } from './ui/tokens';
 import { LESSON_UNITS } from '../data/lessonUnits';
 import { HSK1_VOCABULARY } from '../data/hsk1';
 import type { LessonUnit, VocabItem } from '../types';

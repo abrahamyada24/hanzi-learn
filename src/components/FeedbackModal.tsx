@@ -4,7 +4,7 @@ import { useTheme } from '../context/ThemeContext';
 import { submitFeedback } from '../services/feedbackService';
 import type { FeedbackCategory } from '../services/feedbackService';
 import { Dialog } from './ui/Dialog';
-import { focusRing } from './ui/marks';
+import { focusRing } from './ui/tokens';
 
 interface FeedbackModalProps {
   isOpen: boolean;

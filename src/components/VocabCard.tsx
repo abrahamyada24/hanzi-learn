@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import type { VocabItem, MasteryStatus } from '../types';
 import { speechManager } from '../utils/speech';
-import { AudioButton, BookmarkIcon, StatusSwitch, focusRing } from './ui/marks';
+import { AudioButton, BookmarkIcon, StatusSwitch } from './ui/marks';
+import { focusRing } from './ui/tokens';
 
 interface VocabCardProps {
   vocab: VocabItem;

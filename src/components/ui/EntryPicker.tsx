@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
-import { focusRing } from './marks';
+import { focusRing } from './tokens';
 
 interface EntryPickerProps<T> {
   items: T[];
@@ -42,15 +42,16 @@ export function EntryPicker<T>({
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
   const rootRef = useRef<HTMLDivElement>(null);
+  const close = () => {
+    setOpen(false);
+    setQuery('');
+  };
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (!open) {
-      setQuery('');
-      return;
-    }
+    if (!open) return;
     const outside = (e: MouseEvent | TouchEvent) => {
-      if (rootRef.current && !rootRef.current.contains(e.target as Node)) setOpen(false);
+      if (rootRef.current && !rootRef.current.contains(e.target as Node)) close();
     };
     document.addEventListener('mousedown', outside);
     document.addEventListener('touchstart', outside);
@@ -86,7 +87,7 @@ export function EntryPicker<T>({
         </button>
 
         <button
-          onClick={() => setOpen(!open)}
+          onClick={() => (open ? close() : setOpen(true))}
           aria-expanded={open}
           className={`flex-1 min-w-0 border border-ink px-3 sm:px-4 py-2.5 flex items-center justify-between gap-3 text-left transition-colors ${focusRing}`}
         >
@@ -144,7 +145,7 @@ export function EntryPicker<T>({
                     <button
                       onClick={() => {
                         onSelect(item);
-                        setOpen(false);
+                        close();
                       }}
                       className={`group relative w-full px-3.5 py-2.5 text-left flex items-center gap-4 transition-colors hover:bg-paper-2 ${on ? 'bg-paper-2' : ''}`}
                     >

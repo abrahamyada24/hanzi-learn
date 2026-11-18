@@ -2,7 +2,8 @@ import React, { useState, useMemo } from 'react';
 import type { VocabItem } from '../types';
 import { speechManager } from '../utils/speech';
 import { HanziWriterCanvas } from './HanziWriterCanvas';
-import { AudioButton, focusRing } from './ui/marks';
+import { AudioButton } from './ui/marks';
+import { focusRing } from './ui/tokens';
 
 interface QuizModeProps {
   vocabList: VocabItem[];

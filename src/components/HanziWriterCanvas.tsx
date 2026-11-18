@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import HanziWriter from 'hanzi-writer';
-import { AudioButton, focusRing } from './ui/marks';
+import { AudioButton } from './ui/marks';
+import { focusRing } from './ui/tokens';
 import { speechManager } from '../utils/speech';
 import { useTheme } from '../context/ThemeContext';
 

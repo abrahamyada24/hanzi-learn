@@ -4,7 +4,7 @@ import { useTheme, type Theme } from '../context/ThemeContext';
 import { checkIsAdmin } from '../services/adminService';
 import type { UserStats } from '../types';
 import { ConfirmModal } from './ConfirmModal';
-import { focusRing } from './ui/marks';
+import { focusRing } from './ui/tokens';
 
 interface ProfileViewProps {
   stats: UserStats;

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { HanziWriterCanvas } from './HanziWriterCanvas';
-import { focusRing } from './ui/marks';
+import { focusRing } from './ui/tokens';
 
 interface StrokeRule {
   id: string;

@@ -4,7 +4,8 @@ import type { RadicalItem } from '../types';
 import { HanziWriterCanvas } from './HanziWriterCanvas';
 import { speechManager } from '../utils/speech';
 import { EntryPicker } from './ui/EntryPicker';
-import { AudioButton, focusRing } from './ui/marks';
+import { AudioButton } from './ui/marks';
+import { focusRing } from './ui/tokens';
 
 const label = 'text-[11px] font-medium uppercase tracking-[0.14em] text-muted';
 

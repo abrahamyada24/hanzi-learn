@@ -1,6 +1,6 @@
 import React from 'react';
 import { Dialog } from './ui/Dialog';
-import { focusRing } from './ui/marks';
+import { focusRing } from './ui/tokens';
 
 interface InstallPwaModalProps {
   isOpen: boolean;

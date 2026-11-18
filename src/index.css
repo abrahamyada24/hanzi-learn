@@ -2,11 +2,6 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-@theme {
-  --color-stone-750: #383431;
-  --color-stone-850: #201d1b;
-}
-
 /* Swiss editorial tokens: warm paper, ink, one vermilion accent */
 :root {
   --paper: #f4efe4;

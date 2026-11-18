@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { speechManager } from '../utils/speech';
-import { AudioIcon, focusRing } from './ui/marks';
+import { AudioIcon } from './ui/marks';
+import { focusRing } from './ui/tokens';
 
 interface ToneItem {
   number: number;

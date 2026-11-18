@@ -1,7 +1,8 @@
 import React from 'react';
 import type { VocabItem, MasteryStatus } from '../types';
 import { speechManager } from '../utils/speech';
-import { AudioButton, BookmarkIcon, StatusSwatch, STATUS_LABEL, focusRing } from './ui/marks';
+import { AudioButton, BookmarkIcon, StatusSwatch } from './ui/marks';
+import { STATUS_LABEL, focusRing } from './ui/tokens';
 
 interface CompactListViewProps {
   vocabList: VocabItem[];

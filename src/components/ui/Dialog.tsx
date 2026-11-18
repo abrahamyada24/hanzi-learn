@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { focusRing } from './marks';
+import { focusRing } from './tokens';
 
 interface DialogProps {
   eyebrow: string;

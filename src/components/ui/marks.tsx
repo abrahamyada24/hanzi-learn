@@ -1,8 +1,6 @@
 import React from 'react';
 import type { MasteryStatus } from '../../types';
-
-export const focusRing =
-  'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-vermilion';
+import { focusRing, STATUS_LABEL } from './tokens';
 
 /** Hand-drawn speaker mark: thin strokes, square caps, inherits currentColor. */
 export const AudioIcon: React.FC<{ className?: string }> = ({ className = 'w-5 h-5' }) => (
@@ -19,12 +17,6 @@ export const BookmarkIcon: React.FC<{ active: boolean; className?: string }> = (
     <path d="M6 3h12v18l-6-4.5L6 21z" />
   </svg>
 );
-
-export const STATUS_LABEL: Record<MasteryStatus, string> = {
-  new: 'Baru',
-  learning: 'Belajar',
-  mastered: 'Hafal'
-};
 
 /** Small swatch: empty = new, hatched = learning, solid = mastered. */
 export const StatusSwatch: React.FC<{ status: MasteryStatus }> = ({ status }) => (
